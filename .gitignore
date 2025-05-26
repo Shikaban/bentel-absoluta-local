@@ -1,0 +1,23 @@
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+
+# IntelliJ
+.idea/
+out/
+
+# VS Code
+.vscode/
+
+# Build tools
+target/
+build/
+
+# Gradle
+*.gradle
+
+# Proguard
+proguard.pro

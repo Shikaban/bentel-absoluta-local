@@ -1,0 +1,9 @@
+package protocol.dsc.transport;
+
+public enum SimpleMessage {
+   COMMAND_RECEIVED,
+   CLOSING_CHANNEL_EVENT,
+   HANDSHAKE_BEGIN_EVENT,
+   HANDSHAKE_END_EVENT,
+   HANDSHAKE_STAGE_COMPLETED_EVENT;
+}
