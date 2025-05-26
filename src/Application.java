@@ -9,10 +9,13 @@ import cms.device.spi.PanelProvider;
 import plugin.absoluta.AbsolutaPlugin;
 
 public class Application {
-   private static final String MQTT_SERVER = "tcp://MQTT-IP:MQTT-PORT";
-   private static final String PIN = "YOUR_PIN";
-   private static final String PORT = "3064";
-   private static final String ADDRESS = "YOUR_IP";
+   private static final String MQTT_ADDRESS = System.getenv("MQTT_ADDRESS");
+   private static final String MQTT_PORT = System.getenv("MQTT_PORT");
+   private static final String Username = System.getenv("MQTT_USERNAME");
+   private static final String Password = System.getenv("MQTT_PASSWORD");
+   private static final String ADDRESS = System.getenv("ALARM_ADDRESS");
+   private static final String PIN = System.getenv("ALARM_PIN");
+   private static final String PORT = System.getenv("ALARM_PORT");
 
    public Application() {
    }
@@ -21,11 +24,26 @@ public class Application {
       MemoryPersistence memPers = new MemoryPersistence();
 
       try {
-         MqttClient mqttClient = new MqttClient(MQTT_SERVER, "absolutamqtt", memPers);
+         // Stampa i valori delle variabili d'ambiente per debug
+         System.out.println("MQTT_ADDRESS=" + MQTT_ADDRESS);
+         System.out.println("MQTT_PORT=" + MQTT_PORT);
+         System.out.println("MQTT_USERNAME=" + Username);
+         System.out.println("MQTT_PASSWORD=" + (Password != null ? "***" : null));
+         System.out.println("ALARM_ADDRESS=" + ADDRESS);
+         System.out.println("ALARM_PIN=" + PIN);
+         System.out.println("ALARM_PORT=" + PORT);
+         // Controllo variabili obbligatorie
+         if (MQTT_ADDRESS == null || MQTT_PORT == null || Username == null || Password == null) {
+            throw new IllegalArgumentException("MQTT_ADDRESS, MQTT_PORT, MQTT_USERNAME e MQTT_PASSWORD devono essere valorizzati!");
+         }
+         String mqttServer = "tcp://" + MQTT_ADDRESS + ":" + MQTT_PORT;
+         MqttClient mqttClient = new MqttClient(mqttServer, "absolutamqtt", memPers);
          MqttConnectOptions mqttOption = new MqttConnectOptions();
          mqttOption.setCleanSession(true);
-         System.out.println("Collegamento al broker: " + MQTT_SERVER);
-         HashMap map = new HashMap();
+         mqttOption.setUserName(Username);
+         mqttOption.setPassword(Password.toCharArray());
+         System.out.println("Collegamento al broker: " + mqttServer);
+         HashMap<String, String> map = new HashMap<>();
          map.put("pin", PIN);
          map.put("port", PORT);
          map.put("address", ADDRESS);

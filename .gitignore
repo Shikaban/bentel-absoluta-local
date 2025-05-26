@@ -21,3 +21,6 @@ bin/
 
 # Proguard
 proguard.pro
+
+# Docker Images
+*.tar
