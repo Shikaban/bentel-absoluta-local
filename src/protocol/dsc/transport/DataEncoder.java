@@ -19,7 +19,7 @@ public class DataEncoder extends MessageToByteEncoder<ByteBuf> {
          if (var4 <= 127) {
             var3.writeByte(var4);
          } else {
-            var3.writeShort(var4 | '耀');
+            var3.writeShort(var4 | 0x8000);
          }
 
          var3.writeBytes(var2);

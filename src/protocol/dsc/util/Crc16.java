@@ -25,7 +25,7 @@ public class Crc16 {
       int var2 = var1 << 8;
 
       for(int var3 = 0; var3 < 8; ++var3) {
-         if ((var2 & '耀') != 0) {
+         if ((var2 & 0x8000) != 0) {
             var2 = (var2 <<= 1) ^ this.poly;
          } else {
             var2 <<= 1;
