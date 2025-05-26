@@ -15,6 +15,7 @@ out/
 # Build tools
 target/
 build/
+bin/
 
 # Gradle
 *.gradle
