@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.ArrayUtils;
@@ -32,11 +33,15 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private boolean isConnected = false;
    private static final int RECON_DELAY = 90;
    private static final boolean VERBOSE_DEBUG = false;
+   private HashSet<Integer> sensorDiscoverySent = new HashSet<>();
+   private HashSet<Integer> partitionDiscoverySent = new HashSet<>();
+   private Boolean discoveryEnabled;
 
-   public Callback(MqttClient mqttClient, Panel panel, MqttConnectOptions mqttOption) {
+   public Callback(MqttClient mqttClient, Panel panel, MqttConnectOptions mqttOption, Boolean discoveryEnabled) {
       this.mqttClient = mqttClient;
       this.panel = panel;
       this.connOpts = mqttOption;
+      this.discoveryEnabled = discoveryEnabled;
    }
 
    public void connectionLost(Throwable var1) {
@@ -73,6 +78,39 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       this.partitionNames[0] = "Globale";
       this.partitionTopics[0] = "ABS/global";
 
+      // Invia discovery per la partizione globale (id 0)
+      if (discoveryEnabled && !partitionDiscoverySent.contains(0)) {
+         String topic = "homeassistant/alarm_control_panel/absoluta_partition_global/config";
+         String payload = "{" +
+             "\"name\": \"Globale\"," +
+             "\"state_topic\": \"ABS/global\"," +
+             "\"unique_id\": \"absoluta_partition_global\"," +
+             "\"command_topic\": \"ABS/global/set\"," +
+             "\"code_arm_required\": false," +
+             "\"code_disarm_required\": false," +
+             "\"supported_features\": [\"arm_away\", \"arm_home\", \"arm_night\", \"arm_vacation\", \"arm_custom_bypass\"]," +
+             "\"payload_arm_away\": \"ARM_AWAY\"," +
+             "\"payload_arm_home\": \"MODE_A\"," +
+             "\"payload_arm_night\": \"MODE_B\"," +
+             "\"payload_arm_vacation\": \"MODE_C\"," +
+             "\"payload_arm_custom_bypass\": \"MODE_D\"," +
+             "\"device\": {" +
+                 "\"identifiers\": [\"absoluta_panel\"]," +
+                 "\"name\": \"Centrale Absoluta\"," +
+                 "\"manufacturer\": \"Bentel\"," +
+                 "\"model\": \"Absoluta\"" +
+             "}" +
+         "}";
+         try {
+            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
+            discoveryMsg.setQos(1);
+            this.mqttClient.publish(topic, discoveryMsg);
+            partitionDiscoverySent.add(0);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio discovery partizione globale: " + topic);
+         }
+      }
+
       if (!this.isConnected){
          this.isConnected = true;
          try {
@@ -96,15 +134,20 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
 
    public void setArming(Panel.Arming actArming) {
       if (actArming == Arming.GLOBALLY_DISARMED) {
-         this.partitionStatuses[0] = "Disarmato";
+         this.partitionStatuses[0] = "disarmed";
       } else if (actArming == Arming.GLOBALLY_ARMED) {
-         this.partitionStatuses[0] = "Armato";
+         this.partitionStatuses[0] = "armed_away";
       } else if (actArming == Arming.PARTIALLY_ARMED) {
-         this.partitionStatuses[0] = "Parziale";
+         this.partitionStatuses[0] = "armed_custom_bypass";
       }
 
       try {
-         String str = "Name: " + this.partitionNames[0] + " Status: " + this.partitionStatuses[0];
+         String str = "";
+         if(discoveryEnabled){
+            str = this.partitionStatuses[0];
+         } else {
+            str = "Name: " + this.partitionNames[0] + " Status: " + this.partitionStatuses[0];
+         }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
          this.mqttClient.publish(this.partitionTopics[0], msg);
@@ -120,8 +163,37 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       int sensorIDInt = Integer.parseInt(sensorID);
       this.sensorNames[sensorIDInt] = sensorName;
       this.sensorTopics[sensorIDInt] = "ABS/sensor/" + sensorIDInt;
+      // Invia discovery solo la prima volta per ogni sensore
+      if (discoveryEnabled && !sensorDiscoverySent.contains(sensorIDInt)) {
+         String topic = "homeassistant/binary_sensor/absoluta_sensor_" + sensorID + "/config";
+         String payload = "{" +
+             "\"name\": \"" + sensorName + "\"," +
+             "\"state_topic\": \"ABS/sensor/" + sensorID + "\"," +
+             "\"unique_id\": \"absoluta_sensor_" + sensorID + "\"," +
+             "\"device_class\": \"motion\"," +
+             "\"device\": {" +
+                 "\"identifiers\": [\"absoluta_panel\"]," +
+                 "\"name\": \"Centrale Absoluta\"," +
+                 "\"manufacturer\": \"Bentel\"," +
+                 "\"model\": \"Absoluta\"" +
+             "}" +
+         "}";
+         try {
+            MqttMessage msg = new MqttMessage(payload.getBytes());
+            msg.setQos(1);
+            this.mqttClient.publish(topic, msg);
+            sensorDiscoverySent.add(sensorIDInt);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio discovery sensore: " + topic);
+         }
+      }
       try {
-         String str = "Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt];
+         String str = "";
+         if(discoveryEnabled){
+            str = this.sensorStatuses[sensorIDInt].toUpperCase();
+         } else {
+            str = "Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt];
+         }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
          this.mqttClient.publish(this.sensorTopics[sensorIDInt], msg);
@@ -143,7 +215,12 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
 
       if (this.sensorNames[sensorIDInt] != null) {
          try {
-            String str = "Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt];
+            String str = "";
+            if(discoveryEnabled){
+               str = this.sensorStatuses[sensorIDInt].toUpperCase();
+            } else {
+               str = "Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt];
+            }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
             this.mqttClient.publish(this.sensorTopics[sensorIDInt], msg);
@@ -168,18 +245,23 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    public void setPartitionArming(String partitionID, Partition.Arming partitionStatus) {
       int partitionIDInt = Integer.parseInt(partitionID);
       if (partitionStatus == cms.device.api.Partition.Arming.DISARMED) {
-         this.partitionStatuses[partitionIDInt] = "Disarmata";
+         this.partitionStatuses[partitionIDInt] = "disarmed";
       } else if (partitionStatus == cms.device.api.Partition.Arming.AWAY) {
-         this.partitionStatuses[partitionIDInt] = "Armata";
+         this.partitionStatuses[partitionIDInt] = "armed_away";
       } else if (partitionStatus == cms.device.api.Partition.Arming.STAY) {
-         this.partitionStatuses[partitionIDInt] = "Armata home";
+         this.partitionStatuses[partitionIDInt] = "armed_home";
       } else if (partitionStatus == cms.device.api.Partition.Arming.NODELAY) {
-         this.partitionStatuses[partitionIDInt] = "Armata notte";
+         this.partitionStatuses[partitionIDInt] = "armed_night";
       }
 
       if (this.partitionNames[partitionIDInt] != null) {
          try {
-            String str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+            String str = "";
+            if(discoveryEnabled){
+               str = this.partitionStatuses[partitionIDInt];
+            } else {
+               str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+            }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
             this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
@@ -197,6 +279,38 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       this.partitionNames[partitionIDInt] = partitionName;
       this.partitionTopics[partitionIDInt] = "ABS/partition/" + (partitionIDInt);
 
+      // Invia discovery solo la prima volta per ogni partizione
+      if (discoveryEnabled && !partitionDiscoverySent.contains(partitionIDInt)) {
+         String topic = "homeassistant/alarm_control_panel/absoluta_partition_" + partitionID + "/config";
+         String payload = "{" +
+             "\"name\": \"" + partitionName + "\"," +
+             "\"state_topic\": \"ABS/partition/" + partitionID + "\"," +
+             "\"unique_id\": \"absoluta_partition_" + partitionID + "\"," +
+             "\"command_topic\": \"ABS/partition/" + partitionID + "/set\"," +
+             "\"code_arm_required\": false," +
+             "\"code_disarm_required\": false," +
+             "\"supported_features\": [\"arm_home\", \"arm_away\", \"arm_night\"]," +
+             "\"payload_arm_away\": \"ARM_AWAY\"," +
+             "\"payload_arm_home\": \"ARM_HOME\"," +
+             "\"payload_arm_night\": \"ARM_NIGHT\"," +
+             "\"payload_disarm\": \"DISARM\"," +
+             "\"device\": {" +
+                 "\"identifiers\": [\"absoluta_panel\"]," +
+                 "\"name\": \"Centrale Absoluta\"," +
+                 "\"manufacturer\": \"Bentel\"," +
+                 "\"model\": \"Absoluta\"" +
+             "}" +
+         "}";
+         try {
+            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
+            discoveryMsg.setQos(1);
+            this.mqttClient.publish(topic, discoveryMsg);
+            partitionDiscoverySent.add(partitionIDInt);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio discovery partizione: " + topic);
+         }
+      }
+
       try{
          this.mqttClient.subscribe(this.partitionTopics[partitionIDInt] + "/set");
       } catch (Exception ex) {
@@ -204,7 +318,12 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
 
       try {
-         String str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+         String str = "";
+         if(discoveryEnabled){
+            str = this.partitionStatuses[partitionIDInt];
+         } else {
+            str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+         }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
          this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
@@ -237,7 +356,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          if(VERBOSE_DEBUG) {
             System.out.println("DEBUG: Comando ricevuto per partizione numero: " + idArray + " nuovo stato: " + msg.toString());
          }
-         switch (msg.toString()) {
+         switch (msg.toString().toUpperCase()) {
             case "DISARM":
                this.panel.partitionArming(this.partitionIDs[idArray], cms.device.api.Partition.Arming.DISARMED);
                return;
@@ -257,7 +376,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          if(VERBOSE_DEBUG) {
             System.out.println("DEBUG: Comando ricevuto per stato globale: " + msg.toString());
          }
-         switch (msg.toString()) {
+         switch (msg.toString().toUpperCase()) {
             case "DISARM":
                this.panel.arming(Arming.GLOBALLY_DISARMED);
                return;
