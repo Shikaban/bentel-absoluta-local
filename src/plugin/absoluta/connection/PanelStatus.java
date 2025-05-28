@@ -88,10 +88,10 @@ public class PanelStatus {
       return this.globalArming;
    }
 
-   void setSystemLabel(String var1) {
-      String var2 = this.systemLabel;
-      this.systemLabel = var1;
-      this.changeSupport.firePropertyChange("SYSTEM_LABEL", var2, var1);
+   void setSystemLabel(String newSystemLabel) {
+      String oldSystemLabel = this.systemLabel;
+      this.systemLabel = newSystemLabel;
+      this.changeSupport.firePropertyChange("SYSTEM_LABEL", oldSystemLabel, newSystemLabel);
    }
 
    public String getSystemLabel() {
@@ -128,114 +128,114 @@ public class PanelStatus {
       return this.outputs;
    }
 
-   void setPartitionArming(int var1, cms.device.api.Partition.Arming var2) {
-      if (this.partitions.contains(var1)) {
-         cms.device.api.Partition.Arming var3 = (cms.device.api.Partition.Arming)this.partitionArmings.get(var1);
-         this.partitionArmings.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("PARTITION_ARMING", var1, var3, var2);
+   void setPartitionArming(int partitionID, cms.device.api.Partition.Arming newMode) {
+      if (this.partitions.contains(partitionID)) {
+         cms.device.api.Partition.Arming oldMode = (cms.device.api.Partition.Arming)this.partitionArmings.get(partitionID);
+         this.partitionArmings.put(partitionID, newMode);
+         this.changeSupport.fireIndexedPropertyChange("PARTITION_ARMING", partitionID, oldMode, newMode);
       }
 
    }
 
-   public cms.device.api.Partition.Arming getPartitionArming(int var1) {
-      return (cms.device.api.Partition.Arming)this.partitionArmings.get(var1);
+   public cms.device.api.Partition.Arming getPartitionArming(int mode) {
+      return (cms.device.api.Partition.Arming)this.partitionArmings.get(mode);
    }
 
-   void setPartitionStatus(int var1, Status var2) {
-      if (this.partitions.contains(var1)) {
-         Status var3 = (Status)this.partitionStatuses.get(var1);
-         this.partitionStatuses.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("PARTITION_STATUS", var1, var3, var2);
+   void setPartitionStatus(int partitionID, Status newStatus) {
+      if (this.partitions.contains(partitionID)) {
+         Status oldStatus = (Status)this.partitionStatuses.get(partitionID);
+         this.partitionStatuses.put(partitionID, newStatus);
+         this.changeSupport.fireIndexedPropertyChange("PARTITION_STATUS", partitionID, oldStatus, newStatus);
       }
 
    }
 
-   public Status getPartitionStatus(int var1) {
-      return (Status)this.partitionStatuses.get(var1);
+   public Status getPartitionStatus(int partitionID) {
+      return (Status)this.partitionStatuses.get(partitionID);
    }
 
-   void setPartitionLabel(int var1, String var2) {
-      if (this.partitions.contains(var1)) {
-         String var3 = (String)this.partitionLabels.get(var1);
-         this.partitionLabels.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("PARTITION_LABEL", var1, var3, var2);
+   void setPartitionLabel(int partitionID, String newLabel) {
+      if (this.partitions.contains(partitionID)) {
+         String oldLabel = (String)this.partitionLabels.get(partitionID);
+         this.partitionLabels.put(partitionID, newLabel);
+         this.changeSupport.fireIndexedPropertyChange("PARTITION_LABEL", partitionID, oldLabel, newLabel);
       }
 
    }
 
-   public String getPartitionLabel(int var1) {
-      return (String)this.partitionLabels.get(var1);
+   public String getPartitionLabel(int partitionID) {
+      return (String)this.partitionLabels.get(partitionID);
    }
 
-   void setZoneStatus(int var1, cms.device.api.Input.Status var2) {
-      if (this.zones.contains(var1)) {
-         cms.device.api.Input.Status var3 = (cms.device.api.Input.Status)this.zoneStatuses.get(var1);
-         this.zoneStatuses.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("ZONE_STATUS", var1, var3, var2);
+   void setZoneStatus(int zoneID, cms.device.api.Input.Status newStatus) {
+      if (this.zones.contains(zoneID)) {
+         cms.device.api.Input.Status oldStatus = (cms.device.api.Input.Status)this.zoneStatuses.get(zoneID);
+         this.zoneStatuses.put(zoneID, newStatus);
+         this.changeSupport.fireIndexedPropertyChange("ZONE_STATUS", zoneID, oldStatus, newStatus);
       }
 
    }
 
-   public cms.device.api.Input.Status getZoneStatus(int var1) {
-      return (cms.device.api.Input.Status)this.zoneStatuses.get(var1);
+   public cms.device.api.Input.Status getZoneStatus(int zoneID) {
+      return (cms.device.api.Input.Status)this.zoneStatuses.get(zoneID);
    }
 
-   void setZoneBypass(int var1, Boolean var2) {
-      if (this.zones.contains(var1)) {
-         Boolean var3 = (Boolean)this.zoneBypass.get(var1);
-         this.zoneBypass.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("ZONE_BYPASS", var1, var3, var2);
+   void setZoneBypass(int zoneID, Boolean newSet) {
+      if (this.zones.contains(zoneID)) {
+         Boolean oldSet = (Boolean)this.zoneBypass.get(zoneID);
+         this.zoneBypass.put(zoneID, newSet);
+         this.changeSupport.fireIndexedPropertyChange("ZONE_BYPASS", zoneID, oldSet, newSet);
       }
 
    }
 
-   public Boolean getZoneBypass(int var1) {
-      return (Boolean)this.zoneBypass.get(var1);
+   public Boolean getZoneBypass(int zoneID) {
+      return (Boolean)this.zoneBypass.get(zoneID);
    }
 
-   void setZoneLabel(int var1, String var2) {
-      if (this.zones.contains(var1)) {
-         String var3 = (String)this.zoneLabels.get(var1);
-         this.zoneLabels.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("ZONE_LABEL", var1, var3, var2);
+   void setZoneLabel(int zoneID, String newLabel) {
+      if (this.zones.contains(zoneID)) {
+         String oldLabel = (String)this.zoneLabels.get(zoneID);
+         this.zoneLabels.put(zoneID, newLabel);
+         this.changeSupport.fireIndexedPropertyChange("ZONE_LABEL", zoneID, oldLabel, newLabel);
       }
 
    }
 
-   public String getZoneLabel(int var1) {
-      return (String)this.zoneLabels.get(var1);
+   public String getZoneLabel(int zoneID) {
+      return (String)this.zoneLabels.get(zoneID);
    }
 
-   void setOutputStatus(int var1, cms.device.api.Output.Status var2) {
-      if (this.outputs.contains(var1)) {
-         cms.device.api.Output.Status var3 = (cms.device.api.Output.Status)this.outputStatuses.get(var1);
-         this.outputStatuses.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("OUTPUT_STATUS", var1, var3, var2);
+   void setOutputStatus(int outputID, cms.device.api.Output.Status newStatus) {
+      if (this.outputs.contains(outputID)) {
+         cms.device.api.Output.Status oldStatus = (cms.device.api.Output.Status)this.outputStatuses.get(outputID);
+         this.outputStatuses.put(outputID, newStatus);
+         this.changeSupport.fireIndexedPropertyChange("OUTPUT_STATUS", outputID, oldStatus, newStatus);
       }
 
    }
 
-   public cms.device.api.Output.Status getOutputStatus(int var1) {
-      return (cms.device.api.Output.Status)this.outputStatuses.get(var1);
+   public cms.device.api.Output.Status getOutputStatus(int outputID) {
+      return (cms.device.api.Output.Status)this.outputStatuses.get(outputID);
    }
 
-   void setOutputLabel(int var1, String var2) {
-      if (this.outputs.contains(var1)) {
-         String var3 = (String)this.outputLabels.get(var1);
-         this.outputLabels.put(var1, var2);
-         this.changeSupport.fireIndexedPropertyChange("OUTPUT_LABEL", var1, var3, var2);
+   void setOutputLabel(int outputID, String newLabel) {
+      if (this.outputs.contains(outputID)) {
+         String oldLabel = (String)this.outputLabels.get(outputID);
+         this.outputLabels.put(outputID, newLabel);
+         this.changeSupport.fireIndexedPropertyChange("OUTPUT_LABEL", outputID, oldLabel, newLabel);
       }
 
    }
 
-   public String getOutputLabel(int var1) {
-      return (String)this.outputLabels.get(var1);
+   public String getOutputLabel(int outputID) {
+      return (String)this.outputLabels.get(outputID);
    }
 
-   void setArmingModeLabel(int var1, String var2) {
-      String var3 = (String)this.armingModeLabels.get(var1);
-      this.armingModeLabels.put(var1, var2);
-      this.changeSupport.fireIndexedPropertyChange("ARMING_MODE_LABEL", var1, var3, var2);
+   void setArmingModeLabel(int var1, String newLabel) {
+      String oldLabel = (String)this.armingModeLabels.get(var1);
+      this.armingModeLabels.put(var1, newLabel);
+      this.changeSupport.fireIndexedPropertyChange("ARMING_MODE_LABEL", var1, oldLabel, newLabel);
    }
 
    public String getArmingModeLabel(int var1) {
