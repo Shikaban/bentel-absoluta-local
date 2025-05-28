@@ -176,30 +176,35 @@ class StatusListener implements MessageListener {
       this.panelStatus.setPartitionStatus(selectedPartitionID, newPartitionStatus);
    }
 
-   private void updateZoneStatus(int var1, List<Boolean> var2) {
-      cms.device.api.Input.Status var3;
+   private void updateZoneStatus(int zoneID, List<Boolean> var2) {
+      cms.device.api.Input.Status newStatus;
       if ((Boolean)var2.get(ZI_BYPASSED)) {
-         var3 = cms.device.api.Input.Status.BYPASSED;
+         // Rilevo lo stesso lo stato della zona
+         if ((Boolean)var2.get(ZI_OPEN)) {
+               newStatus = cms.device.api.Input.Status.ACTIVE;
+         } else {
+            newStatus = cms.device.api.Input.Status.OK;
+         }
       } else if (!(Boolean)var2.get(ZI_TAMPER) && !(Boolean)var2.get(ZI_DELINQUENCY)) {
          if (!(Boolean)var2.get(ZI_FAULT) && !(Boolean)var2.get(ZI_LOW_BATTERY)) {
             if (!(Boolean)var2.get(ZI_ALARM) && !(Boolean)var2.get(ZI_ALARM_IN_MEMORY)) {
                if ((Boolean)var2.get(ZI_OPEN)) {
-                  var3 = cms.device.api.Input.Status.ACTIVE;
+                  newStatus = cms.device.api.Input.Status.ACTIVE;
                } else {
-                  var3 = cms.device.api.Input.Status.OK;
+                  newStatus = cms.device.api.Input.Status.OK;
                }
             } else {
-               var3 = cms.device.api.Input.Status.ALARM;
+               newStatus = cms.device.api.Input.Status.ALARM;
             }
          } else {
-            var3 = cms.device.api.Input.Status.FAULT;
+            newStatus = cms.device.api.Input.Status.FAULT;
          }
       } else {
-         var3 = cms.device.api.Input.Status.TAMPER;
+         newStatus = cms.device.api.Input.Status.TAMPER;
       }
 
-      this.panelStatus.setZoneBypass(var1, var3 == cms.device.api.Input.Status.BYPASSED);
-      this.panelStatus.setZoneStatus(var1, var3);
+      this.panelStatus.setZoneBypass(zoneID, (Boolean)var2.get(ZI_BYPASSED));
+      this.panelStatus.setZoneStatus(zoneID, newStatus);
    }
 
 }
