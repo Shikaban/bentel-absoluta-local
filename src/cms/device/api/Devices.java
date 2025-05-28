@@ -164,7 +164,6 @@ public class Devices {
    }
 
    public static String newId() {
-      //return RandomStringUtils.randomAlphanumeric(ID_CHARS);
       return new java.util.Random().ints(ID_CHARS, 0, 62)
          .mapToObj(i -> "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".charAt(i))
          .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
