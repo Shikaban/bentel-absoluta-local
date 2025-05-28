@@ -129,8 +129,7 @@ public class Devices {
    }
 
    private static Panel newPanel(PanelPlugin var0, Map<String, String> var1, String var2) {
-      String var3 = var2 != null && !var2.isEmpty() ? var2 : newId();
-      return new Panel(var0.newPanel(var1), var3);
+      return new Panel(var0.newPanel(var1));
    }
 
    private static Collection<? extends Plugin> getPlugins() {

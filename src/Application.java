@@ -69,9 +69,8 @@ public class Application {
             map.put("pin", PIN);
             map.put("port", PORT);
             map.put("address", ADDRESS);
-            map.put("type", "absoluta");
             PanelProvider provider = (new AbsolutaPlugin()).newPanel(map);
-            Panel panel = new Panel(provider, "absoluta");
+            Panel panel = new Panel(provider);
             Callback callback = new Callback(mqttClient, panel, mqttOption, discoveryEnabled);
             mqttClient.setCallback(callback);
             mqttClient.connect(mqttOption);

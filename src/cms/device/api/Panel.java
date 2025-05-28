@@ -36,14 +36,12 @@ public final class Panel implements Provider, DeviceOrPanel {
    private final Map<String, Input> inputs;
    final OutputSupport outputSupport;
 
-   public Panel(PanelProvider provider, String type) {
+   public Panel(PanelProvider provider) {
       this.lookup = new AbstractLookup(this.content);
       this.arming = Panel.Arming.GLOBALLY_DISARMED;
       this.status = Panel.Status.OK;
 
-      assert type != null && !type.isEmpty();
-
-      this.id = type;
+      this.id = "absoluta";
       this.connected = false;
       this.alarmed = false;
       this.changeSupport = new ChangeSupport(this);
