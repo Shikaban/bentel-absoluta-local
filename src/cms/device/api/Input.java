@@ -6,13 +6,9 @@ import java.util.Objects;
 
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
-import org.openide.util.NbBundle;
-
-import cms.device.spi.Plugin;
 
 public class Input implements NotifierEventSource, ChangeEventSource {
    private String id;
-   private String localName;
    private String remoteName;
    private Input.Status status;
    private final ChangeSupport changeSupport;
@@ -53,10 +49,6 @@ public class Input implements NotifierEventSource, ChangeEventSource {
       this.id = var1;
    }
 
-   public String getLocalName() {
-      return this.localName;
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -66,15 +58,6 @@ public class Input implements NotifierEventSource, ChangeEventSource {
       if (!Objects.equals(this.remoteName, var2)) {
          this.remoteName = var2;
          this.changeSupport.fireChange();
-      }
-
-   }
-
-   public String getName() {
-      if (this.getLocalName() != null) {
-         return this.getLocalName();
-      } else {
-         return this.getRemoteName() != null ? this.getRemoteName() : NbBundle.getMessage(Plugin.class, "LBL_DefaultInputName", this.id);
       }
    }
 
@@ -100,10 +83,6 @@ public class Input implements NotifierEventSource, ChangeEventSource {
 
    public void fireChange() {
       this.changeSupport.fireChange();
-   }
-
-   public String toString() {
-      return this.getName();
    }
 
    public static enum Status {

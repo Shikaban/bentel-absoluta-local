@@ -13,7 +13,6 @@ import cms.device.spi.Plugin;
 
 public class Partition implements NotifierEventSource, ChangeEventSource {
    private String id;
-   private String localName;
    private String remoteName;
    private Partition.Arming arming;
    private Partition.Status status;
@@ -64,15 +63,6 @@ public class Partition implements NotifierEventSource, ChangeEventSource {
       this.id = var1;
    }
 
-   public String getLocalName() {
-      return this.localName;
-   }
-
-   public void setLocalName(String var1) {
-      this.localName = Device.sanitize(var1);
-      this.fireChange();
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -80,14 +70,6 @@ public class Partition implements NotifierEventSource, ChangeEventSource {
    void setRemoteName(String var1) {
       this.remoteName = Device.sanitize(var1);
       this.fireChange();
-   }
-
-   public String getName() {
-      if (this.getLocalName() != null) {
-         return this.getLocalName();
-      } else {
-         return this.getRemoteName() != null ? this.getRemoteName() : NbBundle.getMessage(Plugin.class, "LBL_DefaultPartitionName", this.id);
-      }
    }
 
    public Partition.Arming getArming() {
@@ -144,10 +126,6 @@ public class Partition implements NotifierEventSource, ChangeEventSource {
 
    public List<String> getInputs() {
       return Collections.unmodifiableList(this.inputsIds);
-   }
-
-   public String toString() {
-      return this.getName();
    }
 
    public boolean iconIsAlarmed() {
