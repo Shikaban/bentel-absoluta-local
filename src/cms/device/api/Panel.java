@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 import org.openide.util.Lookup;
@@ -21,9 +20,6 @@ import org.openide.util.lookup.InstanceContent;
 public final class Panel implements Provider, DeviceOrPanel {
    private final InstanceContent content = new InstanceContent();
    private final Lookup lookup;
-   private final String id;
-   private String localName;
-   private String remoteName;
    private boolean connected;
    private boolean discovered;
    private Panel.Arming arming;
@@ -41,7 +37,6 @@ public final class Panel implements Provider, DeviceOrPanel {
       this.arming = Panel.Arming.GLOBALLY_DISARMED;
       this.status = Panel.Status.OK;
 
-      this.id = "absoluta";
       this.connected = false;
       this.alarmed = false;
       this.changeSupport = new ChangeSupport(this);
@@ -150,40 +145,6 @@ public final class Panel implements Provider, DeviceOrPanel {
 
    public void dispose() {
       this.disconnect();
-   }
-
-   public String getId() {
-      return this.id;
-   }
-
-   public String getLocalName() {
-      return this.localName;
-   }
-
-   public void setLocalName(String newName) {
-      String newNameCleaned = Device.sanitize(newName);
-      if (!Objects.equals(this.localName, newNameCleaned)) {
-         this.localName = newNameCleaned;
-         this.changeSupport.fireChange();
-      }
-
-   }
-
-   public String getRemoteName() {
-      return this.remoteName;
-   }
-
-   void setRemoteName(String newName) {
-      String newNameCleaned = Device.sanitize(newName);
-      if (!Objects.equals(this.remoteName, newNameCleaned)) {
-         this.remoteName = newNameCleaned;
-         this.changeSupport.fireChange();
-      }
-
-   }
-
-   public String getName() {
-      return this.getLocalName() != null ? this.getLocalName() : (this.getRemoteName() != null ? this.getRemoteName() : this.impl.getDefaultName());
    }
 
    public Map<String, String> getSettings() {
@@ -302,11 +263,6 @@ public final class Panel implements Provider, DeviceOrPanel {
       return this.outputSupport.getOutputs();
    }
 
-
-   public String toString() {
-      return this.getName();
-   }
-
    public static enum Arming {
       GLOBALLY_ARMED,
       PARTIALLY_ARMED,
@@ -320,9 +276,6 @@ public final class Panel implements Provider, DeviceOrPanel {
    }
 
    private class Callback implements PanelProvider.PanelCallback {
-      public void setRemoteName(String var1) {
-         Panel.this.setRemoteName(var1);
-      }
 
       public void setArming(Panel.Arming var1) {
          Panel.this.setArming(var1);
