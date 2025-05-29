@@ -3,14 +3,11 @@ package cms.device.api;
 import java.util.Objects;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
-import org.openide.util.NbBundle;
 
-import cms.device.spi.Plugin;
 
 public final class Sensor implements NotifierEventSource, ChangeEventSource {
    private final ChangeSupport changeSupport;
    private final Device device;
-   private String localName;
    private String remoteName;
    private boolean enabled;
    private String id;
@@ -39,19 +36,6 @@ public final class Sensor implements NotifierEventSource, ChangeEventSource {
       this.id = var1;
    }
 
-   public String getLocalName() {
-      return this.localName;
-   }
-
-   public void setLocalName(String var1) {
-      String var2 = Device.sanitize(var1);
-      if (!Objects.equals(this.localName, var2)) {
-         this.localName = var2;
-         this.changeSupport.fireChange();
-      }
-
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -62,19 +46,6 @@ public final class Sensor implements NotifierEventSource, ChangeEventSource {
          this.remoteName = var2;
          this.changeSupport.fireChange();
       }
-
-   }
-
-   public String getName() {
-      if (this.getLocalName() != null) {
-         return this.getLocalName();
-      } else {
-         return this.getRemoteName() != null ? this.getRemoteName() : NbBundle.getMessage(Plugin.class, "LBL_DefaultSensorName", this.getNumber() + 1);
-      }
-   }
-
-   public String toString() {
-      return this.getName();
    }
 
    public boolean isEnabled() {

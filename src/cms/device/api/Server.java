@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
@@ -18,7 +17,6 @@ public final class Server implements Connectable {
    private final String id;
    private final Map<String, Device> children;
    private final ChangeSupport changeSupport;
-   private String localName;
    private String remoteName;
    private boolean connected;
    private boolean discovered;
@@ -150,19 +148,6 @@ public final class Server implements Connectable {
       return Collections.unmodifiableMap(this.children);
    }
 
-   public String getLocalName() {
-      return this.localName;
-   }
-
-   public void setLocalName(String var1) {
-      String var2 = Device.sanitize(var1);
-      if (!Objects.equals(this.localName, var2)) {
-         this.localName = var2;
-         this.changeSupport.fireChange();
-      }
-
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -171,20 +156,8 @@ public final class Server implements Connectable {
       this.remoteName = Device.sanitize(var1);
    }
 
-   public String getName() {
-      if (this.getLocalName() != null) {
-         return this.getLocalName();
-      } else {
-         return this.getRemoteName() != null ? this.getRemoteName() : this.impl.getDefaultName();
-      }
-   }
-
    public String getId() {
       return this.id;
-   }
-
-   public String toString() {
-      return this.getName();
    }
 
    public void addChangeListener(ChangeListener var1) {

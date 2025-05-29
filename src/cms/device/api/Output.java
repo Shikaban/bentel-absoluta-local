@@ -1,15 +1,12 @@
 package cms.device.api;
 
-import cms.device.spi.Plugin;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
-import org.openide.util.NbBundle;
 
 public class Output implements NotifierEventSource, ChangeEventSource {
    private final String id;
-   private String localName;
    private String remoteName;
    private boolean enabled = true;
    private Output.Type type;
@@ -45,19 +42,6 @@ public class Output implements NotifierEventSource, ChangeEventSource {
       return this.id;
    }
 
-   public String getLocalName() {
-      return this.localName;
-   }
-
-   public void setLocalName(String var1) {
-      String var2 = Device.sanitize(var1);
-      if (!Objects.equals(this.localName, var2)) {
-         this.localName = var2;
-         this.changeSupport.fireChange();
-      }
-
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -69,14 +53,6 @@ public class Output implements NotifierEventSource, ChangeEventSource {
          this.changeSupport.fireChange();
       }
 
-   }
-
-   public String getName() {
-      if (this.getLocalName() != null) {
-         return this.getLocalName();
-      } else {
-         return this.getRemoteName() != null ? this.getRemoteName() : NbBundle.getMessage(Plugin.class, "LBL_DefaultOutputName", this.id);
-      }
    }
 
    public boolean isEnabled() {
@@ -151,10 +127,6 @@ public class Output implements NotifierEventSource, ChangeEventSource {
 
    void fireChange() {
       this.changeSupport.fireChange();
-   }
-
-   public String toString() {
-      return this.getName();
    }
 
    public static enum Action {

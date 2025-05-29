@@ -132,18 +132,6 @@ public final class Device implements Provider, DeviceOrPanel {
       }
    }
 
-   public String getLocalName() {
-      return this.localName;
-   }
-
-   public void setLocalName(String var1) {
-      String var2 = sanitize(var1);
-      if (!Objects.equals(this.localName, var2)) {
-         this.localName = var2;
-         this.changeSupport.fireChange();
-      }
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -168,22 +156,8 @@ public final class Device implements Provider, DeviceOrPanel {
       this.serialNumber = sanitize(var1);
    }
 
-   public String getName() {
-      if (this.getLocalName() != null) {
-         return this.getLocalName();
-      } else if (this.getRemoteName() != null) {
-         return this.getRemoteName();
-      } else {
-         return this.getModelName() != null ? this.getModelName() : this.impl.getDefaultName();
-      }
-   }
-
    public String getId() {
       return this.id;
-   }
-
-   public String toString() {
-      return this.getName();
    }
 
    public void addChangeListener(ChangeListener var1) {
