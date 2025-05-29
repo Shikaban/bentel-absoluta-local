@@ -13,7 +13,7 @@ import org.openide.util.ChangeSupport;
 import cms.device.spi.DeviceProvider;
 import cms.device.spi.ServerProvider;
 
-public final class Server implements Connectable, Model {
+public final class Server implements Connectable {
    private final ServerProvider impl;
    private final String id;
    private final Map<String, Device> children;

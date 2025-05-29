@@ -1,6 +1,6 @@
 package cms.device.api;
 
-public interface DeviceOrPanel extends Connectable, Model {
+public interface DeviceOrPanel extends Connectable {
 
    void fireChange();
 }

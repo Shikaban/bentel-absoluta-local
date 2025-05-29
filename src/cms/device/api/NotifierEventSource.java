@@ -1,6 +1,6 @@
 package cms.device.api;
 
-public interface NotifierEventSource extends Model {
+public interface NotifierEventSource {
    DeviceOrPanel getParent();
 
    int getNumber();
