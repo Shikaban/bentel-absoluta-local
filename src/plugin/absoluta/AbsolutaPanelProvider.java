@@ -84,8 +84,8 @@ public class AbsolutaPanelProvider implements PanelProvider {
       this.connectionHandler.getCommander().armingSet(var1);
    }
 
-   public void setBypassed(String var1, boolean var2) {
-      this.connectionHandler.getCommander().setBypassed(var1, var2);
+   public void setBypassed(String zoneID, boolean setBypassed) {
+      this.connectionHandler.getCommander().setBypassed(zoneID, setBypassed);
    }
 
    public void doOutputAction(String var1, Action var2) {

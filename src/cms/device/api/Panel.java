@@ -274,8 +274,8 @@ public final class Panel implements Provider, DeviceOrPanel {
       return this.inputs;
    }
 
-   public void bypassInput(String var1, boolean var2) {
-      this.impl.setBypassed(var1, var2);
+   public void bypassInput(String zoneID, boolean setBypassed) {
+      this.impl.setBypassed(zoneID, setBypassed);
    }
 
    private void doOutputAction(String var1, Output.Action var2) {
