@@ -33,7 +33,6 @@ public interface PanelProvider {
    Map<String, String> getSettings();
 
    public interface PanelCallback extends ConnectionListener, AlertCallback {
-      void setRemoteName(String var1);
 
       void setArming(Panel.Arming var1);
 

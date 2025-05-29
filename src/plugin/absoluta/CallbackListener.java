@@ -71,7 +71,6 @@ class CallbackListener implements PropertyChangeListener {
                this.callback.setArming(this.panelStatus.getGlobalArming());
                break;
             case "SYSTEM_LABEL":
-               this.callback.setRemoteName(this.panelStatus.getSystemLabel());
                break;
             case "PARTITIONS":
                this.callback.changePartitions(toStringList(this.panelStatus.getPartitions()));
