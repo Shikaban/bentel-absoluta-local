@@ -16,8 +16,6 @@ public interface PanelProvider {
 
    void disconnect();
 
-   String getDefaultName();
-
    void arming(Panel.Arming var1);
 
    void partitionArming(String var1, Partition.Arming var2);

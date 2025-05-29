@@ -13,7 +13,6 @@ import plugin.absoluta.connection.PanelStatus;
 
 import java.util.Map;
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 
 public class AbsolutaPanelProvider implements PanelProvider {
    private final String address;
@@ -61,10 +60,6 @@ public class AbsolutaPanelProvider implements PanelProvider {
 
    public void disconnect() {
       this.connectionHandler.disconnect();
-   }
-
-   public String getDefaultName() {
-      return NbBundle.getMessage(AbsolutaPanelProvider.class, "DefaultName");
    }
 
    public void arming(Arming var1) {
