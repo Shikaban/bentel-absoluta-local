@@ -280,7 +280,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       this.partitionTopics[partitionIDInt] = "ABS/partition/" + (partitionIDInt);
 
       // Invia discovery solo la prima volta per ogni partizione
-      if (discoveryEnabled && !partitionDiscoverySent.contains(partitionIDInt)) {
+      if (discoveryEnabled && !partitionDiscoverySent.contains(partitionIDInt)  && partitionIDInt > 0) {
          String topic = "homeassistant/alarm_control_panel/absoluta_partition_" + partitionID + "/config";
          String payload = "{" +
              "\"name\": \"" + partitionName + "\"," +
@@ -352,15 +352,38 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
 
    // Smistamento dei comandi ricevuti via MQTT
    public void messageArrived(String topic, MqttMessage msg) {
-      int idArray = ArrayUtils.indexOf(this.partitionTopics, topic.replace("/set", ""));
-      // Se partizione
-      if (idArray > 0 && idArray <= this.partitionIDs.length) {
-         this.commandPartition(idArray, msg);
-      } else if (idArray == 0) { // Se globale
-         this.commandGlobal(idArray, msg);
+      String parentTopic = "";
+      if(topic.startsWith("ABS/") && topic.endsWith("/set")) {
+         parentTopic = topic.replace("/set", "");
+         if (ArrayUtils.contains(this.partitionTopics, parentTopic)) {
+            int idArray = ArrayUtils.indexOf(this.partitionTopics, parentTopic);
+            if (idArray > 0 && idArray <= this.partitionIDs.length) {
+               // Se partizione
+               this.commandPartition(idArray, msg);
+            } else if (idArray == 0) { 
+               // Se globale
+               this.commandGlobal(idArray, msg);
+            } else {
+               // Errore
+               System.out.println("WARN: ID " + idArray + " non valido");
+            }
+         } else if (ArrayUtils.contains(this.sensorTopics, parentTopic)) {
+            int idArray = ArrayUtils.indexOf(this.sensorTopics, parentTopic);
+            if (idArray >= 0 && idArray < this.sensorIDs.length) {
+               // Se sensore
+               //TODO: Gestione comandi per i sensori (bypass, unbypass)
+            } else {
+               // Errore
+               System.out.println("WARN: ID " + idArray + " non valido");
+            }
+         }
+      } else if (topic.equals("homeassistant/status")) {
+         //TODO: Gestione della discovery 
       } else {
-         System.out.println("WARN: ID " + idArray + " non valido");
+         // Comando non riconosciuto
+         System.out.println("WARN: Comando non riconosciuto per il topic: " + topic);
       }
+
    }
 
    private void commandPartition(int idArray, MqttMessage msg) {
