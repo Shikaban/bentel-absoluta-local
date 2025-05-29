@@ -350,10 +350,21 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    public void tagInputIntoPartition(String var1, List<String> var2) {
    }
 
+   // Smistamento dei comandi ricevuti via MQTT
    public void messageArrived(String topic, MqttMessage msg) {
       int idArray = ArrayUtils.indexOf(this.partitionTopics, topic.replace("/set", ""));
+      // Se partizione
       if (idArray > 0 && idArray <= this.partitionIDs.length) {
-         if(VERBOSE_DEBUG) {
+         this.commandPartition(idArray, msg);
+      } else if (idArray == 0) { // Se globale
+         this.commandGlobal(idArray, msg);
+      } else {
+         System.out.println("WARN: ID " + idArray + " non valido");
+      }
+   }
+
+   private void commandPartition(int idArray, MqttMessage msg) {
+      if(VERBOSE_DEBUG) {
             System.out.println("DEBUG: Comando ricevuto per partizione numero: " + idArray + " nuovo stato: " + msg.toString());
          }
          switch (msg.toString().toUpperCase()) {
@@ -372,8 +383,10 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             default:
                System.out.println("WARN: Comando " + msg.toString() + " non valido");
          }
-      } else if (idArray == 0) {
-         if(VERBOSE_DEBUG) {
+   }
+
+   private void commandGlobal(int idArray, MqttMessage msg) {
+      if(VERBOSE_DEBUG) {
             System.out.println("DEBUG: Comando ricevuto per stato globale: " + msg.toString());
          }
          switch (msg.toString().toUpperCase()) {
@@ -398,9 +411,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             default:
                System.out.println("WARN: Comando " + msg.toString() + " non valido");
          }
-      } else {
-         System.out.println("WARN: ID " + idArray + " non valido");
-      }
    }
 
    public void deliveryComplete(IMqttDeliveryToken var1) {
