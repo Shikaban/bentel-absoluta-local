@@ -32,7 +32,6 @@ public class AbsolutaPanelProvider implements PanelProvider {
 
    public Map<String, String> getSettings() {
       return ImmutableMap.<String, String>builder()
-         .put("type", "absoluta")
          .put("address", this.address)
          .put("port", Integer.toString(this.port))
          .put("pin", this.pin)
