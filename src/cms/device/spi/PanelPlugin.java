@@ -4,6 +4,4 @@ import java.util.Map;
 
 public interface PanelPlugin  {
    PanelProvider newPanel(Map<String, String> var1);
-
-   Map<String, String> getPluginValidation();
 }
