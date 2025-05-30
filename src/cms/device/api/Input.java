@@ -1,52 +1,18 @@
 package cms.device.api;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
-public class Input implements NotifierEventSource, ChangeEventSource {
-   private String id;
+public class Input implements ChangeEventSource {
    private String remoteName;
    private Input.Status status;
    private final ChangeSupport changeSupport;
-   private final Panel panelParent;
 
    public Input(Panel var1) {
       this.status = Input.Status.OK;
-      this.panelParent = var1;
       this.changeSupport = new ChangeSupport(this);
-   }
-
-   public Panel getParent() {
-      return this.panelParent;
-   }
-
-   public int getNumber() {
-      return -1;
-   }
-
-   public String getId() {
-      if (this.id == null) {
-         Iterator var1 = this.getParent().getInputs().entrySet().iterator();
-
-         while(var1.hasNext()) {
-            Entry<String, Input> var2 = (Entry)var1.next();
-            if (((Input)var2.getValue()).equals(this)) {
-               return (String)var2.getKey();
-            }
-         }
-      }
-
-      return this.id;
-   }
-
-   public void setId(String var1) {
-      assert var1 != null && !var1.isEmpty();
-
-      this.id = var1;
    }
 
    public String getRemoteName() {
@@ -70,7 +36,6 @@ public class Input implements NotifierEventSource, ChangeEventSource {
          this.status = var1;
          this.changeSupport.fireChange();
       }
-
    }
 
    public void addChangeListener(ChangeListener var1) {

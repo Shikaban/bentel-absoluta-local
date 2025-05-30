@@ -37,11 +37,6 @@ public final class Device implements Provider, DeviceOrPanel {
       System.out.println("TRACE: device created: " + super.toString());
    }
 
-   public void dispose() {
-      this.disconnect();
-      System.out.println("TRACE: device disposed: " + super.toString());
-   }
-
    public Map<String, String> getSettings() {
       return this.impl.getSettings();
    }
@@ -56,10 +51,10 @@ public final class Device implements Provider, DeviceOrPanel {
 
    public void disconnect() {
       if (this.isConnected()) {
-         System.out.println("INFO: disconnecting: " + this + "(" + this.getId() + ")");
+         System.out.println("INFO: disconnecting: " + this + "(" + this.id + ")");
          this.status = Device.Status.USER_DISCONNECTED;
          this.impl.disconnect();
-         System.out.println("INFO: " + this + "(" + this.getId() + ") disconnected.");
+         System.out.println("INFO: " + this + "(" + this.id + ") disconnected.");
          this.fireChange();
       }
 
@@ -67,16 +62,16 @@ public final class Device implements Provider, DeviceOrPanel {
 
    public Device.Status connect() {
       if (!this.isConnected()) {
-         System.out.println("INFO: connecting: " + this + "(" + this.getId() + ")");
+         System.out.println("INFO: connecting: " + this + "(" + this.id + ")");
          this.status = this.impl.connect(true);
 
          assert this.status != Device.Status.USER_DISCONNECTED;
 
          if (this.status == Device.Status.SUCCESS) {
             this.discovered = true;
-            System.out.println("INFO: " + this + "(" + this.getId() + ") connected.");
+            System.out.println("INFO: " + this + "(" + this.id + ") connected.");
          } else {
-            System.out.println("INFO: " + this + "(" + this.getId() + ") not connected: " + this.status);
+            System.out.println("INFO: " + this + "(" + this.id + ") not connected: " + this.status);
          }
 
          this.fireChange();
@@ -102,10 +97,6 @@ public final class Device implements Provider, DeviceOrPanel {
       this.remoteName = sanitize(var1);
    }
 
-   public String getId() {
-      return this.id;
-   }
-
    public void addChangeListener(ChangeListener var1) {
       this.changeSupport.addChangeListener(var1);
    }
@@ -120,14 +111,6 @@ public final class Device implements Provider, DeviceOrPanel {
 
    public Lookup getLookup() {
       return this.lookup;
-   }
-
-   public DeviceOrPanel getParent() {
-      return this;
-   }
-
-   public int getNumber() {
-      return -1;
    }
 
    public List<Output> getOutputs() {
@@ -160,7 +143,7 @@ public final class Device implements Provider, DeviceOrPanel {
       }
 
       public void connectionLost() {
-         System.out.println("INFO: connection lost on " + Device.this + "(" + Device.this.getId() + ")");
+         System.out.println("INFO: connection lost on " + Device.this + "(" + Device.this.id + ")");
          Device.this.disconnect();
       }
 

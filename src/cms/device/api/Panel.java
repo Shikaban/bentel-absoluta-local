@@ -52,14 +52,6 @@ public final class Panel implements Provider, DeviceOrPanel {
       return this.lookup;
    }
 
-   public DeviceOrPanel getParent() {
-      return this;
-   }
-
-   public int getNumber() {
-      return -1;
-   }
-
    public Device.Status connect() {
       if (this.connected) {
          return Device.Status.SUCCESS;
@@ -128,7 +120,6 @@ public final class Panel implements Provider, DeviceOrPanel {
          this.arming = newMode;
          this.changeSupport.fireChange();
       }
-
    }
 
    public Panel.Status getStatus() {
@@ -140,11 +131,6 @@ public final class Panel implements Provider, DeviceOrPanel {
          this.status = newStatus;
          this.changeSupport.fireChange();
       }
-
-   }
-
-   public void dispose() {
-      this.disconnect();
    }
 
    public Map<String, String> getSettings() {
@@ -174,7 +160,6 @@ public final class Panel implements Provider, DeviceOrPanel {
          Input var3 = (Input)var1.next();
          var3.fireChange();
       }
-
    }
 
    void doChangePartitions(Iterable<String> var1) {
@@ -189,7 +174,6 @@ public final class Panel implements Provider, DeviceOrPanel {
                var3.put(var5, (Partition)this.partitions.remove(var5));
             } else {
                var3.put(var5, new Partition(this));
-               ((Partition)var3.get(var5)).setId(var5);
             }
          }
 
@@ -220,7 +204,6 @@ public final class Panel implements Provider, DeviceOrPanel {
                var3.put(var5, (Input)this.inputs.remove(var5));
             } else {
                var3.put(var5, new Input(this));
-               ((Input)var3.get(var5)).setId(var5);
             }
          }
 
@@ -228,7 +211,6 @@ public final class Panel implements Provider, DeviceOrPanel {
          this.inputs.putAll(var3);
          this.fireChange();
       }
-
    }
 
    public Map<String, Input> getInputs() {

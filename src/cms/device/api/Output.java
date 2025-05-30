@@ -5,41 +5,19 @@ import java.util.function.Consumer;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
-public class Output implements NotifierEventSource, ChangeEventSource {
-   private final String id;
+public class Output implements ChangeEventSource {
    private String remoteName;
    private boolean enabled = true;
    private Output.Type type;
    private Output.Status status;
-   private final DeviceOrPanel deviceOrPanel;
    private final Consumer<Output.Action> controller;
    private final ChangeSupport changeSupport;
 
    Output(DeviceOrPanel var1, String var2, Consumer<Output.Action> var3) {
       this.type = Output.Type.BISTABLE;
       this.status = Output.Status.UNKNOWN;
-      this.deviceOrPanel = (DeviceOrPanel)Objects.requireNonNull(var1);
-      this.id = (String)Objects.requireNonNull(var2);
       this.controller = (Consumer)Objects.requireNonNull(var3);
       this.changeSupport = new ChangeSupport(this);
-   }
-
-   public DeviceOrPanel getParent() {
-      return this.deviceOrPanel;
-   }
-
-   public int getNumber() {
-      DeviceOrPanel var1 = this.getParent();
-      if (var1 instanceof Device) {
-         Device var2 = (Device)var1;
-         return var2.getOutputs().indexOf(this);
-      } else {
-         return -1;
-      }
-   }
-
-   public String getId() {
-      return this.id;
    }
 
    public String getRemoteName() {

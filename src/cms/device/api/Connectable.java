@@ -7,5 +7,4 @@ public interface Connectable extends ChangeEventSource {
 
    boolean isConnected();
 
-   void dispose();
 }

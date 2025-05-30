@@ -4,60 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
-public class Partition implements NotifierEventSource, ChangeEventSource {
-   private String id;
+public class Partition implements ChangeEventSource {
    private String remoteName;
    private Partition.Arming arming;
    private Partition.Status status;
    private final List<String> inputsIds;
    private final Panel panel;
    private final ChangeSupport changeSupport;
-   private boolean iconIsAlarmed;
 
    public Partition(Panel var1) {
       this.arming = Partition.Arming.DISARMED;
       this.status = Partition.Status.OK;
       this.panel = var1;
-      this.iconIsAlarmed = false;
       this.inputsIds = new ArrayList();
       this.changeSupport = new ChangeSupport(this);
    }
 
-   public DeviceOrPanel getParent() {
-      return this.panel;
-   }
-
-   public int getNumber() {
-      return -1;
-   }
-
    public Panel getPanel() {
       return this.panel;
-   }
-
-   public String getId() {
-      if (this.id == null) {
-         Iterator var1 = this.getPanel().getPartitions().entrySet().iterator();
-
-         while(var1.hasNext()) {
-            Entry<String, Partition> var2 = (Entry)var1.next();
-            if (((Partition)var2.getValue()).equals(this)) {
-               return (String)var2.getKey();
-            }
-         }
-      }
-
-      return this.id;
-   }
-
-   public void setId(String var1) {
-      assert var1 != null && !var1.isEmpty();
-
-      this.id = var1;
    }
 
    public String getRemoteName() {
@@ -123,15 +90,6 @@ public class Partition implements NotifierEventSource, ChangeEventSource {
 
    public List<String> getInputs() {
       return Collections.unmodifiableList(this.inputsIds);
-   }
-
-   public boolean iconIsAlarmed() {
-      return this.iconIsAlarmed;
-   }
-
-   public void setIconState(boolean var1) {
-      this.iconIsAlarmed = var1;
-      this.fireChange();
    }
 
    public static enum Arming {
