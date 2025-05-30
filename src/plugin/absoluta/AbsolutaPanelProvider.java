@@ -3,7 +3,7 @@ package plugin.absoluta;
 
 import com.google.common.collect.ImmutableMap;
 
-import cms.device.api.Device.Status;
+import cms.device.api.Panel;
 import cms.device.api.Output.Action;
 import cms.device.api.Panel.Arming;
 import cms.device.spi.PanelProvider;
@@ -42,10 +42,10 @@ public class AbsolutaPanelProvider implements PanelProvider {
       this.panelStatus.addPropertyChangeListener(new CallbackListener(var1, this.panelStatus));
    }
 
-   public Status connect() {
+   public Panel.connStatus connect() {
       this.connectionHandler = new ConnectionHandler(this.panelStatus, this.callback);
       if (!this.connectionHandler.setPin(this.pin)) {
-         return Status.UNAUTHORIZED;
+         return Panel.connStatus.UNAUTHORIZED;
       } else {
          (new ConnectionThread(this.address, this.port, this.connectionHandler)).start();
 
@@ -53,7 +53,7 @@ public class AbsolutaPanelProvider implements PanelProvider {
             return this.connectionHandler.waitConnection();
          } catch (InterruptedException var2) {
             Exceptions.printStackTrace(var2);
-            return Status.UNREACHABLE;
+            return Panel.connStatus.UNREACHABLE;
          }
       }
    }

@@ -3,7 +3,6 @@ package cms.device.spi;
 import java.util.List;
 import java.util.Map;
 
-import cms.device.api.Device;
 import cms.device.api.Input;
 import cms.device.api.Output;
 import cms.device.api.Panel;
@@ -12,7 +11,7 @@ import cms.device.api.Partition;
 public interface PanelProvider {
    void initialize(PanelProvider.PanelCallback var1);
 
-   Device.Status connect();
+   Panel.connStatus connect();
 
    void disconnect();
 

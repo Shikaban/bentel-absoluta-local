@@ -9,12 +9,12 @@ public final class Device implements DeviceOrPanel {
    private final DeviceProvider impl;
    private final String id;
    private final ChangeSupport changeSupport;
-   private Device.Status status;
+   private Panel.connStatus status;
    private boolean discovered;
    private String remoteName;
 
    Device(DeviceProvider var1, boolean var2, String var3) {
-      this.status = Device.Status.USER_DISCONNECTED;
+      this.status = Panel.connStatus.USER_DISCONNECTED;
       this.changeSupport = new ChangeSupport(this);
       this.impl = var1;
       this.id = var3;
@@ -27,17 +27,17 @@ public final class Device implements DeviceOrPanel {
    }
 
    public boolean isConnected() {
-      return this.status == Device.Status.SUCCESS;
+      return this.status == Panel.connStatus.SUCCESS;
    }
 
-   public Device.Status getConnectionStatus() {
+   public Panel.connStatus getConnectionStatus() {
       return this.status;
    }
 
    public void disconnect() {
       if (this.isConnected()) {
          System.out.println("INFO: disconnecting: " + this + "(" + this.id + ")");
-         this.status = Device.Status.USER_DISCONNECTED;
+         this.status = Panel.connStatus.USER_DISCONNECTED;
          this.impl.disconnect();
          System.out.println("INFO: " + this + "(" + this.id + ") disconnected.");
          this.fireChange();
@@ -45,14 +45,14 @@ public final class Device implements DeviceOrPanel {
 
    }
 
-   public Device.Status connect() {
+   public Panel.connStatus connect() {
       if (!this.isConnected()) {
          System.out.println("INFO: connecting: " + this + "(" + this.id + ")");
          this.status = this.impl.connect(true);
 
-         assert this.status != Device.Status.USER_DISCONNECTED;
+         assert this.status != Panel.connStatus.USER_DISCONNECTED;
 
-         if (this.status == Device.Status.SUCCESS) {
+         if (this.status == Panel.connStatus.SUCCESS) {
             this.discovered = true;
             System.out.println("INFO: " + this + "(" + this.id + ") connected.");
          } else {
@@ -62,7 +62,7 @@ public final class Device implements DeviceOrPanel {
          this.fireChange();
          return this.status;
       } else {
-         return Device.Status.SUCCESS;
+         return Panel.connStatus.SUCCESS;
       }
    }
 
@@ -111,13 +111,5 @@ public final class Device implements DeviceOrPanel {
          Device.this.setRemoteName(var1);
       }
 
-   }
-
-   public static enum Status {
-      USER_DISCONNECTED,
-      SUCCESS,
-      INCOMPATIBLE,
-      UNAUTHORIZED,
-      UNREACHABLE;
    }
 }

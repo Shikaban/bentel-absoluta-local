@@ -2,14 +2,14 @@ package cms.device.spi;
 
 import java.util.Map;
 
-import cms.device.api.Device;
+import cms.device.api.Panel;
 
 public interface DeviceProvider {
    void initialize(DeviceProvider.DeviceCallback var1);
 
    Map<String, String> getSettings();
 
-   Device.Status connect(boolean var1);
+   Panel.connStatus connect(boolean var1);
 
    void disconnect();
 

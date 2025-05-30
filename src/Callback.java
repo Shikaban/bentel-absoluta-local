@@ -8,13 +8,13 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import cms.device.api.Device;
 import cms.device.api.Input;
 import cms.device.api.Output;
 import cms.device.api.Panel;
 import cms.device.api.Partition;
 import cms.device.api.Input.Status;
 import cms.device.api.Panel.Arming;
+import cms.device.api.Panel.connStatus;
 import cms.device.spi.PanelProvider;
 
 class Callback implements PanelProvider.PanelCallback, MqttCallback {
@@ -490,8 +490,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       try {
          TimeUnit.SECONDS.sleep((long)RECON_DELAY);
          if (objName.equals("centrale")) {
-            Device.Status var2 = this.panel.connect();
-            if (var2 == cms.device.api.Device.Status.UNREACHABLE) {
+            connStatus var2 = this.panel.connect();
+            if (var2 == connStatus.UNREACHABLE) {
                if(VERBOSE_DEBUG) {
                   System.out.println("DEBUG: Rilevato 'busy panel'. Tentativo di riconnessione forzata...");
                }

@@ -1,6 +1,6 @@
 package plugin.absoluta.connection;
 
-import cms.device.api.Device.Status;
+import cms.device.api.Panel;
 import cms.device.spi.AlertCallback;
 import protocol.dsc.DscEndpointState;
 import protocol.dsc.DscError;
@@ -29,7 +29,7 @@ public class ConnectionHandler {
    private MessageHandler messageHandler;
    private StatusReader statusReader;
    private Commander commander;
-   private Status connectionStatus;
+   private Panel.connStatus connectionStatus;
    private boolean loggedIn;
    private boolean closing;
    private static final boolean VERBOSE_DEBUG = false;
@@ -48,7 +48,7 @@ public class ConnectionHandler {
       }
    }
 
-   public synchronized Status waitConnection() throws InterruptedException {
+   public synchronized Panel.connStatus waitConnection() throws InterruptedException {
       while(this.connectionStatus == null) {
          this.wait();
       }
@@ -87,7 +87,7 @@ public class ConnectionHandler {
    void disconnected() {
       this.stop();
       this.panelStatus.setConnectionStatus(PanelStatus.ConnectionStatus.DISCONNECTED);
-      this.setConnectionStatus(Status.UNREACHABLE);
+      this.setConnectionStatus(Panel.connStatus.UNREACHABLE);
    }
 
    private void stop() {
@@ -101,7 +101,7 @@ public class ConnectionHandler {
       }
    }
 
-   private synchronized void setConnectionStatus(Status var1) {
+   private synchronized void setConnectionStatus(Panel.connStatus var1) {
       if (this.connectionStatus == null) {
          this.connectionStatus = var1;
          this.notifyAll();
@@ -155,7 +155,7 @@ public class ConnectionHandler {
          if (var1.isFor(Message.ENTER_ACCESS_LEVEL) && !ConnectionHandler.this.loggedIn) {
             ConnectionHandler.this.loggedIn = true;
             ConnectionHandler.this.panelStatus.setConnectionStatus(PanelStatus.ConnectionStatus.CONNECTED);
-            ConnectionHandler.this.setConnectionStatus(Status.SUCCESS);
+            ConnectionHandler.this.setConnectionStatus(Panel.connStatus.SUCCESS);
             ConnectionHandler.this.statusReader.startNotificationsUponLoginWaiting();
             ConnectionHandler.this.endpoint.setSessionful(true);
          }
@@ -164,9 +164,9 @@ public class ConnectionHandler {
       public void error(DscError var1) {
          if (var1.isFor(Message.ENTER_ACCESS_LEVEL)) {
             if (var1.getResponseCode() == INVALID_ACCESS_CODE) {
-               ConnectionHandler.this.setConnectionStatus(Status.UNAUTHORIZED);
+               ConnectionHandler.this.setConnectionStatus(Panel.connStatus.UNAUTHORIZED);
             } else {
-               ConnectionHandler.this.setConnectionStatus(Status.INCOMPATIBLE);
+               ConnectionHandler.this.setConnectionStatus(Panel.connStatus.INCOMPATIBLE);
             }
             ConnectionHandler.this.stop();
          }

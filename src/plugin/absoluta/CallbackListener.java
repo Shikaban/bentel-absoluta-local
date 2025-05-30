@@ -104,7 +104,6 @@ class CallbackListener implements PropertyChangeListener {
          Integer var3 = (Integer)var2.next();
          var1.add(var3.toString());
       }
-
       return var1;
    }
 }

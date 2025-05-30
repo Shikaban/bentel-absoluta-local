@@ -15,7 +15,6 @@ import org.openide.util.ChangeSupport;
 
 public final class Panel implements DeviceOrPanel {
    private boolean connected;
-   private boolean discovered;
    private Panel.Arming arming;
    public Panel.Status status;
    private boolean alarmed;
@@ -41,19 +40,17 @@ public final class Panel implements DeviceOrPanel {
       provider.initialize(new Panel.Callback());
    }
 
-   public Device.Status connect() {
+   public connStatus connect() {
       if (this.connected) {
-         return Device.Status.SUCCESS;
+         return connStatus.SUCCESS;
       } else {
-         Device.Status var1 = this.impl.connect();
-         if (var1 != Device.Status.SUCCESS) {
+         connStatus var1 = this.impl.connect();
+         if (var1 != connStatus.SUCCESS) {
             return var1;
          } else {
             this.connected = true;
-            this.discovered = true;
-
             this.fireChange();
-            return Device.Status.SUCCESS;
+            return connStatus.SUCCESS;
          }
       }
    }
@@ -74,14 +71,6 @@ public final class Panel implements DeviceOrPanel {
 
    public boolean isUserConnectable() {
       return true;
-   }
-
-   public boolean isDiscovered() {
-      return this.discovered;
-   }
-
-   void setDiscovered(boolean var1) {
-      this.discovered = var1;
    }
 
    public boolean isAlarmed() {
@@ -170,7 +159,6 @@ public final class Panel implements DeviceOrPanel {
          this.partitions.putAll(var3);
          this.fireChange();
       }
-
    }
 
    public Map<String, Partition> getPartitions() {
@@ -244,6 +232,14 @@ public final class Panel implements DeviceOrPanel {
       TAMPER,
       FAULT,
       OK;
+   }
+
+   public static enum connStatus {
+      USER_DISCONNECTED,
+      SUCCESS,
+      INCOMPATIBLE,
+      UNAUTHORIZED,
+      UNREACHABLE;
    }
 
    private class Callback implements PanelProvider.PanelCallback {
