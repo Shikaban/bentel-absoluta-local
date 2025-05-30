@@ -1,7 +1,6 @@
 package cms.device.api;
 
 import cms.device.spi.DevicePlugin;
-import cms.device.spi.DevicePlugin2;
 import cms.device.spi.DeviceProvider;
 import cms.device.spi.PanelPlugin;
 import cms.device.spi.PanelProvider;
@@ -12,7 +11,6 @@ import cms.device.spi.ServerProvider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -159,19 +157,4 @@ public class Devices {
          .toString();
    }
 
-   public static Map<String, String> validationMap(Object var0) {
-      Plugin var1 = getPlugin(var0);
-      if (var1 instanceof DevicePlugin2) {
-         DevicePlugin2 var4 = (DevicePlugin2)var1;
-         return var4.getPluginValidation();
-      } else if (var1 instanceof ServerPlugin) {
-         ServerPlugin var3 = (ServerPlugin)var1;
-         return var3.getPluginValidation();
-      } else if (var1 instanceof PanelPlugin) {
-         PanelPlugin var2 = (PanelPlugin)var1;
-         return var2.getPluginValidation();
-      } else {
-         return new HashMap();
-      }
-   }
 }
