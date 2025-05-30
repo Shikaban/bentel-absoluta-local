@@ -26,9 +26,5 @@ public interface DeviceProvider {
 
       void setRemoteName(String var1);
 
-      void setModelName(String var1);
-
-      void setSerialNumber(String var1);
-
    }
 }

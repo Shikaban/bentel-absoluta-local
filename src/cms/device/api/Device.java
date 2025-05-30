@@ -24,7 +24,6 @@ public final class Device implements Provider, DeviceOrPanel {
    private boolean discovered;
    private String remoteName;
    private String modelName;
-   private String serialNumber;
    private final Lookup lookup;
 
    Device(DeviceProvider var1, boolean var2, String var3) {
@@ -112,14 +111,6 @@ public final class Device implements Provider, DeviceOrPanel {
       this.modelName = sanitize(var1);
    }
 
-   public String getSerialNumber() {
-      return this.serialNumber;
-   }
-
-   void setSerialNumber(String var1) {
-      this.serialNumber = sanitize(var1);
-   }
-
    public String getId() {
       return this.id;
    }
@@ -196,14 +187,6 @@ public final class Device implements Provider, DeviceOrPanel {
 
       public void setRemoteName(String var1) {
          Device.this.setRemoteName(var1);
-      }
-
-      public void setModelName(String var1) {
-         Device.this.setModelName(var1);
-      }
-
-      public void setSerialNumber(String var1) {
-         Device.this.setSerialNumber(var1);
       }
 
    }
