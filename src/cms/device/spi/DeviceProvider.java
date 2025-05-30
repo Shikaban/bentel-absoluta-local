@@ -14,8 +14,6 @@ public interface DeviceProvider {
 
    void disconnect();
 
-   String getDefaultName();
-
    public interface DeviceCallback extends ConnectionListener {
 
       void changeOutputs(List<String> var1);

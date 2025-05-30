@@ -23,7 +23,6 @@ public final class Device implements Provider, DeviceOrPanel {
    private Device.Status status;
    private boolean discovered;
    private String remoteName;
-   private String modelName;
    private final Lookup lookup;
 
    Device(DeviceProvider var1, boolean var2, String var3) {
@@ -101,14 +100,6 @@ public final class Device implements Provider, DeviceOrPanel {
 
    void setRemoteName(String var1) {
       this.remoteName = sanitize(var1);
-   }
-
-   public String getModelName() {
-      return this.modelName;
-   }
-
-   void setModelName(String var1) {
-      this.modelName = sanitize(var1);
    }
 
    public String getId() {
