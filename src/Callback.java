@@ -24,6 +24,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private String[] sensorNames;
    private String[] partitionNames;
    private String[] sensorStatuses;
+   private String[] partitionArming;
    private String[] partitionStatuses;
    private String[] sensorTopics;
    private String[] partitionTopics;
@@ -242,25 +243,25 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    public void setOutputStatus(String var1, Output.Status var2) {
    }
 
-   public void setPartitionArming(String partitionID, Partition.Arming partitionStatus) {
+   public void setPartitionArming(String partitionID, Partition.Arming partitionArming) {
       int partitionIDInt = Integer.parseInt(partitionID);
-      if (partitionStatus == cms.device.api.Partition.Arming.DISARMED) {
-         this.partitionStatuses[partitionIDInt] = "disarmed";
-      } else if (partitionStatus == cms.device.api.Partition.Arming.AWAY) {
-         this.partitionStatuses[partitionIDInt] = "armed_away";
-      } else if (partitionStatus == cms.device.api.Partition.Arming.STAY) {
-         this.partitionStatuses[partitionIDInt] = "armed_home";
-      } else if (partitionStatus == cms.device.api.Partition.Arming.NODELAY) {
-         this.partitionStatuses[partitionIDInt] = "armed_night";
+      if (partitionArming == cms.device.api.Partition.Arming.DISARMED) {
+         this.partitionArming[partitionIDInt] = "disarmed";
+      } else if (partitionArming == cms.device.api.Partition.Arming.AWAY) {
+         this.partitionArming[partitionIDInt] = "armed_away";
+      } else if (partitionArming == cms.device.api.Partition.Arming.STAY) {
+         this.partitionArming[partitionIDInt] = "armed_home";
+      } else if (partitionArming == cms.device.api.Partition.Arming.NODELAY) {
+         this.partitionArming[partitionIDInt] = "armed_night";
       }
 
       if (this.partitionNames[partitionIDInt] != null) {
          try {
             String str = "";
             if(discoveryEnabled){
-               str = this.partitionStatuses[partitionIDInt];
+               str = this.partitionArming[partitionIDInt];
             } else {
-               str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+               str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionArming[partitionIDInt];
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
@@ -270,7 +271,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("Partizione ID: " + partitionID + " stato: " + partitionStatus.toString());
+         System.out.println("Partizione ID: " + partitionID + " stato arming: " + partitionArming.toString());
       }
    }
 
@@ -335,7 +336,43 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
    }
 
-   public void setPartitionStatus(String var1, Partition.Status var2) {
+   public void setPartitionStatus(String partitionID, Partition.Status partitionStatus) {
+      int partitionIDInt = Integer.parseInt(partitionID);
+      switch(partitionStatus) {
+         case Partition.Status.FIRE:
+            this.partitionStatuses[partitionIDInt] = "Fire";
+            break;
+         case Partition.Status.FAULTS:
+            this.partitionStatuses[partitionIDInt] = "Faults";
+            break;
+         case Partition.Status.ALARMS:
+            this.partitionStatuses[partitionIDInt] = "Alarms";
+            break;
+         case Partition.Status.OK:
+            this.partitionStatuses[partitionIDInt] = "Ok";
+            break;
+         default:
+            break;
+      }
+
+      if (this.partitionNames[partitionIDInt] != null) {
+         try {
+            String str = "";
+            if(discoveryEnabled){
+               str = this.partitionStatuses[partitionIDInt].toUpperCase();
+            } else {
+               str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+            }
+            MqttMessage msg = new MqttMessage(str.getBytes());
+            msg.setQos(1);
+            this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionIDInt]);
+         }
+      }
+      if(VERBOSE_DEBUG) {
+         System.out.println("Partizione ID: " + partitionID + " stato cambiato in: " + partitionStatus.toString());
+      }
    }
 
    public void setPartitionsArming(Partition.Arming var1) {
@@ -360,7 +397,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             if (idArray > 0 && idArray <= this.partitionIDs.length) {
                // Se partizione
                this.commandPartition(idArray, msg);
-            } else if (idArray == 0) { 
+            } else if (idArray == 0) {
                // Se globale
                this.commandGlobal(idArray, msg);
             } else {
@@ -378,7 +415,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             }
          }
       } else if (topic.equals("homeassistant/status")) {
-         //TODO: Gestione della discovery 
+         //TODO: Gestione della discovery
       } else {
          // Comando non riconosciuto
          System.out.println("WARN: Comando non riconosciuto per il topic: " + topic);
