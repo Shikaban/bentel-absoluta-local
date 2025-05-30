@@ -14,24 +14,6 @@ public final class AlertNotifier {
       return INSTANCE;
    }
 
-   private AlertNotifier() {
-   }
-
-   public void addAlertListener(AlertListener var1) {
-      if (!this.listeners.contains(var1)) {
-         this.listeners.add(var1);
-      }
-
-   }
-
-   public void removeAlertListener(AlertListener var1) {
-      this.listeners.remove(var1);
-   }
-
-   public boolean containsAlertListener(AlertListener var1) {
-      return this.listeners.contains(var1);
-   }
-
    void fire(Object var1, String var2) {
       final AlertEvent var3 = new AlertEvent((String)Preconditions.checkNotNull(var2), Preconditions.checkNotNull(var1));
       System.out.println("TRACE: firing new event: " + var3);
