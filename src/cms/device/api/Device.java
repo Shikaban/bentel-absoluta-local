@@ -2,7 +2,6 @@ package cms.device.api;
 
 import cms.device.spi.DeviceProvider;
 import java.util.Map;
-import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
 public final class Device implements DeviceOrPanel {
@@ -80,14 +79,6 @@ public final class Device implements DeviceOrPanel {
 
    void setRemoteName(String var1) {
       this.remoteName = sanitize(var1);
-   }
-
-   public void addChangeListener(ChangeListener var1) {
-      this.changeSupport.addChangeListener(var1);
-   }
-
-   public void removeChangeListener(ChangeListener var1) {
-      this.changeSupport.removeChangeListener(var1);
    }
 
    public void fireChange() {

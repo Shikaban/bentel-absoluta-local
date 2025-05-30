@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
-public class Partition implements ChangeEventSource {
+public class Partition {
    private String remoteName;
    private Partition.Arming arming;
    private Partition.Status status;
@@ -46,14 +45,6 @@ public class Partition implements ChangeEventSource {
    void setStatus(Partition.Status var1) {
       this.status = var1;
       this.fireChange();
-   }
-
-   public void addChangeListener(ChangeListener var1) {
-      this.changeSupport.addChangeListener(var1);
-   }
-
-   public void removeChangeListener(ChangeListener var1) {
-      this.changeSupport.removeChangeListener(var1);
    }
 
    public void fireChange() {

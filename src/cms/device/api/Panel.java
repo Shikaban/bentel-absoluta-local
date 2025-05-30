@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
 public final class Panel implements DeviceOrPanel {
@@ -59,7 +58,6 @@ public final class Panel implements DeviceOrPanel {
       if (this.connected) {
          this.impl.disconnect();
          this.connected = false;
-
          this.fireChange();
       }
 
@@ -67,10 +65,6 @@ public final class Panel implements DeviceOrPanel {
 
    public boolean isConnected() {
       return this.connected;
-   }
-
-   public boolean isUserConnectable() {
-      return true;
    }
 
    public boolean isAlarmed() {
@@ -82,7 +76,6 @@ public final class Panel implements DeviceOrPanel {
          this.alarmed = var1;
          this.changeSupport.fireChange();
       }
-
    }
 
    public void arming(Panel.Arming mode) {
@@ -109,18 +102,6 @@ public final class Panel implements DeviceOrPanel {
          this.status = newStatus;
          this.changeSupport.fireChange();
       }
-   }
-
-   public Map<String, String> getSettings() {
-      return this.impl.getSettings();
-   }
-
-   public void addChangeListener(ChangeListener var1) {
-      this.changeSupport.addChangeListener(var1);
-   }
-
-   public void removeChangeListener(ChangeListener var1) {
-      this.changeSupport.removeChangeListener(var1);
    }
 
    public void fireChange() {

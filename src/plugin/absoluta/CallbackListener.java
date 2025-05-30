@@ -80,7 +80,6 @@ class CallbackListener implements PropertyChangeListener {
                   this.callback.changeInputs(var10);
                   List<String> var13 = toStringList(this.panelStatus.getPartitions());
                   Iterator var12 = var13.iterator();
-
                   while(var12.hasNext()) {
                      String var7 = (String)var12.next();
                      this.callback.tagInputIntoPartition(var7, var10);

@@ -2,10 +2,9 @@ package cms.device.api;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
-public class Output implements ChangeEventSource {
+public class Output {
    private String remoteName;
    private boolean enabled = true;
    private Output.Type type;
@@ -93,14 +92,6 @@ public class Output implements ChangeEventSource {
 
    public void doAction(Output.Action var1) {
       this.controller.accept(var1);
-   }
-
-   public void addChangeListener(ChangeListener var1) {
-      this.changeSupport.addChangeListener(var1);
-   }
-
-   public void removeChangeListener(ChangeListener var1) {
-      this.changeSupport.removeChangeListener(var1);
    }
 
    void fireChange() {

@@ -1,6 +1,6 @@
 package cms.device.api;
 
-public interface Connectable extends ChangeEventSource {
+public interface Connectable {
    Panel.connStatus connect();
 
    void disconnect();

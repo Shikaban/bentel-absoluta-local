@@ -2,10 +2,9 @@ package cms.device.api;
 
 import java.util.Objects;
 
-import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 
-public class Input implements ChangeEventSource {
+public class Input {
    private String remoteName;
    private Input.Status status;
    private final ChangeSupport changeSupport;
@@ -36,14 +35,6 @@ public class Input implements ChangeEventSource {
          this.status = var1;
          this.changeSupport.fireChange();
       }
-   }
-
-   public void addChangeListener(ChangeListener var1) {
-      this.changeSupport.addChangeListener(var1);
-   }
-
-   public void removeChangeListener(ChangeListener var1) {
-      this.changeSupport.removeChangeListener(var1);
    }
 
    public void fireChange() {
