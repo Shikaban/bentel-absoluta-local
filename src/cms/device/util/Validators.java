@@ -12,7 +12,6 @@ public class Validators {
    private static String CSV_INTEGERS_REGEX = "\\d+(,\\d+)*";
    private static final String UID_REGEX = "[0-9A-Fa-f]{8}";
    private static final String PIN_REGEX = "\\d{4,6}";
-   private static final AddressValidator validator = new AddressValidator();
 
    private Validators() {
    }
@@ -30,10 +29,6 @@ public class Validators {
 
       if (var0.equals("string")) {
          return new Validators.StringValidator();
-      } else if (var0.equals("address")) {
-         return new Validators.AddrValidator();
-      } else if (var0.equals("port")) {
-         return new Validators.PortValidator();
       } else if (var0.equals("boolean")) {
          return new Validators.BooleanValidator();
       } else if (var0.equals("csvIntegers")) {
@@ -51,16 +46,6 @@ public class Validators {
          return (String)var1;
       } else {
          throw new Validators.InvalidParamException(PluginValidator.invalidResult(var0, "invalid.class"));
-      }
-   }
-
-   private static class AddrValidator extends Validators.SubValidator {
-      public AddrValidator() {
-         super(new Validators.StringValidator());
-      }
-
-      protected PluginValidator.Result doSubValidation(String var1, Object var2) throws Validators.InvalidParamException {
-         return Validators.validator.isValidAddress(Validators.stringCast(var1, var2).trim()) ? PluginValidator.validResult() : PluginValidator.invalidResult(var1, "invalid.address");
       }
    }
 
@@ -120,16 +105,6 @@ public class Validators {
 
       public PluginValidator.Result validate(String var1, Object var2) {
          return var2 != null ? PluginValidator.validResult() : PluginValidator.invalidResult(var1, "null.value");
-      }
-   }
-
-   private static class PortValidator extends Validators.SubValidator {
-      public PortValidator() {
-         super(new Validators.StringValidator());
-      }
-
-      protected PluginValidator.Result doSubValidation(String var1, Object var2) throws Validators.InvalidParamException {
-         return Validators.validator.isValidPort(Validators.stringCast(var1, var2).trim()) ? PluginValidator.validResult() : PluginValidator.invalidResult(var1, "invalid.port");
       }
    }
 
