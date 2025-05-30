@@ -409,6 +409,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             if (idArray >= 0 && idArray < this.sensorIDs.length) {
                // Se sensore
                //TODO: Gestione comandi per i sensori (bypass, unbypass)
+               // this.Panel.bypassInput(zoneID, setBypassed)
             } else {
                // Errore
                System.out.println("WARN: ID " + idArray + " non valido");

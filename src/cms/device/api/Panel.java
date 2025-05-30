@@ -243,12 +243,10 @@ public final class Panel implements DeviceOrPanel {
 
       public void setPartitionsArming(Partition.Arming var1) {
          Iterator var2 = Panel.this.getPartitions().values().iterator();
-
          while(var2.hasNext()) {
             Partition var3 = (Partition)var2.next();
             var3.setArming(var1);
          }
-
       }
 
       public void setPartitionArming(String var1, Partition.Arming var2) {
