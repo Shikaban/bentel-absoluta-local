@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
-import org.openide.util.NbBundle;
-
-import cms.device.spi.Plugin;
 
 public class Partition implements NotifierEventSource, ChangeEventSource {
    private String id;
