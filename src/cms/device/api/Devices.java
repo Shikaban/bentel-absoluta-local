@@ -97,8 +97,6 @@ public class Devices {
    private static Connectable newConnectable(Plugin var0, Map<String, String> var1, String var2) {
       if (var0 instanceof DevicePlugin) {
          return newDevice((DevicePlugin)var0, var1, var2);
-      } else if (var0 instanceof ServerPlugin) {
-         return newServer((ServerPlugin)var0, var1, var2);
       } else {
          assert var0 instanceof PanelPlugin;
 
@@ -112,16 +110,7 @@ public class Devices {
 
    private static Device newDevice(DevicePlugin var0, Map<String, String> var1, String var2) {
       String var3 = var2 != null && !var2.isEmpty() ? var2 : newId();
-      return new Device(var0.newDevice(var1), isCool(var0), var3, (Server)null);
-   }
-
-   public static Server newServer(Map<String, String> var0, String var1) {
-      return newServer((ServerPlugin)getPlugin(var0.get("type")), var0, var1);
-   }
-
-   private static Server newServer(ServerPlugin var0, Map<String, String> var1, String var2) {
-      String var3 = var2 != null && !var2.isEmpty() ? var2 : newId();
-      return new Server(var0.newServer(var1), var3);
+      return new Device(var0.newDevice(var1), isCool(var0), var3);
    }
 
    public static Panel newPanel(Map<String, String> var0, String var1) {

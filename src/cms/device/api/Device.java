@@ -21,7 +21,6 @@ public final class Device implements Provider, DeviceOrPanel {
    private final DeviceProvider impl;
    private final InstanceContent content;
    private final String id;
-   private final Server server;
    private final ChangeSupport changeSupport;
    private final List<Sensor> sensors;
    final OutputSupport outputSupport;
@@ -33,14 +32,13 @@ public final class Device implements Provider, DeviceOrPanel {
    private String serialNumber;
    private final Lookup lookup;
 
-   Device(DeviceProvider var1, boolean var2, String var3, Server var4) {
+   Device(DeviceProvider var1, boolean var2, String var3) {
       this.status = Device.Status.USER_DISCONNECTED;
       this.changeSupport = new ChangeSupport(this);
       this.impl = var1;
       this.content = new InstanceContent();
       this.lookup = new AbstractLookup(this.content);
       this.id = var3;
-      this.server = var4;
       this.sensors = new ArrayList();
       this.outputSupport = new OutputSupport(this, this::doOutputAction);
       var1.initialize(new Device.Callback());
@@ -62,10 +60,6 @@ public final class Device implements Provider, DeviceOrPanel {
 
    public Device.Status getConnectionStatus() {
       return this.status;
-   }
-
-   public boolean isUserConnectable() {
-      return this.server == null;
    }
 
    public void disconnect() {
@@ -106,10 +100,6 @@ public final class Device implements Provider, DeviceOrPanel {
 
    void setDiscovered(boolean var1) {
       this.discovered = var1;
-   }
-
-   public Server getServer() {
-      return this.server;
    }
 
    public List<Sensor> getSensors() {
