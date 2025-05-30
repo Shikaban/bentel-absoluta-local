@@ -121,6 +121,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
                this.mqttClient.publish("ABS/conn", mqttMessage);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + "ABS/conn");
+            System.out.println("ERROR: " + ex.getMessage());
          }
       }
 
@@ -146,7 +147,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       try {
          String str = "";
          if(discoveryEnabled){
-            str = this.partitionStatuses[0];
+            str = this.partitionArmStatuses[0];
          } else {
             str = "Name: " + this.partitionNames[0] + " Arming: " + this.partitionArmStatuses[0] + " Status: " + this.partitionStatuses[0];
          }
@@ -155,6 +156,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          this.mqttClient.publish(this.partitionTopics[0], msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + this.partitionTopics[0]);
+         System.out.println("ERROR: " + ex.getMessage());
       }
       if(VERBOSE_DEBUG) {
          System.out.println("DEBUG: Stato generale allarme cambiato in: " + actArming.toString());
@@ -202,6 +204,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          this.mqttClient.publish(this.sensorTopics[sensorIDInt], msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + this.sensorTopics[sensorIDInt]);
+         System.out.println("ERROR: " + ex.getMessage());
       }
       if(VERBOSE_DEBUG) {
          System.out.println("DEBUG: Sensore ID: " + sensorID + ", nome: " + sensorName);
@@ -270,6 +273,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionIDInt]);
+            System.out.println("ERROR: " + ex.getMessage());
          }
       }
       if(VERBOSE_DEBUG) {
@@ -333,6 +337,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionIDInt]);
+         System.out.println("ERROR: " + ex.getMessage());
       }
       if(VERBOSE_DEBUG) {
          System.out.println("Partizione ID: " + partitionID + ", nome: " + partitionName);
@@ -371,6 +376,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionIDInt]);
+            System.out.println("ERROR: " + ex.getMessage());
          }
       }
       if(VERBOSE_DEBUG) {

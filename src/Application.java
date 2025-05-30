@@ -50,10 +50,11 @@ public class Application {
             System.out.println("MQTT_ADDRESS=" + MQTT_ADDRESS);
             System.out.println("MQTT_PORT=" + MQTT_PORT);
             System.out.println("MQTT_USERNAME=" + Username);
-            System.out.println("MQTT_PASSWORD=" + (Password != null ? "***" : null));
+            System.out.println("MQTT_PASSWORD=" + (Password != null ? "***" : "non definito"));
             System.out.println("ALARM_ADDRESS=" + ADDRESS);
-            System.out.println("ALARM_PIN=" + PIN);
+            System.out.println("ALARM_PIN=" + PIN != null ? "***" : "non definito");
             System.out.println("ALARM_PORT=" + PORT);
+            System.out.println("HOME_ASSISTANT_DISCOVERY=" + discoveryEnabled);
             // Controllo variabili obbligatorie
             if (MQTT_ADDRESS == null || MQTT_PORT == null || Username == null || Password == null) {
                throw new IllegalArgumentException("MQTT_ADDRESS, MQTT_PORT, MQTT_USERNAME e MQTT_PASSWORD devono essere valorizzati!");
