@@ -24,7 +24,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private String[] sensorNames;
    private String[] partitionNames;
    private String[] sensorStatuses;
-   private String[] partitionArming;
+   private String[] partitionArmStatuses;
    private String[] partitionStatuses;
    private String[] sensorTopics;
    private String[] partitionTopics;
@@ -75,6 +75,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       this.partitionIDs = (String[])msg.toArray(new String[0]);
       this.partitionNames = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
       this.partitionTopics = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
+      this.partitionArmStatuses = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
       this.partitionStatuses = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
       this.partitionNames[0] = "Globale";
       this.partitionTopics[0] = "ABS/global";
@@ -135,11 +136,11 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
 
    public void setArming(Panel.Arming actArming) {
       if (actArming == Arming.GLOBALLY_DISARMED) {
-         this.partitionStatuses[0] = "disarmed";
+         this.partitionArmStatuses[0] = "disarmed";
       } else if (actArming == Arming.GLOBALLY_ARMED) {
-         this.partitionStatuses[0] = "armed_away";
+         this.partitionArmStatuses[0] = "armed_away";
       } else if (actArming == Arming.PARTIALLY_ARMED) {
-         this.partitionStatuses[0] = "armed_custom_bypass";
+         this.partitionArmStatuses[0] = "armed_custom_bypass";
       }
 
       try {
@@ -147,7 +148,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          if(discoveryEnabled){
             str = this.partitionStatuses[0];
          } else {
-            str = "Name: " + this.partitionNames[0] + " Status: " + this.partitionStatuses[0];
+            str = "Name: " + this.partitionNames[0] + " Arming: " + this.partitionArmStatuses[0] + " Status: " + this.partitionStatuses[0];
          }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
@@ -244,25 +245,25 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    public void setOutputStatus(String var1, Output.Status var2) {
    }
 
-   public void setPartitionArming(String partitionID, Partition.Arming partitionArming) {
+   public void setPartitionArming(String partitionID, Partition.Arming actArming) {
       int partitionIDInt = Integer.parseInt(partitionID);
-      if (partitionArming == cms.device.api.Partition.Arming.DISARMED) {
-         this.partitionArming[partitionIDInt] = "disarmed";
-      } else if (partitionArming == cms.device.api.Partition.Arming.AWAY) {
-         this.partitionArming[partitionIDInt] = "armed_away";
-      } else if (partitionArming == cms.device.api.Partition.Arming.STAY) {
-         this.partitionArming[partitionIDInt] = "armed_home";
-      } else if (partitionArming == cms.device.api.Partition.Arming.NODELAY) {
-         this.partitionArming[partitionIDInt] = "armed_night";
+      if (actArming == cms.device.api.Partition.Arming.DISARMED) {
+         this.partitionArmStatuses[partitionIDInt] = "disarmed";
+      } else if (actArming == cms.device.api.Partition.Arming.AWAY) {
+         this.partitionArmStatuses[partitionIDInt] = "armed_away";
+      } else if (actArming == cms.device.api.Partition.Arming.STAY) {
+         this.partitionArmStatuses[partitionIDInt] = "armed_home";
+      } else if (actArming == cms.device.api.Partition.Arming.NODELAY) {
+         this.partitionArmStatuses[partitionIDInt] = "armed_night";
       }
 
       if (this.partitionNames[partitionIDInt] != null) {
          try {
             String str = "";
             if(discoveryEnabled){
-               str = this.partitionArming[partitionIDInt];
+               str = this.partitionArmStatuses[partitionIDInt];
             } else {
-               str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionArming[partitionIDInt];
+               str = "Name: " + this.partitionNames[partitionIDInt] + " Arming: " + this.partitionArmStatuses[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
@@ -272,7 +273,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("Partizione ID: " + partitionID + " stato arming: " + partitionArming.toString());
+         System.out.println("Partizione ID: " + partitionID + " stato arming: " + actArming.toString());
       }
    }
 
@@ -325,7 +326,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          if(discoveryEnabled){
             str = this.partitionStatuses[partitionIDInt];
          } else {
-            str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+            str = "Name: " + this.partitionNames[partitionIDInt] + " Arming: " + this.partitionArmStatuses[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
          }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
@@ -338,9 +339,9 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
    }
 
-   public void setPartitionStatus(String partitionID, Partition.Status partitionStatus) {
+   public void setPartitionStatus(String partitionID, Partition.Status actStatus) {
       int partitionIDInt = Integer.parseInt(partitionID);
-      switch(partitionStatus) {
+      switch(actStatus) {
          case Partition.Status.FIRE:
             this.partitionStatuses[partitionIDInt] = "Fire";
             break;
@@ -363,7 +364,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             if(discoveryEnabled){
                str = this.partitionStatuses[partitionIDInt].toUpperCase();
             } else {
-               str = "Name: " + this.partitionNames[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
+               str = "Name: " + this.partitionNames[partitionIDInt] + " Arming: " + this.partitionArmStatuses[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
@@ -373,7 +374,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("Partizione ID: " + partitionID + " stato cambiato in: " + partitionStatus.toString());
+         System.out.println("Partizione ID: " + partitionID + " stato cambiato in: " + actStatus.toString());
       }
    }
 
@@ -411,6 +412,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             if (idArray >= 0 && idArray < this.sensorIDs.length) {
                // Se sensore
                //TODO: Gestione comandi per i sensori (bypass, unbypass)
+               // this.Panel.bypassInput(zoneID, setBypassed)
             } else {
                // Errore
                System.out.println("WARN: ID " + idArray + " non valido");

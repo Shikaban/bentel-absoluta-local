@@ -12,37 +12,7 @@ final class Callbacks {
       public void connectionLost() {
       }
 
-      public void setSensorRemoteName(int var1, String var2) {
-      }
-
-      public void setSensorEnabled(int var1, boolean var2) {
-      }
-
-      public void setSensorId(int var1, String var2) {
-      }
-
-      public void changeOutputs(List<String> var1) {
-      }
-
-      public void setOutputRemoteName(String var1, String var2) {
-      }
-
-      public void setOutputEnabled(String var1, boolean var2) {
-      }
-
       public void setRemoteName(String var1) {
-      }
-
-      public void setModelName(String var1) {
-      }
-
-      public void setSerialNumber(String var1) {
-      }
-
-      public void addContent(Object var1) {
-      }
-
-      public void removeContent(Object var1) {
       }
    }
 
@@ -85,9 +55,6 @@ final class Callbacks {
       public void alert(String var1) {
       }
 
-      public void setRemoteName(String var1) {
-      }
-
       public void setPartitionRemoteName(String var1, String var2) {
       }
 
@@ -102,12 +69,5 @@ final class Callbacks {
 
       public void setOutputStatus(String var1, Output.Status var2) {
       }
-
-      public void addContent(Object var1) {
-      }
-
-      public void removeContent(Object var1) {
-      }
    }
-
 }
