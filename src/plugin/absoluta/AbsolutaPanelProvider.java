@@ -70,12 +70,12 @@ public class AbsolutaPanelProvider implements PanelProvider {
       this.connectionHandler.getCommander().partitionArming(var1, var2);
    }
 
-   public boolean armingSupport(char var1) {
-      return this.connectionHandler.getCommander().armingSupport(var1);
+   public boolean armingSupport(char presetMode) {
+      return this.connectionHandler.getCommander().armingSupport(presetMode);
    }
 
-   public void armingSet(char var1) {
-      this.connectionHandler.getCommander().armingSet(var1);
+   public void armingSet(char presetMode) {
+      this.connectionHandler.getCommander().armingSet(presetMode);
    }
 
    public void setBypassed(String zoneID, boolean setBypassed) {
