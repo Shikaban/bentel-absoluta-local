@@ -12,19 +12,13 @@ public class Partition implements ChangeEventSource {
    private Partition.Arming arming;
    private Partition.Status status;
    private final List<String> inputsIds;
-   private final Panel panel;
    private final ChangeSupport changeSupport;
 
    public Partition(Panel var1) {
       this.arming = Partition.Arming.DISARMED;
       this.status = Partition.Status.OK;
-      this.panel = var1;
       this.inputsIds = new ArrayList();
       this.changeSupport = new ChangeSupport(this);
-   }
-
-   public Panel getPanel() {
-      return this.panel;
    }
 
    public String getRemoteName() {

@@ -1,38 +1,23 @@
 package cms.device.api;
 
-import com.google.common.collect.ImmutableList;
-import cms.device.spi.OutputControlCookie;
-import cms.device.spi.OutputControlProvider;
-
 import cms.device.spi.DeviceProvider;
-import java.util.List;
 import java.util.Map;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
-import org.openide.util.Lookup;
-import org.openide.util.Lookup.Provider;
-import org.openide.util.lookup.AbstractLookup;
-import org.openide.util.lookup.InstanceContent;
 
-public final class Device implements Provider, DeviceOrPanel {
+public final class Device implements DeviceOrPanel {
    private final DeviceProvider impl;
-   private final InstanceContent content;
    private final String id;
    private final ChangeSupport changeSupport;
-   final OutputSupport outputSupport;
    private Device.Status status;
    private boolean discovered;
    private String remoteName;
-   private final Lookup lookup;
 
    Device(DeviceProvider var1, boolean var2, String var3) {
       this.status = Device.Status.USER_DISCONNECTED;
       this.changeSupport = new ChangeSupport(this);
       this.impl = var1;
-      this.content = new InstanceContent();
-      this.lookup = new AbstractLookup(this.content);
       this.id = var3;
-      this.outputSupport = new OutputSupport(this, this::doOutputAction);
       var1.initialize(new Device.Callback());
       System.out.println("TRACE: device created: " + super.toString());
    }
@@ -109,31 +94,6 @@ public final class Device implements Provider, DeviceOrPanel {
       this.changeSupport.fireChange();
    }
 
-   public Lookup getLookup() {
-      return this.lookup;
-   }
-
-   public List<Output> getOutputs() {
-      return ImmutableList.copyOf(this.outputSupport.getOutputs().values());
-   }
-
-   public Output getOutput(String var1) {
-      return this.outputSupport.getOutput(var1);
-   }
-
-   private void doOutputAction(String var1, Output.Action var2) {
-      OutputControlCookie var3 = (OutputControlCookie)this.getLookup().lookup(OutputControlCookie.class);
-      if (var3 != null) {
-         OutputControlProvider var4 = var3.getOutputControlProvider(var1);
-         if (var4 != null) {
-            System.out.println("DEBUG: output " + this + "/" + var1 + " doing action: " + var2);
-            var4.doAction(var2);
-            return;
-         }
-      }
-      System.out.println("WARN: output " + this + "/" + var1 + ": OutputControlProvider not available");
-   }
-
    static String sanitize(String var0) {
       return var0 != null && !var0.trim().isEmpty() ? var0.trim() : null;
    }
@@ -145,18 +105,6 @@ public final class Device implements Provider, DeviceOrPanel {
       public void connectionLost() {
          System.out.println("INFO: connection lost on " + Device.this + "(" + Device.this.id + ")");
          Device.this.disconnect();
-      }
-
-      public void changeOutputs(List<String> var1) {
-         Device.this.outputSupport.changeOutputs(var1);
-      }
-
-      public void setOutputRemoteName(String var1, String var2) {
-         Device.this.outputSupport.setOutputRemoteName(var1, var2);
-      }
-
-      public void setOutputEnabled(String var1, boolean var2) {
-         Device.this.outputSupport.setOutputEnabled(var1, var2);
       }
 
       public void setRemoteName(String var1) {

@@ -12,14 +12,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
-import org.openide.util.Lookup;
-import org.openide.util.Lookup.Provider;
-import org.openide.util.lookup.AbstractLookup;
-import org.openide.util.lookup.InstanceContent;
 
-public final class Panel implements Provider, DeviceOrPanel {
-   private final InstanceContent content = new InstanceContent();
-   private final Lookup lookup;
+public final class Panel implements DeviceOrPanel {
    private boolean connected;
    private boolean discovered;
    private Panel.Arming arming;
@@ -33,7 +27,6 @@ public final class Panel implements Provider, DeviceOrPanel {
    final OutputSupport outputSupport;
 
    public Panel(PanelProvider provider) {
-      this.lookup = new AbstractLookup(this.content);
       this.arming = Panel.Arming.GLOBALLY_DISARMED;
       this.status = Panel.Status.OK;
 
@@ -46,10 +39,6 @@ public final class Panel implements Provider, DeviceOrPanel {
       this.outputSupport = new OutputSupport(this, this::doOutputAction);
       this.impl = provider;
       provider.initialize(new Panel.Callback());
-   }
-
-   public Lookup getLookup() {
-      return this.lookup;
    }
 
    public Device.Status connect() {
