@@ -5,8 +5,6 @@ import cms.device.spi.OutputControlCookie;
 import cms.device.spi.OutputControlProvider;
 
 import cms.device.spi.DeviceProvider;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.ChangeListener;
@@ -21,7 +19,6 @@ public final class Device implements Provider, DeviceOrPanel {
    private final InstanceContent content;
    private final String id;
    private final ChangeSupport changeSupport;
-   private final List<Sensor> sensors;
    final OutputSupport outputSupport;
    private Device.Status status;
    private boolean discovered;
@@ -37,7 +34,6 @@ public final class Device implements Provider, DeviceOrPanel {
       this.content = new InstanceContent();
       this.lookup = new AbstractLookup(this.content);
       this.id = var3;
-      this.sensors = new ArrayList();
       this.outputSupport = new OutputSupport(this, this::doOutputAction);
       var1.initialize(new Device.Callback());
       System.out.println("TRACE: device created: " + super.toString());
@@ -100,26 +96,6 @@ public final class Device implements Provider, DeviceOrPanel {
       this.discovered = var1;
    }
 
-   public List<Sensor> getSensors() {
-      return ImmutableList.copyOf(this.sensors);
-   }
-
-   void doChangeSensorsSize(int var1) {
-      int var2 = this.sensors.size();
-
-      while(var1 < this.sensors.size()) {
-         this.sensors.remove(this.sensors.size() - 1);
-      }
-
-      while(var1 > this.sensors.size()) {
-         this.sensors.add(new Sensor(this));
-      }
-
-      if (var2 != var1) {
-         this.fireChange();
-      }
-   }
-
    public String getRemoteName() {
       return this.remoteName;
    }
@@ -158,13 +134,6 @@ public final class Device implements Provider, DeviceOrPanel {
 
    public void fireChange() {
       this.changeSupport.fireChange();
-
-      Iterator var1 = this.getSensors().iterator();
-
-      while(var1.hasNext()) {
-         Sensor var3 = (Sensor)var1.next();
-         var3.fireChange();
-      }
    }
 
    public Lookup getLookup() {
@@ -211,18 +180,6 @@ public final class Device implements Provider, DeviceOrPanel {
       public void connectionLost() {
          System.out.println("INFO: connection lost on " + Device.this + "(" + Device.this.getId() + ")");
          Device.this.disconnect();
-      }
-
-      public void setSensorRemoteName(int var1, String var2) {
-         ((Sensor)Device.this.getSensors().get(var1)).setRemoteName(var2);
-      }
-
-      public void setSensorEnabled(int var1, boolean var2) {
-         ((Sensor)Device.this.getSensors().get(var1)).setEnabled(var2);
-      }
-
-      public void setSensorId(int var1, String var2) {
-         ((Sensor)Device.this.getSensors().get(var1)).setId(var2);
       }
 
       public void changeOutputs(List<String> var1) {

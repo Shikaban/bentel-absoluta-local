@@ -18,12 +18,6 @@ public interface DeviceProvider {
 
    public interface DeviceCallback extends ConnectionListener {
 
-      void setSensorRemoteName(int var1, String var2);
-
-      void setSensorEnabled(int var1, boolean var2);
-
-      void setSensorId(int var1, String var2);
-
       void changeOutputs(List<String> var1);
 
       void setOutputRemoteName(String var1, String var2);

@@ -8,33 +8,9 @@ import cms.device.api.NotifierEventSource;
 import cms.device.api.Output;
 import cms.device.api.Panel;
 import cms.device.api.Partition;
-import cms.device.api.Sensor;
-import java.util.Iterator;
 import java.util.List;
 
 public enum SourceType {
-   SENSOR(Sensor.class) {
-      public List<Sensor> getSources(Connectable var1) {
-         Device var2 = (Device)var1;
-         return var2.getSensors();
-      }
-
-      public Sensor getSource(Connectable var1, String var2) {
-         Device var3 = (Device)var1;
-         Iterator var4 = var3.getSensors().iterator();
-
-         Sensor var5;
-         do {
-            if (!var4.hasNext()) {
-               return null;
-            }
-
-            var5 = (Sensor)var4.next();
-         } while(!var5.getId().equals(var2));
-
-         return var5;
-      }
-   },
    INPUT(Input.class) {
       public List<Input> getSources(Connectable var1) {
          Panel var2 = (Panel)var1;
