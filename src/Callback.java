@@ -180,9 +180,10 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
              "}" +
          "}";
          try {
-            MqttMessage msg = new MqttMessage(payload.getBytes());
-            msg.setQos(1);
-            this.mqttClient.publish(topic, msg);
+            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
+            discoveryMsg.setQos(1);
+            discoveryMsg.setRetained(true);
+            this.mqttClient.publish(topic, discoveryMsg);
             sensorDiscoverySent.add(sensorIDInt);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore: " + topic);
@@ -305,6 +306,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          try {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
+            discoveryMsg.setRetained(true);
             this.mqttClient.publish(topic, discoveryMsg);
             partitionDiscoverySent.add(partitionIDInt);
          } catch (Exception ex) {
