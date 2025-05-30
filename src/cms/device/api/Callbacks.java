@@ -4,7 +4,6 @@ import java.util.List;
 
 import cms.device.spi.DeviceProvider;
 import cms.device.spi.PanelProvider;
-import cms.device.spi.ServerProvider;
 
 final class Callbacks {
    static enum DeviceCb implements DeviceProvider.DeviceCallback {
@@ -111,19 +110,4 @@ final class Callbacks {
       }
    }
 
-   static enum ServerCb implements ServerProvider.ServerCallback {
-      DUMMY;
-
-      public void setChildrenKeys(List<String> var1) {
-      }
-
-      public void setChildConnected(String var1, boolean var2) {
-      }
-
-      public void connectionLost() {
-      }
-
-      public void setRemoteName(String var1) {
-      }
-   }
 }

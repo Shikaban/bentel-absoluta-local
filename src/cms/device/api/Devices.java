@@ -5,8 +5,6 @@ import cms.device.spi.DeviceProvider;
 import cms.device.spi.PanelPlugin;
 import cms.device.spi.PanelProvider;
 import cms.device.spi.Plugin;
-import cms.device.spi.ServerPlugin;
-import cms.device.spi.ServerProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,18 +51,6 @@ public class Devices {
       DeviceProvider var2 = var1.newDevice(var0);
       var2.initialize(Callbacks.DeviceCb.DUMMY);
       boolean var3 = Device.Status.SUCCESS == var2.connect(false);
-      if (var3) {
-         var2.disconnect();
-      }
-
-      return var3;
-   }
-
-   public static boolean probeServer(Map<String, String> var0) {
-      ServerPlugin var1 = (ServerPlugin)getPlugin(var0.get("type"));
-      ServerProvider var2 = var1.newServer(var0);
-      var2.initialize(Callbacks.ServerCb.DUMMY);
-      boolean var3 = Device.Status.SUCCESS == var2.connect();
       if (var3) {
          var2.disconnect();
       }
@@ -122,7 +108,6 @@ public class Devices {
    private static Collection<? extends Plugin> getPlugins() {
       List<Plugin> var0 = new ArrayList();
       var0.addAll(Lookup.getDefault().lookupAll(DevicePlugin.class));
-      var0.addAll(Lookup.getDefault().lookupAll(ServerPlugin.class));
       var0.addAll(Lookup.getDefault().lookupAll(PanelPlugin.class));
       return var0;
    }
