@@ -106,6 +106,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          try {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
+            discoveryMsg.setRetained(true);
             this.mqttClient.publish(topic, discoveryMsg);
             partitionDiscoverySent.add(0);
          } catch (Exception ex) {
