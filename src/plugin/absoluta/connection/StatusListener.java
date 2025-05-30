@@ -40,27 +40,27 @@ class StatusListener implements MessageListener {
       this.panelStatus = (PanelStatus)Objects.requireNonNull(var1);
    }
 
-   public void newValue(NewValue var1) {
+   public void newValue(NewValue msg) {
       List var2;
-      if (var1.isFor(Message.PARTITION_ASSIGNMENT_CONFIGURATION)) {
-         var2 = (List)var1.getValue(Message.PARTITION_ASSIGNMENT_CONFIGURATION);
+      if (msg.isFor(Message.PARTITION_ASSIGNMENT_CONFIGURATION)) {
+         var2 = (List)msg.getValue(Message.PARTITION_ASSIGNMENT_CONFIGURATION);
          this.panelStatus.setPartitions(ImmutableList.copyOf(var2));
       } else {
          List var3;
-         if (var1.isFor(Message.PARTITION_ZONES)) {
-            Integer var6 = (Integer)var1.getParam(Message.PARTITION_ZONES);
+         if (msg.isFor(Message.PARTITION_ZONES)) {
+            Integer var6 = (Integer)msg.getParam(Message.PARTITION_ZONES);
             if (var6 == null) {
-               var3 = (List)var1.getValue(Message.PARTITION_ZONES);
+               var3 = (List)msg.getValue(Message.PARTITION_ZONES);
                this.panelStatus.setZones(ImmutableList.copyOf(var3));
             } else {
                System.out.println("WARN: unexpected partition number for partition zones: " + var6);
             }
-         } else if (var1.isFor(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)) {
-            var2 = (List)((Pair)var1.getValue(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)).getValue0();
+         } else if (msg.isFor(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)) {
+            var2 = (List)((Pair)msg.getValue(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)).getValue0();
             this.panelStatus.setOutputs(ImmutableList.copyOf(var2));
-         } else if (var1.isFor(Message.PARTITION_STATUSES)) {
-            var2 = (List)var1.getParam(Message.PARTITION_STATUSES);
-            var3 = (List)var1.getValue(Message.PARTITION_STATUSES);
+         } else if (msg.isFor(Message.PARTITION_STATUSES)) {
+            var2 = (List)msg.getParam(Message.PARTITION_STATUSES);
+            var3 = (List)msg.getValue(Message.PARTITION_STATUSES);
 
             assert var2.size() == var3.size();
 
@@ -69,17 +69,17 @@ class StatusListener implements MessageListener {
                this.updatePartitionStatus(var5, (List)var3.get(var4));
             }
          } else {
-            int var7;
-            if (var1.isFor(Message.ZONE_STATUSES)) {
-               var7 = (Integer)((Pair)var1.getParam(Message.ZONE_STATUSES)).getValue0();
-               var3 = (List)var1.getValue(Message.ZONE_STATUSES);
+            int intID;
+            if (msg.isFor(Message.ZONE_STATUSES)) {
+               intID = (Integer)((Pair)msg.getParam(Message.ZONE_STATUSES)).getValue0();
+               var3 = (List)msg.getValue(Message.ZONE_STATUSES);
 
-               for(Iterator var11 = var3.iterator(); var11.hasNext(); ++var7) {
+               for(Iterator var11 = var3.iterator(); var11.hasNext(); ++intID) {
                   List<Boolean> var13 = (List)var11.next();
-                  this.updateZoneStatus(var7, var13);
+                  this.updateZoneStatus(intID, var13);
                }
-            } else if (var1.isFor(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION)) {
-               var2 = (List)var1.getValue(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION);
+            } else if (msg.isFor(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION)) {
+               var2 = (List)msg.getValue(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION);
                UnmodifiableIterator var8 = this.panelStatus.getOutputs().iterator();
 
                while(var8.hasNext()) {
@@ -87,27 +87,27 @@ class StatusListener implements MessageListener {
                   Status var14 = var2.contains(var12) ? Status.CLOSED : Status.OPEN;
                   this.panelStatus.setOutputStatus(var12, var14);
                }
-            } else if (var1.isFor(Message.ABSOLUTA_SYSTEM_LABEL)) {
-               String var9 = ((String)var1.getValue(Message.ABSOLUTA_SYSTEM_LABEL)).trim();
+            } else if (msg.isFor(Message.ABSOLUTA_SYSTEM_LABEL)) {
+               String var9 = ((String)msg.getValue(Message.ABSOLUTA_SYSTEM_LABEL)).trim();
                this.panelStatus.setSystemLabel(var9);
             } else {
-               String var10;
-               if (var1.isFor(Message.ABSOLUTA_PARTITION_LABEL)) {
-                  var7 = (Integer)var1.getParam(Message.ABSOLUTA_PARTITION_LABEL);
-                  var10 = ((String)var1.getValue(Message.ABSOLUTA_PARTITION_LABEL)).trim();
-                  this.panelStatus.setPartitionLabel(var7, var10);
-               } else if (var1.isFor(Message.ABSOLUTA_ZONE_LABEL)) {
-                  var7 = (Integer)var1.getParam(Message.ABSOLUTA_ZONE_LABEL);
-                  var10 = ((String)var1.getValue(Message.ABSOLUTA_ZONE_LABEL)).trim();
-                  this.panelStatus.setZoneLabel(var7, var10);
-               } else if (var1.isFor(Message.ABSOLUTA_OUTPUT_LABEL)) {
-                  var7 = (Integer)var1.getParam(Message.ABSOLUTA_OUTPUT_LABEL);
-                  var10 = ((String)var1.getValue(Message.ABSOLUTA_OUTPUT_LABEL)).trim();
-                  this.panelStatus.setOutputLabel(var7, var10);
-               } else if (var1.isFor(Message.ABSOLUTA_ARMING_MODE_LABEL)) {
-                  var7 = (Integer)var1.getParam(Message.ABSOLUTA_ARMING_MODE_LABEL);
-                  var10 = ((String)var1.getValue(Message.ABSOLUTA_ARMING_MODE_LABEL)).trim();
-                  this.panelStatus.setArmingModeLabel(var7, var10);
+               String label;
+               if (msg.isFor(Message.ABSOLUTA_PARTITION_LABEL)) {
+                  intID = (Integer)msg.getParam(Message.ABSOLUTA_PARTITION_LABEL);
+                  label = ((String)msg.getValue(Message.ABSOLUTA_PARTITION_LABEL)).trim();
+                  this.panelStatus.setPartitionLabel(intID, label);
+               } else if (msg.isFor(Message.ABSOLUTA_ZONE_LABEL)) {
+                  intID = (Integer)msg.getParam(Message.ABSOLUTA_ZONE_LABEL);
+                  label = ((String)msg.getValue(Message.ABSOLUTA_ZONE_LABEL)).trim();
+                  this.panelStatus.setZoneLabel(intID, label);
+               } else if (msg.isFor(Message.ABSOLUTA_OUTPUT_LABEL)) {
+                  intID = (Integer)msg.getParam(Message.ABSOLUTA_OUTPUT_LABEL);
+                  label = ((String)msg.getValue(Message.ABSOLUTA_OUTPUT_LABEL)).trim();
+                  this.panelStatus.setOutputLabel(intID, label);
+               } else if (msg.isFor(Message.ABSOLUTA_ARMING_MODE_LABEL)) {
+                  intID = (Integer)msg.getParam(Message.ABSOLUTA_ARMING_MODE_LABEL);
+                  label = ((String)msg.getValue(Message.ABSOLUTA_ARMING_MODE_LABEL)).trim();
+                  this.panelStatus.setArmingModeLabel(intID, label);
                }
             }
          }
