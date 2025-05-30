@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.swing.event.ChangeListener;
 import org.openide.util.ChangeSupport;
 import org.openide.util.Lookup;
@@ -26,7 +25,6 @@ public final class Device implements Provider, DeviceOrPanel {
    final OutputSupport outputSupport;
    private Device.Status status;
    private boolean discovered;
-   private String localName;
    private String remoteName;
    private String modelName;
    private String serialNumber;
