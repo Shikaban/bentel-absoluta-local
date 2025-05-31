@@ -72,7 +72,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void changePartitions(List<String> msg) {
-      //TODO: controllare dimensione array partitionIDs
+      //TODO: #STEFANO controllare dimensione array partitionIDs
+      //TODO: #STEFANO valutare se unire globale alle altre partizioni
       this.partitionIDs = (String[])msg.toArray(new String[0]);
       this.partitionNames = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
       this.partitionTopics = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
@@ -193,6 +194,30 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore: " + topic);
          }
+         topic = "homeassistant/switch/absoluta_sensor_" + sensorID + "_bypass/config";
+         payload = "{" +
+            "\"name\": \"" + sensorName + " Bypass\"," +
+            "\"state_topic\": \"ABS/sensor/" + sensorID + "_bypass" + "\"," +
+            "\"unique_id\": \"absoluta_sensor_" + sensorID + "_bypass\"," +
+            "\"command_topic\": \"ABS/sensor/" + sensorID + "/set\"," +
+            "\"payload_on\": \"ON\"," +
+            "\"payload_off\": \"OFF\"," +
+            "\"device_class\": \"switch\"," +
+            "\"device\": {" +
+               "\"identifiers\": [\"absoluta_panel\"]," +
+               "\"name\": \"Centrale Absoluta\"," +
+               "\"manufacturer\": \"Bentel\"," +
+               "\"model\": \"Absoluta\"" +
+            "}" +
+         "}";
+         try {
+            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
+            discoveryMsg.setQos(1);
+            discoveryMsg.setRetained(true);
+            this.mqttClient.publish(topic, discoveryMsg);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio discovery sensore Bypass: " + topic);
+         }
       }
       try {
          String str = "";
@@ -210,6 +235,11 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
       if(VERBOSE_DEBUG) {
          System.out.println("DEBUG: Sensore ID: " + sensorID + ", nome: " + sensorName);
+      }
+      try {
+         this.mqttClient.subscribe(this.sensorTopics[sensorIDInt] + "/set");
+      } catch (Exception ex) {
+         System.out.println("ERROR: subscribe to: " + this.sensorTopics[sensorIDInt]);
       }
    }
 
@@ -242,7 +272,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setLabelArming(char var1, String var2) {
-      // TODO: Implementare la logica per impostare l'etichetta di arming
+      //TODO: #STEFANO Implementare la logica per impostare l'etichetta di arming
    }
 
    public void setOutputRemoteName(String var1, String var2) {
@@ -252,7 +282,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setPartitionArming(String partitionID, Partition.Arming actArming) {
-      //TODO: agggiungi triggered 
+      //TODO: #STEFANO aggiungi triggered
       int partitionIDInt = Integer.parseInt(partitionID);
       if (actArming == cms.device.api.Partition.Arming.DISARMED) {
          this.partitionArmStatuses[partitionIDInt] = "disarmed";
@@ -414,24 +444,23 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
                // Se globale
                this.commandGlobal(idArray, msg);
             } else if (false) {
-               // TODO: Gestione comandi modalità zona
+               //TODO: #STEFANO Gestione comandi modalità zona
             } else {
                // Errore
-               System.out.println("WARN: ID " + idArray + " non valido");
+               System.out.println("WARN: ID " + idArray + " non valido per il topic: " + topic);
             }
          } else if (ArrayUtils.contains(this.sensorTopics, parentTopic)) {
             int idArray = ArrayUtils.indexOf(this.sensorTopics, parentTopic);
             if (idArray >= 0 && idArray < this.sensorIDs.length) {
                // Se sensore
-               // TODO: Gestione comandi per i sensori (bypass, unbypass)
-               // Panel.bypassInput(zoneID, setBypassed)
+               this.commandSensor(idArray, msg);
             } else {
                // Errore
-               System.out.println("WARN: ID " + idArray + " non valido");
+               System.out.println("WARN: ID " + idArray + " non valido per il topic: " + topic);
             }
          }
       } else if (topic.equals("homeassistant/status")) {
-         //TODO: Gestione della discovery
+         //TODO: #ALESSANDRO Gestione del reinvio degli stati quando home assistant si riavvia
       } else {
          // Comando non riconosciuto
          System.out.println("WARN: Comando non riconosciuto per il topic: " + topic);
@@ -487,6 +516,30 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             default:
                System.out.println("WARN: Comando " + msg.toString() + " non valido");
          }
+   }
+
+   private void commandSensor(int idArray, MqttMessage msg) {
+      //TODO: #STEFANO Gestione comandi per i sensori (bypass, unbypass)
+      //TODO: #Stefano e #ALESSANDRO Sensori 29->37 danno errore
+      if(msg.toString().equals("ON")) {
+         // Panel.bypassInput(idArray, true);
+      } else if(msg.toString().equals("OFF")){
+         // Panel.bypassInput(idArray, false);
+      } else {
+         System.out.println("WARN: Comando " + msg.toString() + " non valido per il sensore ID: " + idArray);
+      }
+
+      //TODO: #ALESSANDRO Spostare invio dello stato di bypass nella callback, È QUI SOLO PER TEST!
+      String topic = "ABS/sensor/" + idArray + "_bypass";  
+      String payload = msg.toString().toUpperCase();
+      try {
+            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
+            discoveryMsg.setQos(1);
+            this.mqttClient.publish(topic, discoveryMsg);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio comando Bypass sensore: " + topic);
+      }
+
    }
 
    public void deliveryComplete(IMqttDeliveryToken var1) {
