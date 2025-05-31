@@ -72,6 +72,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void changePartitions(List<String> msg) {
+      //TODO: controllare dimensione array partitionIDs
       this.partitionIDs = (String[])msg.toArray(new String[0]);
       this.partitionNames = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
       this.partitionTopics = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
@@ -84,24 +85,24 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       if (discoveryEnabled && !partitionDiscoverySent.contains(0)) {
          String topic = "homeassistant/alarm_control_panel/absoluta_partition_global/config";
          String payload = "{" +
-             "\"name\": \"Globale\"," +
-             "\"state_topic\": \"ABS/global\"," +
-             "\"unique_id\": \"absoluta_partition_global\"," +
-             "\"command_topic\": \"ABS/global/set\"," +
-             "\"code_arm_required\": false," +
-             "\"code_disarm_required\": false," +
-             "\"supported_features\": [\"arm_away\", \"arm_home\", \"arm_night\", \"arm_vacation\", \"arm_custom_bypass\"]," +
-             "\"payload_arm_away\": \"ARM_AWAY\"," +
-             "\"payload_arm_home\": \"MODE_A\"," +
-             "\"payload_arm_night\": \"MODE_B\"," +
-             "\"payload_arm_vacation\": \"MODE_C\"," +
-             "\"payload_arm_custom_bypass\": \"MODE_D\"," +
-             "\"device\": {" +
-                 "\"identifiers\": [\"absoluta_panel\"]," +
-                 "\"name\": \"Centrale Absoluta\"," +
-                 "\"manufacturer\": \"Bentel\"," +
-                 "\"model\": \"Absoluta\"" +
-             "}" +
+            "\"name\": \"Globale\"," +
+            "\"state_topic\": \"ABS/global\"," +
+            "\"unique_id\": \"absoluta_partition_global\"," +
+            "\"command_topic\": \"ABS/global/set\"," +
+            "\"code_arm_required\": false," +
+            "\"code_disarm_required\": false," +
+            "\"supported_features\": [\"arm_away\", \"arm_home\", \"arm_night\", \"arm_vacation\", \"arm_custom_bypass\"]," +
+            "\"payload_arm_away\": \"ARM_AWAY\"," +
+            "\"payload_arm_home\": \"MODE_A\"," +
+            "\"payload_arm_night\": \"MODE_B\"," +
+            "\"payload_arm_vacation\": \"MODE_C\"," +
+            "\"payload_arm_custom_bypass\": \"MODE_D\"," +
+            "\"device\": {" +
+               "\"identifiers\": [\"absoluta_panel\"]," +
+               "\"name\": \"Centrale Absoluta\"," +
+               "\"manufacturer\": \"Bentel\"," +
+               "\"model\": \"Absoluta\"" +
+            "}" +
          "}";
          try {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
@@ -172,16 +173,16 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       if (discoveryEnabled && !sensorDiscoverySent.contains(sensorIDInt)) {
          String topic = "homeassistant/binary_sensor/absoluta_sensor_" + sensorID + "/config";
          String payload = "{" +
-             "\"name\": \"" + sensorName + "\"," +
-             "\"state_topic\": \"ABS/sensor/" + sensorID + "\"," +
-             "\"unique_id\": \"absoluta_sensor_" + sensorID + "\"," +
-             "\"device_class\": \"motion\"," +
-             "\"device\": {" +
-                 "\"identifiers\": [\"absoluta_panel\"]," +
-                 "\"name\": \"Centrale Absoluta\"," +
-                 "\"manufacturer\": \"Bentel\"," +
-                 "\"model\": \"Absoluta\"" +
-             "}" +
+            "\"name\": \"" + sensorName + "\"," +
+            "\"state_topic\": \"ABS/sensor/" + sensorID + "\"," +
+            "\"unique_id\": \"absoluta_sensor_" + sensorID + "\"," +
+            "\"device_class\": \"motion\"," +
+            "\"device\": {" +
+               "\"identifiers\": [\"absoluta_panel\"]," +
+               "\"name\": \"Centrale Absoluta\"," +
+               "\"manufacturer\": \"Bentel\"," +
+               "\"model\": \"Absoluta\"" +
+            "}" +
          "}";
          try {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
@@ -241,6 +242,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setLabelArming(char var1, String var2) {
+      // TODO: Implementare la logica per impostare l'etichetta di arming
    }
 
    public void setOutputRemoteName(String var1, String var2) {
@@ -250,6 +252,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setPartitionArming(String partitionID, Partition.Arming actArming) {
+      //TODO: agggiungi triggered 
       int partitionIDInt = Integer.parseInt(partitionID);
       if (actArming == cms.device.api.Partition.Arming.DISARMED) {
          this.partitionArmStatuses[partitionIDInt] = "disarmed";
@@ -291,24 +294,24 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       if (discoveryEnabled && !partitionDiscoverySent.contains(partitionIDInt)  && partitionIDInt > 0) {
          String topic = "homeassistant/alarm_control_panel/absoluta_partition_" + partitionID + "/config";
          String payload = "{" +
-             "\"name\": \"" + partitionName + "\"," +
-             "\"state_topic\": \"ABS/partition/" + partitionID + "\"," +
-             "\"unique_id\": \"absoluta_partition_" + partitionID + "\"," +
-             "\"command_topic\": \"ABS/partition/" + partitionID + "/set\"," +
-             "\"code_arm_required\": false," +
-             "\"code_disarm_required\": false," +
-             "\"supported_features\": [\"arm_home\", \"arm_away\", \"arm_night\"]," +
-             "\"payload_arm_away\": \"ARM_AWAY\"," +
-             "\"payload_arm_home\": \"ARM_HOME\"," +
-             "\"payload_arm_night\": \"ARM_NIGHT\"," +
-             "\"payload_disarm\": \"DISARM\"," +
-             "\"device\": {" +
-                 "\"identifiers\": [\"absoluta_panel\"]," +
-                 "\"name\": \"Centrale Absoluta\"," +
-                 "\"manufacturer\": \"Bentel\"," +
-                 "\"model\": \"Absoluta\"" +
-             "}" +
-         "}";
+            "\"name\": \"" + partitionName + "\"," +
+            "\"state_topic\": \"ABS/partition/" + partitionID + "\"," +
+            "\"unique_id\": \"absoluta_partition_" + partitionID + "\"," +
+            "\"command_topic\": \"ABS/partition/" + partitionID + "/set\"," +
+            "\"code_arm_required\": false," +
+            "\"code_disarm_required\": false," +
+            "\"supported_features\": [\"arm_home\", \"arm_away\", \"arm_night\"]," +
+            "\"payload_arm_away\": \"ARM_AWAY\"," +
+            "\"payload_arm_home\": \"ARM_HOME\"," +
+            "\"payload_arm_night\": \"ARM_NIGHT\"," +
+            "\"payload_disarm\": \"DISARM\"," +
+            "\"device\": {" +
+               "\"identifiers\": [\"absoluta_panel\"]," +
+               "\"name\": \"Centrale Absoluta\"," +
+               "\"manufacturer\": \"Bentel\"," +
+               "\"model\": \"Absoluta\"" +
+            "}" +
+      "}";
          try {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
@@ -410,6 +413,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             } else if (idArray == 0) {
                // Se globale
                this.commandGlobal(idArray, msg);
+            } else if (false) {
+               // TODO: Gestione comandi modalità zona
             } else {
                // Errore
                System.out.println("WARN: ID " + idArray + " non valido");
@@ -418,8 +423,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             int idArray = ArrayUtils.indexOf(this.sensorTopics, parentTopic);
             if (idArray >= 0 && idArray < this.sensorIDs.length) {
                // Se sensore
-               //TODO: Gestione comandi per i sensori (bypass, unbypass)
-               // this.Panel.bypassInput(zoneID, setBypassed)
+               // TODO: Gestione comandi per i sensori (bypass, unbypass)
+               // Panel.bypassInput(zoneID, setBypassed)
             } else {
                // Errore
                System.out.println("WARN: ID " + idArray + " non valido");
