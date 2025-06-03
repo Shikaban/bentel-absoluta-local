@@ -51,6 +51,9 @@ public class Commander {
          break;
       case NODELAY:
          this.messageHandler.sendCommand(Message.ARM, Pair.with(partitionIDInteger, INSTANT_STAY_ARM));
+         break;
+      default:
+         break;
       }
 
    }
