@@ -279,29 +279,46 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       int modeIDInt = 0;
       switch (modeChar) {
          case 'A':
+            modeIDInt = 0;
+            if (modeLabel == null || modeLabel.trim().isEmpty()) {
+               modeDiscoverySent.add(modeIDInt);
+               break;
+            }
             this.modeNames[0] = modeLabel;
             break;
          case 'B':
-            this.modeNames[1] = modeLabel;
             modeIDInt = 1;
+            if (modeLabel == null || modeLabel.trim().isEmpty()) {
+               modeDiscoverySent.add(modeIDInt);
+               break;
+            }
+            this.modeNames[1] = modeLabel;
             break;
          case 'C':
-            this.modeNames[2] = modeLabel;
             modeIDInt = 2;
+            if (modeLabel == null || modeLabel.trim().isEmpty()) {
+               modeDiscoverySent.add(modeIDInt);
+               break;
+            }
+            this.modeNames[2] = modeLabel;
             break;
          case 'D':
-            this.modeNames[3] = modeLabel;
             modeIDInt = 3;
+            if (modeLabel == null || modeLabel.trim().isEmpty()) {
+               modeDiscoverySent.add(modeIDInt);
+               break;
+            }
+            this.modeNames[3] = modeLabel;
             break;
          default:
             break;
       }
-      // Invia discovery solo la prima volta per ogni sensore
+      // Invia discovery solo la prima volta per ogni modalità
       if (discoveryEnabled && !modeDiscoverySent.contains(modeIDInt)) {
          //TODO: @ALESSANDRO verifica se la gestione homeassistant è corretta
          String topic = "homeassistant/button/absoluta_mode_" + modeChar + "/config";
          String payload = "{" +
-         "\"name\": \"Mode " + modeChar + "\"," +
+         "\"name\": \"Mode " + modeLabel + "\"," +
          "\"state_topic\": \"ABS/mode/" + modeChar + "\"," +
          "\"unique_id\": \"absoluta_mode_" + modeChar + "\"," +
          "\"command_topic\": \"ABS/mode/" + modeChar + "/set\"," +
@@ -317,6 +334,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
             discoveryMsg.setRetained(true);
+            modeDiscoverySent.add(modeIDInt);
             this.mqttClient.publish(topic, discoveryMsg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore Bypass: " + topic);
