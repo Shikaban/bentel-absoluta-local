@@ -436,7 +436,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       try {
          String str = "";
          if(discoveryEnabled){
-            str = this.partitionStatuses[partitionIDInt];
+            str = this.partitionNames[partitionIDInt];
          } else {
             str = "Name: " + this.partitionNames[partitionIDInt] + " Arming: " + this.partitionArmStatuses[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt];
          }
