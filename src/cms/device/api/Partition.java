@@ -77,13 +77,12 @@ public class Partition {
       return Collections.unmodifiableList(this.inputsIds);
    }
 
-   //TODO: unifica arming e status
-
    public static enum Arming {
       DISARMED,
       AWAY,
       STAY,
-      NODELAY;
+      NODELAY,
+      TRIGGERED;
    }
 
    public static enum Status {
