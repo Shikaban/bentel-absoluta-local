@@ -25,7 +25,7 @@ public final class Panel implements DeviceOrPanel {
    final OutputSupport outputSupport;
 
    public Panel(PanelProvider provider) {
-      this.arming = Panel.Arming.GLOBALLY_DISARMED;
+      this.arming = Panel.Arming.NOT_AVAILABLE;
       this.status = Panel.Status.OK;
 
       this.connected = false;
@@ -206,7 +206,8 @@ public final class Panel implements DeviceOrPanel {
    public static enum Arming {
       GLOBALLY_ARMED,
       PARTIALLY_ARMED,
-      GLOBALLY_DISARMED;
+      GLOBALLY_DISARMED,
+      NOT_AVAILABLE;
    }
 
    public static enum Status {
