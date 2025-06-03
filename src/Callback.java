@@ -28,6 +28,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private String[] partitionStatuses;
    private String[] sensorTopics;
    private String[] partitionTopics;
+   private String[] modeNames = new String[4];
    private Panel panel;
    private MqttConnectOptions connOpts;
    private int reconnectionAttempts = 0;
@@ -36,6 +37,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private static final boolean VERBOSE_DEBUG = false;
    private HashSet<Integer> sensorDiscoverySent = new HashSet<>();
    private HashSet<Integer> partitionDiscoverySent = new HashSet<>();
+   private HashSet<Integer> modeDiscoverySent = new HashSet<>();
    private Boolean discoveryEnabled;
 
    public Callback(MqttClient mqttClient, Panel panel, MqttConnectOptions mqttOption, Boolean discoveryEnabled) {
@@ -273,8 +275,59 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
    }
 
-   public void setLabelArming(char var1, String var2) {
-      //TODO: #STEFANO Implementare la logica per impostare l'etichetta di arming
+   public void setLabelArming(char modeChar, String modeLabel) {
+      int modeIDInt = 0;
+      switch (modeChar) {
+         case 'A':
+            this.modeNames[0] = modeLabel;
+            break;
+         case 'B':
+            this.modeNames[1] = modeLabel;
+            modeIDInt = 1;
+            break;
+         case 'C':
+            this.modeNames[2] = modeLabel;
+            modeIDInt = 2;
+            break;
+         case 'D':
+            this.modeNames[3] = modeLabel;
+            modeIDInt = 3;
+            break;
+         default:
+            break;
+      }
+      // Invia discovery solo la prima volta per ogni sensore
+      if (discoveryEnabled && !modeDiscoverySent.contains(modeIDInt)) {
+         //TODO: @ALESSANDRO verifica se la gestione homeassistant è corretta
+         String topic = "homeassistant/button/absoluta_mode_" + modeChar + "/config";
+         String payload = "{" +
+         "\"name\": \"Mode " + modeChar + "\"," +
+         "\"state_topic\": \"ABS/mode/" + modeChar + "\"," +
+         "\"unique_id\": \"absoluta_mode_" + modeChar + "\"," +
+         "\"command_topic\": \"ABS/mode/" + modeChar + "/set\"," +
+         "\"payload_press\": \"MODE_" + modeChar + "\"," +
+         "\"device\": {" +
+            "\"identifiers\": [\"absoluta_panel\"]," +
+            "\"name\": \"Centrale Absoluta\"," +
+            "\"manufacturer\": \"Bentel\"," +
+            "\"model\": \"Absoluta\"" +
+         "}" +
+         "}";
+         try {
+            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
+            discoveryMsg.setQos(1);
+            discoveryMsg.setRetained(true);
+            this.mqttClient.publish(topic, discoveryMsg);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio discovery sensore Bypass: " + topic);
+         }
+      }
+
+      try {
+         this.mqttClient.subscribe("ABS/mode");
+      } catch (Exception ex) {
+         System.out.println("ERROR: subscribe to: " + "ABS/mode");
+      }
    }
 
    public void setOutputRemoteName(String var1, String var2) {
@@ -446,8 +499,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             } else if (idArray == 0) {
                // Se globale
                this.commandGlobal(idArray, msg);
-            } else if (false) {
-               //TODO: #STEFANO Gestione comandi modalità zona
             } else {
                // Errore
                System.out.println("WARN: ID " + idArray + " non valido per il topic: " + topic);
@@ -462,6 +513,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
                // Errore
                System.out.println("WARN: ID " + idArray + " non valido per il topic: " + topic);
             }
+         } else if (parentTopic.contains("mode")) {
+            this.commandMode(msg);
          }
       } else if (topic.equals("homeassistant/status")) {
          //TODO: #ALESSANDRO Gestione del reinvio degli stati quando home assistant si riavvia
@@ -469,7 +522,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          // Comando non riconosciuto
          System.out.println("WARN: Comando non riconosciuto per il topic: " + topic);
       }
-
    }
 
    private void commandPartition(int idArray, MqttMessage msg) {
@@ -505,21 +557,31 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             case "ARM_AWAY":
                this.panel.arming(Arming.GLOBALLY_ARMED);
                return;
-            case "MODE_A" :
-               this.panel.modalityArming('A');
-               return;
-            case "MODE_B" :
-               this.panel.modalityArming('B');
-               return;
-            case "MODE_C" :
-               this.panel.modalityArming('C');
-               return;
-            case "MODE_D" :
-               this.panel.modalityArming('D');
-               return;
             default:
                System.out.println("WARN: Comando " + msg.toString() + " non valido");
          }
+   }
+
+   private void commandMode(MqttMessage msg) {
+      if(VERBOSE_DEBUG) {
+         System.out.println("DEBUG: Comando ricevuto per modalità: " + msg.toString());
+      }
+      switch (msg.toString().toUpperCase()) {
+         case "MODE_A" :
+            this.panel.modalityArming('A');
+            return;
+         case "MODE_B" :
+            this.panel.modalityArming('B');
+            return;
+         case "MODE_C" :
+            this.panel.modalityArming('C');
+            return;
+         case "MODE_D" :
+            this.panel.modalityArming('D');
+            return;
+         default:
+            System.out.println("WARN: Comando " + msg.toString() + " non valido");
+      }
    }
 
    private void commandSensor(int idArray, MqttMessage msg) {
