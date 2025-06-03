@@ -14,7 +14,7 @@ public class Partition {
    private final ChangeSupport changeSupport;
 
    public Partition(Panel var1) {
-      this.arming = Partition.Arming.DISARMED;
+      this.arming = Partition.Arming.NOT_AVAILABLE;
       this.status = Partition.Status.OK;
       this.inputsIds = new ArrayList();
       this.changeSupport = new ChangeSupport(this);
@@ -82,7 +82,8 @@ public class Partition {
       AWAY,
       STAY,
       NODELAY,
-      TRIGGERED;
+      TRIGGERED,
+      NOT_AVAILABLE;
    }
 
    public static enum Status {
