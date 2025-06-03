@@ -603,6 +603,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    private void commandSensor(int idArray, MqttMessage msg) {
+      //TODO: @Stefano verificare perchè non viene mai mandato il comando di bypass alla centrale
       //TODO: #Stefano e #ALESSANDRO Sensori 29->37 danno errore
       if(msg.toString().equals("ON")) {
          this.panel.bypassInput(this.sensorIDs[idArray], true);
