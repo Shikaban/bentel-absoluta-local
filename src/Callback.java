@@ -19,8 +19,8 @@ import cms.device.spi.PanelProvider;
 
 class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private MqttClient mqttClient;
-   private String[] sensorIDs;
-   private String[] partitionIDs;
+   private int[] sensorIDs;
+   private int[] partitionIDs;
    private String[] sensorNames;
    private String[] partitionNames;
    private String[] sensorStatuses;
@@ -61,13 +61,22 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void changeInputs(List<String> msg) {
-      this.sensorIDs = (String[])msg.toArray(new String[0]);
-      // Utilizzo l'ultimo ID come dimensione degli array per allineare il numero dell'ID all'indice dell'array
-      this.sensorNames = new String[Integer.parseInt(this.sensorIDs[this.sensorIDs.length - 1]) + 1];
-      this.sensorTopics = new String[Integer.parseInt(this.sensorIDs[this.sensorIDs.length - 1]) + 1];
-      this.sensorStatuses = new String[Integer.parseInt(this.sensorIDs[this.sensorIDs.length - 1]) + 1];
+      this.sensorIDs = new int[msg.size()];
+      int maxId = 0;
+      for (int i = 0; i < msg.size(); i++) {
+         try {
+            this.sensorIDs[i] = Integer.parseInt(msg.get(i));
+            if (this.sensorIDs[i] > maxId) maxId = this.sensorIDs[i];
+         } catch (NumberFormatException e) {
+            System.err.println("Errore di parsing sensorID: '" + msg.get(i) + "' non è un intero valido.");
+            this.sensorIDs[i] = -1;
+         }
+      }
+      this.sensorNames = new String[maxId + 1];
+      this.sensorTopics = new String[maxId + 1];
+      this.sensorStatuses = new String[maxId + 1];
       if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: Sensore ID: " + String.valueOf(msg));
+         System.out.println("DEBUG: Sensore ID: " + msg);
       }
    }
 
@@ -75,11 +84,15 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void changePartitions(List<String> msg) {
-      // Predispongo l'ID zero vuoto perchè usato dalla globale
-      this.partitionIDs = new String[msg.size() + 1];
-      this.partitionIDs[0] = "0";
+      this.partitionIDs = new int[msg.size() + 1];
+      this.partitionIDs[0] = 0;
       for (int i = 0; i < msg.size(); i++) {
-         this.partitionIDs[i + 1] = msg.get(i);
+         try {
+            this.partitionIDs[i + 1] = Integer.parseInt(msg.get(i));
+         } catch (NumberFormatException e) {
+            System.err.println("Errore di parsing partitionID: '" + msg.get(i) + "' non è un intero valido.");
+            this.partitionIDs[i + 1] = -1;
+         }
       }
       //TODO: #STEFANO valutare se unire globale alle altre partizioni
       this.partitionNames = new String[this.partitionIDs.length];
@@ -176,7 +189,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       this.sensorTopics[sensorIDInt] = "ABS/sensor/" + sensorIDInt;
       // Invia discovery solo la prima volta per ogni sensore
       if (discoveryEnabled && !sensorDiscoverySent.contains(sensorIDInt)) {
-         String topic = "homeassistant/binary_sensor/absoluta_sensor_" + sensorID + "/config";
+         String topic = "homeassistant/binary_sensor/absoluta_sensor_" + sensorIDInt + "/config";
          String payload = "{" +
             "\"name\": \"" + sensorName + "\"," +
             "\"state_topic\": \"ABS/sensor/" + sensorID + "\"," +
@@ -198,7 +211,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore: " + topic);
          }
-         topic = "homeassistant/switch/absoluta_sensor_" + sensorID + "_bypass/config";
+         topic = "homeassistant/switch/absoluta_sensor_" + sensorIDInt + "_bypass/config";
          payload = "{" +
             "\"name\": \"" + sensorName + " Bypass\"," +
             "\"state_topic\": \"ABS/sensor/" + sensorID + "_bypass" + "\"," +
@@ -315,7 +328,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
       // Invia discovery solo la prima volta per ogni modalità
       if (discoveryEnabled && !modeDiscoverySent.contains(modeIDInt)) {
-         //TODO: @ALESSANDRO verifica se la gestione homeassistant è corretta
          String topic = "homeassistant/button/absoluta_mode_" + modeChar + "/config";
          String payload = "{" +
          "\"name\": \"Mode " + modeLabel + "\"," +
@@ -544,24 +556,24 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
 
    private void commandPartition(int idArray, MqttMessage msg) {
       if(VERBOSE_DEBUG) {
-            System.out.println("DEBUG: Comando ricevuto per partizione numero: " + idArray + " nuovo stato: " + msg.toString());
-         }
-         switch (msg.toString().toUpperCase()) {
-            case "DISARM":
-               this.panel.partitionArming(this.partitionIDs[idArray], cms.device.api.Partition.Arming.DISARMED);
-               return;
-            case "ARM_HOME":
-               this.panel.partitionArming(this.partitionIDs[idArray], cms.device.api.Partition.Arming.STAY);
-               return;
-            case "ARM_AWAY":
-               this.panel.partitionArming(this.partitionIDs[idArray], cms.device.api.Partition.Arming.AWAY);
-               return;
-            case "ARM_NIGHT":
-               this.panel.partitionArming(this.partitionIDs[idArray], cms.device.api.Partition.Arming.NODELAY);
-               return;
-            default:
-               System.out.println("WARN: Comando " + msg.toString() + " non valido");
-         }
+         System.out.println("DEBUG: Comando ricevuto per partizione numero: " + idArray + " nuovo stato: " + msg.toString());
+      }
+      switch (msg.toString().toUpperCase()) {
+         case "DISARM":
+            this.panel.partitionArming(String.valueOf(this.partitionIDs[idArray]), cms.device.api.Partition.Arming.DISARMED);
+            return;
+         case "ARM_HOME":
+            this.panel.partitionArming(String.valueOf(this.partitionIDs[idArray]), cms.device.api.Partition.Arming.STAY);
+            return;
+         case "ARM_AWAY":
+            this.panel.partitionArming(String.valueOf(this.partitionIDs[idArray]), cms.device.api.Partition.Arming.AWAY);
+            return;
+         case "ARM_NIGHT":
+            this.panel.partitionArming(String.valueOf(this.partitionIDs[idArray]), cms.device.api.Partition.Arming.NODELAY);
+            return;
+         default:
+            System.out.println("WARN: Comando " + msg.toString() + " non valido");
+      }
    }
 
    private void commandGlobal(int idArray, MqttMessage msg) {
@@ -603,12 +615,10 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    private void commandSensor(int idArray, MqttMessage msg) {
-      //TODO: @Stefano verificare perchè non viene mai mandato il comando di bypass alla centrale
-      //TODO: #Stefano e #ALESSANDRO Sensori 29->37 danno errore
       if(msg.toString().equals("ON")) {
-         this.panel.bypassInput(this.sensorIDs[idArray], true);
+         this.panel.bypassInput(String.valueOf(this.sensorIDs[idArray]), true);
       } else if(msg.toString().equals("OFF")){
-         this.panel.bypassInput(this.sensorIDs[idArray], false);
+         this.panel.bypassInput(String.valueOf(this.sensorIDs[idArray]), false);
       } else {
          System.out.println("WARN: Comando " + msg.toString() + " non valido per il sensore ID: " + idArray);
       }
