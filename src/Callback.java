@@ -261,10 +261,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setInputStatus(String sensorID, Input.Status sensorStatus) {
-      if (this.panel.getBypassInput(sensorID)) {
-         //TODO @Alessandro, qui ricevi se il sensore è bypassato o meno
-         return;
-      }
       int sensorIDInt = Integer.parseInt(sensorID);
       if (sensorStatus != Status.ACTIVE && sensorStatus != Status.ALARM) {
          this.sensorStatuses[sensorIDInt] = "Off";
@@ -287,8 +283,25 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             System.out.println("ERROR: invio messaggio: " + this.sensorTopics[sensorIDInt]);
          }
       }
+
       if(VERBOSE_DEBUG) {
          System.out.println("Sensore ID: " + sensorID + " stato cambiato in: " + sensorStatus.toString());
+      }
+
+      //TODO: #STEFANO esiste funzione dedicata per il feedback del bypass dei sensori?
+      String bypassStatus = "";
+      String topic = "ABS/sensor/" + sensorID + "_bypass";  
+      if (this.panel.getBypassInput(sensorID)) {
+         bypassStatus = "ON";
+      } else {
+         bypassStatus = "OFF";
+      }
+      try {
+            MqttMessage discoveryMsg = new MqttMessage(bypassStatus.getBytes());
+            discoveryMsg.setQos(1);
+            this.mqttClient.publish(topic, discoveryMsg);
+         } catch (Exception ex) {
+            System.out.println("ERROR: invio comando Bypass sensore: " + topic);
       }
    }
 
@@ -626,18 +639,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       } else {
          System.out.println("WARN: Comando " + msg.toString() + " non valido per il sensore ID: " + idArray);
       }
-
-      //TODO: #ALESSANDRO Spostare invio dello stato di bypass nella callback, È QUI SOLO PER TEST!
-      String topic = "ABS/sensor/" + idArray + "_bypass";  
-      String payload = msg.toString().toUpperCase();
-      try {
-            MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
-            discoveryMsg.setQos(1);
-            this.mqttClient.publish(topic, discoveryMsg);
-         } catch (Exception ex) {
-            System.out.println("ERROR: invio comando Bypass sensore: " + topic);
-      }
-
    }
 
    public void deliveryComplete(IMqttDeliveryToken var1) {
