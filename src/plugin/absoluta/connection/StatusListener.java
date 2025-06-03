@@ -132,6 +132,25 @@ class StatusListener implements MessageListener {
          newPartitionmode = Arming.NODELAY;
       }
 
+      // Rilevo lo stato della partizione
+      cms.device.api.Partition.Status newPartitionStatus;
+      if ((Boolean)dataPartitionMask.get(PI_FIRE)) {
+         newPartitionStatus = cms.device.api.Partition.Status.FIRE;
+      } else if ((Boolean)dataPartitionMask.get(PI_TROUBLES)) {
+         newPartitionStatus = cms.device.api.Partition.Status.FAULTS;
+      } else if (!(Boolean)dataPartitionMask.get(PI_ALARM) && !(Boolean)dataPartitionMask.get(PI_ALARM_IN_MEMORY)) {
+         newPartitionStatus = cms.device.api.Partition.Status.OK;
+      } else {
+         newPartitionStatus = cms.device.api.Partition.Status.ALARMS;
+      }
+
+      this.panelStatus.setPartitionStatus(selectedPartitionID, newPartitionStatus);
+
+      // Se la partizione è in allarme, imposto TRIGGERED
+      if (newPartitionStatus == cms.device.api.Partition.Status.ALARMS){
+         newPartitionmode = Arming.TRIGGERED;
+      }
+
       this.panelStatus.setPartitionArming(selectedPartitionID, newPartitionmode);
       boolean systemArmed = false;
       boolean onePartitionDisarmed = false;
@@ -162,18 +181,6 @@ class StatusListener implements MessageListener {
       }
 
       this.panelStatus.setGlobalArming(newGlobalMode);
-      cms.device.api.Partition.Status newPartitionStatus;
-      if ((Boolean)dataPartitionMask.get(PI_FIRE)) {
-         newPartitionStatus = cms.device.api.Partition.Status.FIRE;
-      } else if ((Boolean)dataPartitionMask.get(PI_TROUBLES)) {
-         newPartitionStatus = cms.device.api.Partition.Status.FAULTS;
-      } else if (!(Boolean)dataPartitionMask.get(PI_ALARM) && !(Boolean)dataPartitionMask.get(PI_ALARM_IN_MEMORY)) {
-         newPartitionStatus = cms.device.api.Partition.Status.OK;
-      } else {
-         newPartitionStatus = cms.device.api.Partition.Status.ALARMS;
-      }
-
-      this.panelStatus.setPartitionStatus(selectedPartitionID, newPartitionStatus);
    }
 
    private void updateZoneStatus(int zoneID, List<Boolean> var2) {
