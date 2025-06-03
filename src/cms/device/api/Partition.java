@@ -2,7 +2,6 @@ package cms.device.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import org.openide.util.ChangeSupport;
 
@@ -51,26 +50,16 @@ public class Partition {
       this.changeSupport.fireChange();
    }
 
-   public synchronized void addInputs(List<String> var1) {
-      Iterator var2 = this.inputsIds.iterator();
+   public synchronized void addInputs(List<String> newInputIds) {
+      // Rimuovi gli input che non sono più presenti
+      inputsIds.removeIf(existingId -> !newInputIds.contains(existingId));
 
-      String var3;
-      while(var2.hasNext()) {
-         var3 = (String)var2.next();
-         if (!var1.contains(var3)) {
-            this.inputsIds.remove(var3);
+      // Aggiungi i nuovi input che non sono già presenti
+      for (String inputId : newInputIds) {
+         if (!inputsIds.contains(inputId)) {
+            inputsIds.add(inputId);
          }
       }
-
-      var2 = var1.iterator();
-
-      while(var2.hasNext()) {
-         var3 = (String)var2.next();
-         if (!this.inputsIds.contains(var3)) {
-            this.inputsIds.add(var3);
-         }
-      }
-
    }
 
    public List<String> getInputs() {

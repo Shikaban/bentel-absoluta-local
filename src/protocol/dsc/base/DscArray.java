@@ -4,13 +4,12 @@ import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public final class DscArray<T extends DscSerializable> extends ArrayList<T> implements DscSerializable {
    private final DscArray.ElementProvider<T> elementProvider;
 
    public DscArray(DscArray.ElementProvider<T> var1) {
-      this.elementProvider = (DscArray.ElementProvider)Preconditions.checkNotNull(var1);
+      this.elementProvider = Preconditions.checkNotNull(var1);
    }
 
    public void readFrom(ByteBuf var1) throws IndexOutOfBoundsException, DecoderException {
@@ -34,20 +33,16 @@ public final class DscArray<T extends DscSerializable> extends ArrayList<T> impl
 
    }
 
-   public void writeTo(ByteBuf var1) {
-      Iterator var2 = this.iterator();
-
-      while(var2.hasNext()) {
-         T var3 = (T) var2.next();
-         var3.writeTo(var1);
+   public void writeTo(ByteBuf buffer) {
+      for (T element : this) {
+         element.writeTo(buffer);
       }
-
    }
 
    public boolean isEquivalent(DscSerializable var1) {
       if (var1 instanceof DscArray) {
          int var2 = this.size();
-         DscArray<?> var3 = (DscArray)var1;
+         DscArray<?> var3 = (DscArray<?>)var1;
          if (var2 != var3.size()) {
             return false;
          } else {
@@ -76,7 +71,6 @@ public final class DscArray<T extends DscSerializable> extends ArrayList<T> impl
 
    public interface ElementProvider<T> {
       int numberOfElements();
-
       T newElement();
    }
 }

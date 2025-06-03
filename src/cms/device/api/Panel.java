@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 
 import cms.device.spi.PanelProvider;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,38 +105,27 @@ public final class Panel implements DeviceOrPanel {
 
    public void fireChange() {
       this.changeSupport.fireChange();
-      Iterator var1 = this.getPartitions().values().iterator();
-
-      while(var1.hasNext()) {
-         Partition var2 = (Partition)var1.next();
-         var2.fireChange();
+      for (Partition partition : this.getPartitions().values()) {
+         partition.fireChange();
       }
-
-      var1 = this.getInputs().values().iterator();
-
-      while(var1.hasNext()) {
-         Input var3 = (Input)var1.next();
-         var3.fireChange();
+      for (Input input : this.getInputs().values()) {
+         input.fireChange();
       }
    }
 
-   void doChangePartitions(Iterable<String> var1) {
-      ImmutableList var2 = ImmutableList.copyOf(this.partitions.keySet());
-      if (!Iterables.elementsEqual(var2, var1)) {
-         LinkedHashMap var3 = Maps.newLinkedHashMap();
-         Iterator var4 = var1.iterator();
-
-         while(var4.hasNext()) {
-            String var5 = (String)var4.next();
-            if (this.partitions.containsKey(var5)) {
-               var3.put(var5, (Partition)this.partitions.remove(var5));
+   void doChangePartitions(Iterable<String> newPartitionIds) {
+      ImmutableList<String> currentPartitionIds = ImmutableList.copyOf(this.partitions.keySet());
+      if (!Iterables.elementsEqual(currentPartitionIds, newPartitionIds)) {
+         LinkedHashMap<String, Partition> updatedPartitions = Maps.newLinkedHashMap();
+         for (String partitionId : newPartitionIds) {
+            if (this.partitions.containsKey(partitionId)) {
+               updatedPartitions.put(partitionId, this.partitions.remove(partitionId));
             } else {
-               var3.put(var5, new Partition(this));
+               updatedPartitions.put(partitionId, new Partition(this));
             }
          }
-
          this.partitions.clear();
-         this.partitions.putAll(var3);
+         this.partitions.putAll(updatedPartitions);
          this.fireChange();
       }
    }
@@ -150,23 +138,19 @@ public final class Panel implements DeviceOrPanel {
       this.impl.partitionArming(var1, var2);
    }
 
-   private void doChangeInputs(Iterable<String> var1) {
-      ImmutableList var2 = ImmutableList.copyOf(this.inputs.keySet());
-      if (!Iterables.elementsEqual(var2, var1)) {
-         LinkedHashMap var3 = Maps.newLinkedHashMap();
-         Iterator var4 = var1.iterator();
-
-         while(var4.hasNext()) {
-            String var5 = (String)var4.next();
-            if (this.inputs.containsKey(var5)) {
-               var3.put(var5, (Input)this.inputs.remove(var5));
+   private void doChangeInputs(Iterable<String> newInputIds) {
+      ImmutableList<String> currentInputIds = ImmutableList.copyOf(this.inputs.keySet());
+      if (!Iterables.elementsEqual(currentInputIds, newInputIds)) {
+         LinkedHashMap<String, Input> updatedInputs = Maps.newLinkedHashMap();
+         for (String inputId : newInputIds) {
+            if (this.inputs.containsKey(inputId)) {
+               updatedInputs.put(inputId, this.inputs.remove(inputId));
             } else {
-               var3.put(var5, new Input(this));
+               updatedInputs.put(inputId, new Input(this));
             }
          }
-
          this.inputs.clear();
-         this.inputs.putAll(var3);
+         this.inputs.putAll(updatedInputs);
          this.fireChange();
       }
    }
@@ -243,10 +227,8 @@ public final class Panel implements DeviceOrPanel {
       }
 
       public void setPartitionsArming(Partition.Arming var1) {
-         Iterator var2 = Panel.this.getPartitions().values().iterator();
-         while(var2.hasNext()) {
-            Partition var3 = (Partition)var2.next();
-            var3.setArming(var1);
+         for (Partition partition : Panel.this.getPartitions().values()) {
+            partition.setArming(var1);
          }
       }
 

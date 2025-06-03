@@ -1,7 +1,6 @@
 package cms.device.api;
 
 import com.google.common.base.Preconditions;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.SwingUtilities;
@@ -19,18 +18,13 @@ public final class AlertNotifier {
       System.out.println("TRACE: firing new event: " + var3);
       SwingUtilities.invokeLater(new Runnable() {
          public void run() {
-            Iterator var1 = AlertNotifier.this.listeners.iterator();
-
-            while(var1.hasNext()) {
-               AlertListener var2 = (AlertListener)var1.next();
-
+            for (AlertListener listener : AlertNotifier.this.listeners) {
                try {
-                  var2.alertEventReceived(var3);
+                  listener.alertEventReceived(var3);
                } catch (RuntimeException ex) {
                   System.out.println("WARN: exception in event listener: " + ex);
                }
             }
-
          }
       });
    }
