@@ -3,47 +3,45 @@ package protocol.dsc.messages;
 import io.netty.channel.ChannelHandlerContext;
 import protocol.dsc.commands.DscCommandWithAppSeq;
 import protocol.dsc.commands.EnterConfigurationMode;
-
 import org.javatuples.Pair;
 
 public class EnterConfigurationModeWriting<P> extends Writing<P> {
    private final int type;
    private final boolean readWrite;
 
-   public static EnterConfigurationModeWriting<Pair<Integer, String>> withPartitionAndCodeParam(int var0, boolean var1) {
-      return new EnterConfigurationModeWriting<Pair<Integer, String>>(var0, var1);
+   public static EnterConfigurationModeWriting<Pair<Integer, String>> withPartitionAndCodeParam(int type, boolean readWrite) {
+      return new EnterConfigurationModeWriting<>(type, readWrite);
    }
 
-   public static EnterConfigurationModeWriting<Integer> withPartitionParam(int var0, boolean var1) {
-      return new EnterConfigurationModeWriting<Integer>(var0, var1);
+   public static EnterConfigurationModeWriting<Integer> withPartitionParam(int type, boolean readWrite) {
+      return new EnterConfigurationModeWriting<>(type, readWrite);
    }
 
-   private EnterConfigurationModeWriting(int var1, boolean var2) {
-      this.type = var1;
-      this.readWrite = var2;
+   private EnterConfigurationModeWriting(int type, boolean readWrite) {
+      this.type = type;
+      this.readWrite = readWrite;
    }
 
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, P var2) throws Exception {
-      int var3;
-      String var4;
-      if (var2 instanceof Pair) {
-         Pair<?, ?> var5 = (Pair)var2;
-         var3 = (Integer)var5.getValue0();
-         var4 = (String)var5.getValue1();
+   @Override
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext ctx, P param) throws Exception {
+      int partitionNumber;
+      String programmingAccessCode;
+
+      if (param instanceof Pair<?, ?> pair) {
+         partitionNumber = (Integer) pair.getValue0();
+         programmingAccessCode = (String) pair.getValue1();
+      } else if (param instanceof Integer) {
+         partitionNumber = (Integer) param;
+         programmingAccessCode = Messages.getPin(ctx);
       } else {
-         if (!(var2 instanceof Integer)) {
-            throw new IllegalArgumentException("unexpected param class");
-         }
-
-         var3 = (Integer)var2;
-         var4 = Messages.getPin(var1);
+         throw new IllegalArgumentException("Unexpected parameter class: " + param.getClass());
       }
 
-      EnterConfigurationMode var6 = new EnterConfigurationMode();
-      var6.setPartitionNumber(var3);
-      var6.setType(this.type);
-      var6.setProgrammingAccessCode(var4);
-      var6.setReadWrite(this.readWrite);
-      return var6;
+      EnterConfigurationMode command = new EnterConfigurationMode();
+      command.setPartitionNumber(partitionNumber);
+      command.setType(this.type);
+      command.setProgrammingAccessCode(programmingAccessCode);
+      command.setReadWrite(this.readWrite);
+      return command;
    }
 }

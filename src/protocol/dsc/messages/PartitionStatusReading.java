@@ -13,22 +13,23 @@ public class PartitionStatusReading extends RequestableCommandReading<Integer, L
       super(PartitionStatus.class);
    }
 
-   protected PartitionStatus prepareRequest(ChannelHandlerContext var1, Integer var2) {
-      PartitionStatus var3 = new PartitionStatus();
-      var3.setPartition(var2);
-      return var3;
+   @Override
+   protected PartitionStatus prepareRequest(ChannelHandlerContext ctx, Integer partitionNumber) {
+      PartitionStatus request = new PartitionStatus();
+      request.setPartition(partitionNumber);
+      return request;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, PartitionStatus var2, List<Message.Response> var3) {
-      List<Integer> var4 = var2.getPartitions();
-      List<? extends List<Boolean>> var5 = var2.getStatuses();
-      if (var4.size() != var5.size()) {
-         throw new IllegalArgumentException("invalid partition status");
-      } else {
-         for(int var6 = 0; var6 < var4.size(); ++var6) {
-            var3.add(new NewValue(this, var4.get(var6), Collections.unmodifiableList((List)var5.get(var6))));
-         }
-
+   @Override
+   protected void parseResponse(ChannelHandlerContext ctx, PartitionStatus response, List<Message.Response> responses) {
+      List<Integer> partitions = response.getPartitions();
+      List<? extends List<Boolean>> statuses = response.getStatuses();
+      if (partitions.size() != statuses.size()) {
+         throw new IllegalArgumentException("Invalid partition status: partitions and statuses size mismatch");
+      }
+      for (int i = 0; i < partitions.size(); i++) {
+         List<Boolean> status = Collections.unmodifiableList(statuses.get(i));
+         responses.add(new NewValue(this, partitions.get(i), status));
       }
    }
 }

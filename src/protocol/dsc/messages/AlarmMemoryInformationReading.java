@@ -13,14 +13,20 @@ public class AlarmMemoryInformationReading extends RequestableCommandReading<Int
       super(AlarmMemoryInformation.class);
    }
 
-   protected AlarmMemoryInformation prepareRequest(ChannelHandlerContext var1, Integer var2) throws Exception {
-      AlarmMemoryInformation var3 = new AlarmMemoryInformation();
-      var3.setPartitionNumber(var2);
-      return var3;
+   @Override
+   protected AlarmMemoryInformation prepareRequest(ChannelHandlerContext ctx, Integer partitionNumber) throws Exception {
+      AlarmMemoryInformation request = new AlarmMemoryInformation();
+      request.setPartitionNumber(partitionNumber);
+      return request;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, AlarmMemoryInformation var2, List<Message.Response> var3) {
-      Triplet<Boolean, Boolean, List<Integer>> var4 = new Triplet(var2.getFireAlarm(), var2.getCOAlarm(), var2.getZoneAlarms());
-      var3.add(new NewValue(this, var2.getPartitionNumber(), var4));
+   @Override
+   protected void parseResponse(ChannelHandlerContext ctx, AlarmMemoryInformation response, List<Message.Response> responses) {
+      Triplet<Boolean, Boolean, List<Integer>> alarmInfo = Triplet.with(
+               response.getFireAlarm(),
+               response.getCOAlarm(),
+               response.getZoneAlarms()
+      );
+      responses.add(new NewValue(this, response.getPartitionNumber(), alarmInfo));
    }
 }

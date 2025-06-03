@@ -8,7 +8,6 @@ import protocol.dsc.commands.ZoneAlarmStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import org.javatuples.Triplet;
 
@@ -17,30 +16,30 @@ public class PartitionZoneAlarmStatusReading extends RequestableCommandReading<I
       super(ZoneAlarmStatus.class);
    }
 
-   protected ZoneAlarmStatus prepareRequest(ChannelHandlerContext var1, Integer var2) throws Exception {
-      ZoneAlarmStatus var3 = new ZoneAlarmStatus();
-      var3.setPartitionNumber(var2);
-      var3.setRequestsAllZones();
-      return var3;
+   @Override
+   protected ZoneAlarmStatus prepareRequest(ChannelHandlerContext ctx, Integer partitionNumber) throws Exception {
+      ZoneAlarmStatus request = new ZoneAlarmStatus();
+      request.setPartitionNumber(partitionNumber);
+      request.setRequestsAllZones();
+      return request;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, ZoneAlarmStatus var2, List<Message.Response> var3) {
-      List<ZoneAlarmStatus.ZoneAlarm> var4 = var2.getAlarms();
-      List<Triplet<Integer, Integer, Boolean>> var5 = new ArrayList(var4.size());
-      Iterator var6 = var4.iterator();
+   @Override
+   protected void parseResponse(ChannelHandlerContext ctx, ZoneAlarmStatus response, List<Message.Response> responses) {
+      List<ZoneAlarmStatus.ZoneAlarm> alarms = response.getAlarms();
+      List<Triplet<Integer, Integer, Boolean>> alarmTriplets = new ArrayList<>(alarms.size());
 
-      while(var6.hasNext()) {
-         ZoneAlarmStatus.ZoneAlarm var7 = (ZoneAlarmStatus.ZoneAlarm)var6.next();
-         var5.add(new Triplet(var7.getZoneNumber(), var7.getTypeOfAlarm(), var7.getAlarmState()));
+      for (ZoneAlarmStatus.ZoneAlarm alarm : alarms) {
+         alarmTriplets.add(Triplet.with(alarm.getZoneNumber(), alarm.getTypeOfAlarm(), alarm.getAlarmState()));
       }
 
-      var3.add(new NewValue(this, var2.getPartitionNumber(), var5));
+      responses.add(new NewValue(this, response.getPartitionNumber(), alarmTriplets));
    }
 
-   protected void parseCommandResponse(ChannelHandlerContext var1, Integer var2, CommandResponse var3, List<Message.Response> var4) {
-      if (var3.getResponseCode() == 27) {
-         var4.add(new NewValue(this, var2, Collections.emptyList()));
+   @Override
+   protected void parseCommandResponse(ChannelHandlerContext ctx, Integer partitionNumber, CommandResponse response, List<Message.Response> responses) {
+      if (response.getResponseCode() == 27) {
+         responses.add(new NewValue(this, partitionNumber, Collections.emptyList()));
       }
-
    }
 }
