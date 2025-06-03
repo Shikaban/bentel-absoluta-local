@@ -23,10 +23,10 @@ public class Output {
       return this.remoteName;
    }
 
-   void setRemoteName(String var1) {
-      String var2 = Device.sanitize(var1);
-      if (!Objects.equals(this.remoteName, var2)) {
-         this.remoteName = var2;
+   void setRemoteName(String name) {
+      String clean = name != null && !name.trim().isEmpty() ? name.trim() : null;
+      if (!Objects.equals(this.remoteName, clean)) {
+         this.remoteName = clean;
          this.changeSupport.fireChange();
       }
 

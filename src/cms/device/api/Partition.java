@@ -23,8 +23,8 @@ public class Partition {
       return this.remoteName;
    }
 
-   void setRemoteName(String var1) {
-      this.remoteName = Device.sanitize(var1);
+   void setRemoteName(String name) {
+      this.remoteName = name != null && !name.trim().isEmpty() ? name.trim() : null;
       this.fireChange();
    }
 

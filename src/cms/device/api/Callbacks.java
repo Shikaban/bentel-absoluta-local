@@ -2,20 +2,9 @@ package cms.device.api;
 
 import java.util.List;
 
-import cms.device.spi.DeviceProvider;
 import cms.device.spi.PanelProvider;
 
 final class Callbacks {
-   static enum DeviceCb implements DeviceProvider.DeviceCallback {
-      DUMMY;
-
-      public void connectionLost() {
-      }
-
-      public void setRemoteName(String var1) {
-      }
-   }
-
    static enum PanelCb implements PanelProvider.PanelCallback {
       DUMMY;
 
