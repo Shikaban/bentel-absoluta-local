@@ -287,7 +287,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setPartitionArming(String partitionID, Partition.Arming actArming) {
-      //TODO: #STEFANO aggiungi triggered
       int partitionIDInt = Integer.parseInt(partitionID);
       if (actArming == cms.device.api.Partition.Arming.DISARMED) {
          this.partitionArmStatuses[partitionIDInt] = "disarmed";
@@ -297,6 +296,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          this.partitionArmStatuses[partitionIDInt] = "armed_home";
       } else if (actArming == cms.device.api.Partition.Arming.NODELAY) {
          this.partitionArmStatuses[partitionIDInt] = "armed_night";
+      } else if (actArming == cms.device.api.Partition.Arming.TRIGGERED) {
+         this.partitionArmStatuses[partitionIDInt] = "triggered";
       }
 
       if (this.partitionNames[partitionIDInt] != null) {
