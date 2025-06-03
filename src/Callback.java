@@ -97,12 +97,9 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             "\"command_topic\": \"ABS/global/set\"," +
             "\"code_arm_required\": false," +
             "\"code_disarm_required\": false," +
-            "\"supported_features\": [\"arm_away\", \"arm_home\", \"arm_night\", \"arm_vacation\", \"arm_custom_bypass\"]," +
+            "\"supported_features\": [\"arm_away\"]," +
             "\"payload_arm_away\": \"ARM_AWAY\"," +
-            "\"payload_arm_home\": \"MODE_A\"," +
-            "\"payload_arm_night\": \"MODE_B\"," +
-            "\"payload_arm_vacation\": \"MODE_C\"," +
-            "\"payload_arm_custom_bypass\": \"MODE_D\"," +
+            "\"payload_disarm\": \"DISARM\"," +
             "\"device\": {" +
                "\"identifiers\": [\"absoluta_panel\"]," +
                "\"name\": \"Centrale Absoluta\"," +
