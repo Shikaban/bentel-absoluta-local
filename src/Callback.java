@@ -453,7 +453,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
                System.out.println("WARN: ID " + idArray + " non valido per il topic: " + topic);
             }
          } else if (ArrayUtils.contains(this.sensorTopics, parentTopic)) {
-            int idArray = ArrayUtils.indexOf(this.sensorTopics, parentTopic);
+            int idSensor = ArrayUtils.indexOf(this.sensorTopics, parentTopic);
+            int idArray = ArrayUtils.indexOf(this.sensorIDs, idSensor);
             if (idArray >= 0 && idArray < this.sensorIDs.length) {
                // Se sensore
                this.commandSensor(idArray, msg);
@@ -522,12 +523,11 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    private void commandSensor(int idArray, MqttMessage msg) {
-      //TODO: #STEFANO Gestione comandi per i sensori (bypass, unbypass)
       //TODO: #Stefano e #ALESSANDRO Sensori 29->37 danno errore
       if(msg.toString().equals("ON")) {
-         // Panel.bypassInput(idArray, true);
+         this.panel.bypassInput(this.sensorIDs[idArray], true);
       } else if(msg.toString().equals("OFF")){
-         // Panel.bypassInput(idArray, false);
+         this.panel.bypassInput(this.sensorIDs[idArray], false);
       } else {
          System.out.println("WARN: Comando " + msg.toString() + " non valido per il sensore ID: " + idArray);
       }
