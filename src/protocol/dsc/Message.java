@@ -9,49 +9,17 @@ import org.javatuples.Septet;
 import org.javatuples.Triplet;
 
 import protocol.dsc.base.DscCharsets;
-import protocol.dsc.messages.AbsolutaEnabledOutputsAndRemoteCommandsReading;
-import protocol.dsc.messages.AccessCodesReading;
-import protocol.dsc.messages.AlarmMemoryInformationReading;
-import protocol.dsc.messages.ArmWriting;
-import protocol.dsc.messages.CodeLengthReading;
-import protocol.dsc.messages.CommandOutputActivationReading;
-import protocol.dsc.messages.DisarmWriting;
-import protocol.dsc.messages.EnterAccessLevelWriting;
-import protocol.dsc.messages.EnterConfigurationModeWriting;
-import protocol.dsc.messages.EventBufferReading;
-import protocol.dsc.messages.EventReportingConfigurationReading;
-import protocol.dsc.messages.EventReportingConfigurationWriting;
-import protocol.dsc.messages.ExitConfigurationModeWriting;
-import protocol.dsc.messages.MasterCodeReading;
-import protocol.dsc.messages.MaxUsersReading;
-import protocol.dsc.messages.NumberedLabelReading;
-import protocol.dsc.messages.OutputWriting;
-import protocol.dsc.messages.PartitionAssignmentConfigurationReading;
-import protocol.dsc.messages.PartitionAssignmentReading;
-import protocol.dsc.messages.PartitionStatusReading;
-import protocol.dsc.messages.PartitionStatusesReading;
-import protocol.dsc.messages.PartitionZoneAlarmStatusReading;
-import protocol.dsc.messages.SingleLabelReading;
-import protocol.dsc.messages.SingleZoneBypassStatusReading;
-import protocol.dsc.messages.SingleZoneBypassWriting;
-import protocol.dsc.messages.SystemTroubleStatusReading;
-import protocol.dsc.messages.TestCommandWriting;
-import protocol.dsc.messages.TroubleDetailReading;
-import protocol.dsc.messages.UserActivityWriting;
-import protocol.dsc.messages.ValidateUserCodeWriting;
-import protocol.dsc.messages.ZoneAssignmentReading;
-import protocol.dsc.messages.ZoneBypassStatusReading;
-import protocol.dsc.messages.ZoneStatusReading;
-import protocol.dsc.messages.ZoneStatusesReading;
+import protocol.dsc.messages.*;
 
 public class Message<P, V> {
-   public static final Message<Void, String> TEXT_NOTIFICATION = new Message();
-   public static final Message<Void, List<Quartet<Integer, Integer, Integer, Integer>>> TROUBLE_DETAIL_NOTIFICATION = new Message();
-   public static final Message<Void, Integer> PARTITION_STATUS_CHANGED = new Message();
-   public static final Message<Void, Integer> PARTITION_ALARM_MEMORY_CHANGED = new Message();
-   public static final Message<Void, Integer> ZONE_STATUS_CHANGED = new Message();
-   public static final Message<Void, Quartet<Integer, Integer, Integer, Integer>> ACCESS_LEVEL_LEAD_IN_OUT = new Message();
-   public static final Message<Void, Pair<Integer, List<Integer>>> USER_PARTITION_ASSIGNMENT_CONFIGURATION = new Message();
+   // Definizioni statiche di messaggi comuni
+   public static final Message<Void, String> TEXT_NOTIFICATION = new Message<>();
+   public static final Message<Void, List<Quartet<Integer, Integer, Integer, Integer>>> TROUBLE_DETAIL_NOTIFICATION = new Message<>();
+   public static final Message<Void, Integer> PARTITION_STATUS_CHANGED = new Message<>();
+   public static final Message<Void, Integer> PARTITION_ALARM_MEMORY_CHANGED = new Message<>();
+   public static final Message<Void, Integer> ZONE_STATUS_CHANGED = new Message<>();
+   public static final Message<Void, Quartet<Integer, Integer, Integer, Integer>> ACCESS_LEVEL_LEAD_IN_OUT = new Message<>();
+   public static final Message<Void, Pair<Integer, List<Integer>>> USER_PARTITION_ASSIGNMENT_CONFIGURATION = new Message<>();
    public static final Message<Void, Integer> MAX_USERS = new MaxUsersReading();
    public static final Message<Void, Integer> CODE_LENGTH = new CodeLengthReading();
    public static final Message<Void, String> MASTER_CODE = new MasterCodeReading();
@@ -80,6 +48,7 @@ public class Message<P, V> {
    public static final Message<Integer, String> HIGH_CURRENT_OUTPUT_MODULE_LABEL = new NumberedLabelReading(229);
    public static final Message<Integer, String> OUTPUT_EXPANDER_MODULE_LABEL = new NumberedLabelReading(230);
    public static final Message<Void, String> SYSTEM_LABEL = new SingleLabelReading(211, 0);
+
    public static final Message<Integer, String> ABSOLUTA_PARTITION_LABEL;
    public static final Message<Integer, String> ABSOLUTA_OUTPUT_LABEL;
    public static final Message<Integer, String> ABSOLUTA_REMOTE_COMMAND_LABEL;
@@ -106,29 +75,26 @@ public class Message<P, V> {
    public static final Message<Pair<Integer, String>, Void> VALIDATE_USER_CODE;
    public static final Message<Integer, Void> USER_ACTIVITY;
    public static final Message<Pair<Integer, String>, Void> TEST_COMMAND;
+
    private String name;
 
    protected Message() {
    }
 
+   @Override
    public final String toString() {
       if (this.name == null) {
-         Field[] var1 = Message.class.getFields();
-         int var2 = var1.length;
-
-         for(int var3 = 0; var3 < var2; ++var3) {
-            Field var4 = var1[var3];
-
-            try {
-               if (this == var4.get(this)) {
-                  this.name = var4.getName();
-                  break;
+         Field[] fields = Message.class.getFields();
+         for (Field field : fields) {
+               try {
+                  if (this == field.get(this)) {
+                     this.name = field.getName();
+                     break;
+                  }
+               } catch (IllegalAccessException | IllegalArgumentException ignored) {
                }
-            } catch (IllegalAccessException | IllegalArgumentException var6) {
-            }
          }
       }
-
       return this.name;
    }
 
@@ -139,9 +105,9 @@ public class Message<P, V> {
       ABSOLUTA_ZONE_LABEL = new NumberedLabelReading(1, 0, DscCharsets.WIN1252);
       ABSOLUTA_ARMING_MODE_LABEL = new NumberedLabelReading(13, 0, DscCharsets.WIN1252);
       ABSOLUTA_SYSTEM_LABEL = new SingleLabelReading(3, 1, DscCharsets.WIN1252);
-      WIRELESS_TRANSCEIVER_LABEL = new SingleLabelReading(231, (Integer)null);
-      ALTERNATE_COMMUNICATOR_MODULE_LABEL = new SingleLabelReading(232, (Integer)null);
-      AUDIO_VERIFICATION_MODULE_LABEL = new SingleLabelReading(235, (Integer)null);
+      WIRELESS_TRANSCEIVER_LABEL = new SingleLabelReading(231, null);
+      ALTERNATE_COMMUNICATOR_MODULE_LABEL = new SingleLabelReading(232, null);
+      AUDIO_VERIFICATION_MODULE_LABEL = new SingleLabelReading(235, null);
       EVENT_REPORTING_CONFIGURATION_READ = new EventReportingConfigurationReading();
       EVENT_BUFFER_READ = new EventBufferReading();
       ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS = new AbsolutaEnabledOutputsAndRemoteCommandsReading();
@@ -165,25 +131,27 @@ public class Message<P, V> {
       protected final Message<?, ?> message;
       protected final Object param;
 
-      protected <P, V> Response(Message<P, V> var1, P var2) {
-         this.message = var1;
-         this.param = var2;
+      protected <P, V> Response(Message<P, V> message, P param) {
+         this.message = message;
+         this.param = param;
       }
 
-      public boolean isFor(Message<?, ?> var1) {
-         return this.message == var1;
+      public boolean isFor(Message<?, ?> message) {
+         return this.message == message;
       }
 
       public Message<?, ?> getMessage() {
          return this.message;
       }
 
-      public <P> P getParam(Message<P, ?> var1) {
-         if (this.message != var1) {
-            throw new IllegalArgumentException(String.format("unexpected message: %s instead of %s", var1, this.message));
-         } else {
-            return (P) this.param;
+      @SuppressWarnings("unchecked")
+      public <P> P getParam(Message<P, ?> message) {
+         if (this.message != message) {
+               throw new IllegalArgumentException(
+                  String.format("unexpected message: %s instead of %s", message, this.message)
+               );
          }
+         return (P) this.param;
       }
    }
 }

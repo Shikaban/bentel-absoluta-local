@@ -5,21 +5,23 @@ import com.google.common.base.Preconditions;
 public class NewValue extends Message.Response {
    private final Object value;
 
-   public <V> NewValue(Message<Void, V> var1, V var2) {
-      this(var1, null, var2);
+   public <V> NewValue(Message<Void, V> message, V value) {
+      this(message, null, value);
    }
 
-   public <P, V> NewValue(Message<P, V> var1, P var2, V var3) {
-      super((Message)Preconditions.checkNotNull(var1), var2);
-      this.value = var3;
+   public <P, V> NewValue(Message<P, V> message, P param, V value) {
+      super(Preconditions.checkNotNull(message), param);
+      this.value = value;
    }
 
-   public <V> V getValue(Message<?, V> var1) {
-      if (this.message != var1) {
-         throw new IllegalArgumentException(String.format("unexpected message: %s instead of %s", var1, this.message));
-      } else {
-         return (V) this.value;
+   @SuppressWarnings("unchecked")
+   public <V> V getValue(Message<?, V> message) {
+      if (this.message != message) {
+         throw new IllegalArgumentException(
+               String.format("unexpected message: %s instead of %s", message, this.message)
+         );
       }
+      return (V) this.value;
    }
 
    public String toString() {

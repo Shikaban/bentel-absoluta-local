@@ -16,12 +16,12 @@ class OutputSupport {
 
    OutputSupport(DeviceOrPanel var1, BiConsumer<String, Output.Action> var2) {
       this.deviceOrPanel = (DeviceOrPanel)Objects.requireNonNull(var1);
-      this.controller = (BiConsumer)Objects.requireNonNull(var2);
+      this.controller = Objects.requireNonNull(var2);
    }
 
    void changeOutputs(List<String> var1) {
       if (!Iterables.elementsEqual(this.outputs.keySet(), var1)) {
-         Map<String, Output> var2 = new LinkedHashMap(var1.size());
+         Map<String, Output> var2 = new LinkedHashMap<String, Output>(var1.size());
          var1.forEach((var2x) -> {
             if (this.outputs.containsKey(var2x)) {
                var2.put(var2x, this.outputs.get(var2x));

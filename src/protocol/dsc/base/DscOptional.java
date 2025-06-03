@@ -32,7 +32,7 @@ public final class DscOptional<T extends DscSerializable> implements DscSerializ
 
    public boolean equals(Object var1) {
       if (var1 != null && this.getClass() == var1.getClass()) {
-         DscOptional<?> var2 = (DscOptional)var1;
+         DscOptional<?> var2 = (DscOptional<?>)var1;
          return Objects.equals(this.get(), var2.get());
       } else {
          return false;
@@ -59,7 +59,7 @@ public final class DscOptional<T extends DscSerializable> implements DscSerializ
 
    public boolean isEquivalent(DscSerializable var1) {
       if (var1 instanceof DscOptional) {
-         DscOptional<?> var2 = (DscOptional)var1;
+         DscOptional<?> var2 = (DscOptional<?>)var1;
          if (this.isPresent() != var2.isPresent()) {
             return false;
          } else {

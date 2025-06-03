@@ -7,7 +7,7 @@ import javax.swing.SwingUtilities;
 
 public final class AlertNotifier {
    private static final AlertNotifier INSTANCE = new AlertNotifier();
-   private final List<AlertListener> listeners = new CopyOnWriteArrayList();
+   private final List<AlertListener> listeners = new CopyOnWriteArrayList<AlertListener>();
 
    public static AlertNotifier getDefault() {
       return INSTANCE;

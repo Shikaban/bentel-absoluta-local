@@ -78,7 +78,7 @@ public class AbsolutaClient implements ITv2Client {
       }
 
       protected Queue<HandshakeHandler<?>> buildHandshakeHandlers() {
-         Queue<HandshakeHandler<?>> var1 = new ArrayDeque(3);
+         Queue<HandshakeHandler<?>> var1 = new ArrayDeque<HandshakeHandler<?>>(3);
          var1.add(new OpenSessionHandler());
          var1.add(new RequestAccessHandler());
          var1.add(new SoftwareVersionHandler());

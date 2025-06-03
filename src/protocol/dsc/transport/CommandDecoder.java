@@ -79,89 +79,104 @@ import java.util.Map;
 
 @Sharable
 public class CommandDecoder extends MessageToMessageDecoder<ByteBuf> {
-   private static final Map<Integer, Class<? extends DscCommand>> COMMANDS = initCommandsWith(AccessCodeLengthNotification.class, AccessCodes.class, AccessCodesResponse.class, AccessLevelLeadInOut.class, AlarmMemoryInformation.class, ArmingDisarmingNotification.class, ArmingPreAlertNotification.class, CommandError.class, CommandOutput.class, CommandOutputActivation.class, CommandRequest.class, CommandResponse.class, Configuration.class, EncapsulatedCommandForMultiplePackets.class, EndSession.class, EnterAccessLevel.class, EnterConfigurationMode.class, EntryDelayNotification.class, EventBufferRead.class, EventBufferReadResponse.class, EventReportingConfigurationRead.class, EventReportingConfigurationReadResponse.class, EventReportingConfigurationWrite.class, ExitConfigurationMode.class, ExitDelayNotification.class, LifeStyleZoneStatus.class, MiscellaneousPreAlertNotification.class, OpenSession.class, PartitionAlarmMemoryNotification.class, PartitionArmControl.class, PartitionAssignmentConfiguration.class, PartitionAssignments.class, PartitionAssignmentsResponse.class, PartitionDisarmControl.class, PartitionQuickExitNotification.class, PartitionReadyStatusNotification.class, PartitionStatus.class, Poll.class, RequestAccess.class, SectionRead.class, SectionReadResponse.class, SingleZoneBypassStatus.class, SingleZoneBypassWrite.class, SoftwareVersion.class, SystemCapabilities.class, SystemTroubleStatus.class, TextNotification.class, TimeDateBroadcastNotification.class, TroubleDetail.class, TroubleDetailNotification.class, UserActivity.class, UserPartitionAssignmentConfiguration.class, ZoneAlarmStatus.class, ZoneAssignmentConfiguration.class, ZoneBypassStatus.class, ZoneStatus.class);
+   private static final Map<Integer, Class<? extends DscCommand>> COMMANDS = initCommandsWith(
+         AccessCodeLengthNotification.class, AccessCodes.class, AccessCodesResponse.class, AccessLevelLeadInOut.class,
+         AlarmMemoryInformation.class, ArmingDisarmingNotification.class, ArmingPreAlertNotification.class,
+         CommandError.class, CommandOutput.class, CommandOutputActivation.class, CommandRequest.class,
+         CommandResponse.class, Configuration.class, EncapsulatedCommandForMultiplePackets.class, EndSession.class,
+         EnterAccessLevel.class, EnterConfigurationMode.class, EntryDelayNotification.class, EventBufferRead.class,
+         EventBufferReadResponse.class, EventReportingConfigurationRead.class, EventReportingConfigurationReadResponse.class,
+         EventReportingConfigurationWrite.class, ExitConfigurationMode.class, ExitDelayNotification.class,
+         LifeStyleZoneStatus.class, MiscellaneousPreAlertNotification.class, OpenSession.class,
+         PartitionAlarmMemoryNotification.class, PartitionArmControl.class, PartitionAssignmentConfiguration.class,
+         PartitionAssignments.class, PartitionAssignmentsResponse.class, PartitionDisarmControl.class,
+         PartitionQuickExitNotification.class, PartitionReadyStatusNotification.class, PartitionStatus.class, Poll.class,
+         RequestAccess.class, SectionRead.class, SectionReadResponse.class, SingleZoneBypassStatus.class,
+         SingleZoneBypassWrite.class, SoftwareVersion.class, SystemCapabilities.class, SystemTroubleStatus.class,
+         TextNotification.class, TimeDateBroadcastNotification.class, TroubleDetail.class, TroubleDetailNotification.class,
+         UserActivity.class, UserPartitionAssignmentConfiguration.class, ZoneAlarmStatus.class,
+         ZoneAssignmentConfiguration.class, ZoneBypassStatus.class, ZoneStatus.class);
 
    @SafeVarargs
-   private static Map<Integer, Class<? extends DscCommand>> initCommandsWith(Class<? extends DscCommand>... var0) {
+   private static Map<Integer, Class<? extends DscCommand>> initCommandsWith(Class<? extends DscCommand>... commandClasses) {
       try {
-         Map<Integer, Class<? extends DscCommand>> var1 = new HashMap();
-         Class[] var2 = var0;
-         int var3 = var0.length;
-
-         for(int var4 = 0; var4 < var3; ++var4) {
-            Class<? extends DscCommand> var5 = var2[var4];
-            DscCommand var6 = (DscCommand)var5.newInstance();
-            Integer var7 = DscUtils.validateUShort(var6.getCommandNumber());
-            if (var1.containsKey(var7)) {
-               throw new IllegalStateException(String.format("duplicated command number 0x%04X", var7));
+         Map<Integer, Class<? extends DscCommand>> commandMap = new HashMap<>();
+         for (Class<? extends DscCommand> clazz : commandClasses) {
+            DscCommand instance = clazz.getDeclaredConstructor().newInstance();
+            Integer commandNumber = DscUtils.validateUShort(instance.getCommandNumber());
+            if (commandMap.containsKey(commandNumber)) {
+               throw new IllegalStateException(String.format("Duplicated command number 0x%04X", commandNumber));
             }
-
-            var1.put(var7, var5);
+            commandMap.put(commandNumber, clazz);
          }
-
-         return ImmutableMap.copyOf(var1);
-      } catch (IllegalAccessException | InstantiationException var8) {
-         throw new AssertionError("init error", var8);
+         return ImmutableMap.copyOf(commandMap);
+      } catch (ReflectiveOperationException e) {
+         throw new AssertionError("Error initializing command map", e);
       }
    }
 
-   public static boolean knows(Class<? extends DscCommand> var0) {
-      return COMMANDS == null || COMMANDS.containsValue(var0);
+   public static boolean knows(Class<? extends DscCommand> clazz) {
+      return COMMANDS.containsValue(clazz);
    }
 
-   protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws DscProtocolException, CorruptedFrameException {
-      assert var2.order() == ByteOrder.BIG_ENDIAN;
+   @Override
+   protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
+         throws DscProtocolException, CorruptedFrameException {
+      assert in.order() == ByteOrder.BIG_ENDIAN;
 
-      if (SequenceHandlersHelper.isLowACK(var2)) {
-         var3.add(LowACK.getInstance());
-      } else {
-         if (var2.readableBytes() < 2) {
-            throw new CorruptedFrameException("invalid frame lenght");
-         }
-
-         int var4 = var2.readUnsignedShort();
-
-         try {
-            DscCommand var5 = this.newCommand(var4);
-            if (var5 instanceof DscCommandWithAppSeq) {
-               short var6 = var2.readUnsignedByte();
-               ((DscCommandWithAppSeq)var5).setAppSeq(var6);
-            }
-
-            if (var5 instanceof CommandRequest) {
-               this.parseCommandRequest((CommandRequest)var5, var2);
-            } else {
-               var5.readFrom(var2);
-            }
-
-            var3.add(var5);
-         } catch (IndexOutOfBoundsException var7) {
-            throw new WrongCommandLengthException(var4, "too short command data");
-         }
+      if (SequenceHandlersHelper.isLowACK(in)) {
+         out.add(LowACK.getInstance());
+         return;
       }
 
-   }
+      if (in.readableBytes() < 2) {
+         throw new CorruptedFrameException("Invalid frame length");
+      }
 
-   private DscCommand newCommand(int var1) {
+      int commandNumber = in.readUnsignedShort();
+
       try {
-         Class<? extends DscCommand> var2 = (Class)COMMANDS.get(var1);
-         return (DscCommand)(var2 != null ? (DscCommand)var2.newInstance() : new UnknownCommand(var1));
-      } catch (IllegalAccessException | InstantiationException var3) {
-         throw new AssertionError("unexpected error", var3);
+         DscCommand command = this.newCommand(commandNumber);
+         if (command instanceof DscCommandWithAppSeq) {
+            short appSeq = in.readUnsignedByte();
+            ((DscCommandWithAppSeq) command).setAppSeq(appSeq);
+         }
+
+         if (command instanceof CommandRequest) {
+            this.parseCommandRequest((CommandRequest) command, in);
+         } else {
+            command.readFrom(in);
+         }
+
+         out.add(command);
+      } catch (IndexOutOfBoundsException ex) {
+         throw new WrongCommandLengthException(commandNumber, "Too short command data");
       }
    }
 
-   private void parseCommandRequest(CommandRequest var1, ByteBuf var2) {
-      int var3 = var2.readUnsignedShort();
-      DscCommand var4 = this.newCommand(var3);
-      if (var4 instanceof DscRequestableCommand) {
-         DscRequestableCommand var5 = (DscRequestableCommand)var4;
-         var5.readRequestDataFrom(var2);
-         var1.setRequestedCmd(var5);
-         var1.readCodeFrom(var2);
-      } else {
-         System.out.println("WARN: unknown or unexpected requested command: " + var4.getCommandNumber());
+   private DscCommand newCommand(int commandNumber) {
+      try {
+         Class<? extends DscCommand> clazz = COMMANDS.get(commandNumber);
+         if (clazz != null) {
+            return clazz.getDeclaredConstructor().newInstance();
+         } else {
+            return new UnknownCommand(commandNumber);
+         }
+      } catch (ReflectiveOperationException e) {
+         throw new AssertionError("Unexpected error creating command instance", e);
       }
+   }
 
+   private void parseCommandRequest(CommandRequest request, ByteBuf in) {
+      int requestedCmdNumber = in.readUnsignedShort();
+      DscCommand requestedCmd = this.newCommand(requestedCmdNumber);
+      if (requestedCmd instanceof DscRequestableCommand) {
+         DscRequestableCommand reqCmd = (DscRequestableCommand) requestedCmd;
+         reqCmd.readRequestDataFrom(in);
+         request.setRequestedCmd(reqCmd);
+         request.readCodeFrom(in);
+      } else {
+         System.out.println("WARN: Unknown or unexpected requested command: " + requestedCmd.getCommandNumber());
+      }
    }
 }

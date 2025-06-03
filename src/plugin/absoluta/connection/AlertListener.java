@@ -14,49 +14,55 @@ class AlertListener implements MessageListener {
    private final AlertCallback alertCallback;
    private final PanelStatus panelStatus;
 
-   public AlertListener(AlertCallback var1, PanelStatus var2) {
-      this.alertCallback = var1;
-      this.panelStatus = var2;
+   public AlertListener(AlertCallback alertCallback, PanelStatus panelStatus) {
+      this.alertCallback = alertCallback;
+      this.panelStatus = panelStatus;
    }
 
-   public void newValue(NewValue var1) {
+   public void newValue(NewValue newValue) {
    }
 
-   public void error(DscError err) {
-      if (err.getResponseCode() != null) {
-         System.out.println("DEBUG: error received: " + err);
-         Integer var2;
-         if (err.isFor(Message.ARM)) {
-            if (((Pair)err.getParam(Message.ARM)).getValue0() == null) {
-               this.alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.global"));
-            } else {
-               var2 = (Integer)((Pair)err.getParam(Message.ARM)).getValue0();
-               String var3 = this.panelStatus.getPartitionLabel(var2);
-               this.alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.partition", var3));
-            }
+   public void error(DscError error) {
+      if (error.getResponseCode() == null) {
+         return;
+      }
+
+      System.out.println("DEBUG: error received: " + error);
+
+      if (error.isFor(Message.ARM)) {
+         // ARM error: check if it's global or for a specific partition
+         Pair<Integer, ?> armParam = (Pair<Integer, ?>) error.getParam(Message.ARM);
+         Integer partitionId = armParam.getValue0();
+         if (partitionId == null) {
+               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.global"));
          } else {
-            String var4;
-            if (err.isFor(Message.SINGLE_ZONE_BYPASS_WRITE)) {
-               var2 = (Integer)((Triplet)err.getParam(Message.SINGLE_ZONE_BYPASS_WRITE)).getValue1();
-               Boolean var5 = (Boolean)((Triplet)err.getParam(Message.SINGLE_ZONE_BYPASS_WRITE)).getValue2();
-               var4 = this.panelStatus.getZoneLabel(var2);
-               if (var5) {
-                  this.alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.bypass.zone", var4));
-               } else {
-                  this.alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.unbypass.zone", var4));
-               }
-            } else if (err.isFor(Message.SET_OUTPUT)) {
-               var2 = (Integer)((Triplet)err.getParam(Message.SET_OUTPUT)).getValue1();
-               Integer var6 = (Integer)((Triplet)err.getParam(Message.SET_OUTPUT)).getValue2();
-               var4 = this.panelStatus.getOutputLabel(var2);
-               if (var6 == 1) {
-                  this.alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.close", var4));
-               } else if (var6 == 2) {
-                  this.alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.open", var4));
-               }
-            }
+               String partitionLabel = panelStatus.getPartitionLabel(partitionId);
+               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.partition", partitionLabel));
+         }
+      } else if (error.isFor(Message.SINGLE_ZONE_BYPASS_WRITE)) {
+         // Zone bypass/unbypass error
+         Triplet<?, Integer, Boolean> bypassParam = (Triplet<?, Integer, Boolean>) error.getParam(Message.SINGLE_ZONE_BYPASS_WRITE);
+         Integer zoneId = bypassParam.getValue1();
+         Boolean isBypass = bypassParam.getValue2();
+         String zoneLabel = panelStatus.getZoneLabel(zoneId);
+
+         if (isBypass) {
+               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.bypass.zone", zoneLabel));
+         } else {
+               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.unbypass.zone", zoneLabel));
          }
 
+         // Output set error (if present)
+         Triplet<?, Integer, Integer> outputParam = (Triplet<?, Integer, Integer>) error.getParam(Message.SET_OUTPUT);
+         Integer outputId = outputParam.getValue1();
+         Integer outputState = outputParam.getValue2();
+         String outputLabel = panelStatus.getOutputLabel(outputId);
+
+         if (outputState == 1) {
+               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.close", outputLabel));
+         } else if (outputState == 2) {
+               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.open", outputLabel));
+         }
       }
    }
 }

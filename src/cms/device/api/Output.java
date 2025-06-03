@@ -15,7 +15,7 @@ public class Output {
    Output(DeviceOrPanel var1, String var2, Consumer<Output.Action> var3) {
       this.type = Output.Type.BISTABLE;
       this.status = Output.Status.UNKNOWN;
-      this.controller = (Consumer)Objects.requireNonNull(var3);
+      this.controller = Objects.requireNonNull(var3);
       this.changeSupport = new ChangeSupport(this);
    }
 

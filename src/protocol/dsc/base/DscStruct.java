@@ -2,30 +2,21 @@ package protocol.dsc.base;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class DscStruct implements DscSerializable {
    protected abstract List<DscSerializable> getFields();
 
    public void readFrom(ByteBuf var1) throws DecoderException, IndexOutOfBoundsException {
-      Iterator var2 = this.getFields().iterator();
-
-      while(var2.hasNext()) {
-         DscSerializable var3 = (DscSerializable)var2.next();
-         var3.readFrom(var1);
+      for (DscSerializable field : this.getFields()) {
+         field.readFrom(var1);
       }
-
    }
 
    public void writeTo(ByteBuf var1) {
-      Iterator var2 = this.getFields().iterator();
-
-      while(var2.hasNext()) {
-         DscSerializable var3 = (DscSerializable)var2.next();
-         var3.writeTo(var1);
+      for (DscSerializable field : this.getFields()) {
+         field.writeTo(var1);
       }
-
    }
 
    public boolean isEquivalent(DscSerializable var1) {

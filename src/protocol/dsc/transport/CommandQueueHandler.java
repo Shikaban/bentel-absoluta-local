@@ -10,7 +10,6 @@ import protocol.dsc.Priority;
 import protocol.dsc.commands.DscCommand;
 
 import java.util.ArrayDeque;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CancellationException;
@@ -26,7 +25,7 @@ public class CommandQueueHandler extends ChannelOutboundHandlerAdapter {
 
       for(int var4 = 0; var4 < var3; ++var4) {
          Priority var5 = var2[var4];
-         var1.put(var5, new ArrayDeque());
+         var1.put(var5, new ArrayDeque<CommandQueueHandler.WaitingMsg>());
       }
 
       this.queues = var1.build();
@@ -38,14 +37,11 @@ public class CommandQueueHandler extends ChannelOutboundHandlerAdapter {
 
       for(int var4 = 0; var4 < var3; ++var4) {
          Priority var5 = var2[var4];
-         Queue<CommandQueueHandler.WaitingMsg> var6 = (Queue)this.queues.get(var5);
+         Queue<CommandQueueHandler.WaitingMsg> var6 = this.queues.get(var5);
          if (!var6.isEmpty()) {
             System.out.println("WARN: removing " + var6.size() + " enqueued commands with priority " + var5);
             CancellationException var7 = new CancellationException("channel inactivated before sending");
-            Iterator var8 = var6.iterator();
-
-            while(var8.hasNext()) {
-               CommandQueueHandler.WaitingMsg var9 = (CommandQueueHandler.WaitingMsg)var8.next();
+            for (CommandQueueHandler.WaitingMsg var9 : var6) {
                var9.promise.setFailure(var7);
             }
 
@@ -75,7 +71,7 @@ public class CommandQueueHandler extends ChannelOutboundHandlerAdapter {
 
    private void enqueue(ChannelHandlerContext var1, DscCommand var2, ChannelPromise var3) throws IllegalStateException {
       Priority var4 = var2.getPriority();
-      Queue<CommandQueueHandler.WaitingMsg> var5 = (Queue)this.queues.get(var4);
+      Queue<CommandQueueHandler.WaitingMsg> var5 = this.queues.get(var4);
       if(VERBOSE_DEBUG) {
          System.out.println("DEBUG: enqueuing a command with priority " + var4 + ": " + var2);
       }
@@ -96,7 +92,7 @@ public class CommandQueueHandler extends ChannelOutboundHandlerAdapter {
 
          for(int var4 = 0; var4 < var3; ++var4) {
             Priority var5 = var2[var4];
-            CommandQueueHandler.WaitingMsg var6 = (CommandQueueHandler.WaitingMsg)((Queue)this.queues.get(var5)).poll();
+            CommandQueueHandler.WaitingMsg var6 = this.queues.get(var5).poll();
             if (var6 != null) {
                if(VERBOSE_DEBUG) {
                   System.out.println("DEBUG: sending enqueued command with priority " + var5 + ": " + var6.cmd);
