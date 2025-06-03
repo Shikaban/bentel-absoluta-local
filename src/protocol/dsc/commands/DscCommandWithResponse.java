@@ -12,7 +12,7 @@ public abstract class DscCommandWithResponse extends DscCommandWithAppSeq {
       if (!(var1 instanceof DscCommandWithResponse.Response)) {
          return false;
       } else {
-         DscCommandWithResponse var2 = ((DscCommandWithResponse.Response)var1).requestInstance;
+         DscCommandWithResponse var2 = ((DscCommandWithResponse.Response<?>)var1).requestInstance;
          return this.getClass() == var2.getClass() && this.getFields().equals(var2.getFields());
       }
    }

@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 import protocol.dsc.base.DscSerializable;
 
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class DscRequestableCommand extends DscAbstractCommand implements DscResponse {
@@ -26,13 +25,10 @@ public abstract class DscRequestableCommand extends DscAbstractCommand implement
    }
 
    public final void readRequestDataFrom(ByteBuf var1) throws DecoderException, IndexOutOfBoundsException {
-      Iterator var2 = this.getRequestFields().iterator();
-
-      while(var2.hasNext()) {
-         DscSerializable var3 = (DscSerializable)var2.next();
-         var3.readFrom(var1);
+      List<DscSerializable> requestFields = this.getRequestFields();
+      for (int i = 0; i < requestFields.size(); i++) {
+         requestFields.get(i).readFrom(var1);
       }
-
    }
 
    public final void writeTo(ByteBuf var1) {
@@ -40,13 +36,10 @@ public abstract class DscRequestableCommand extends DscAbstractCommand implement
    }
 
    public final void writeRequestDataTo(ByteBuf var1) {
-      Iterator var2 = this.getRequestFields().iterator();
-
-      while(var2.hasNext()) {
-         DscSerializable var3 = (DscSerializable)var2.next();
-         var3.writeTo(var1);
+      List<DscSerializable> requestFields = this.getRequestFields();
+      for (int i = 0; i < requestFields.size(); i++) {
+         requestFields.get(i).writeTo(var1);
       }
-
    }
 
    public boolean match(DscRequestableCommand var1) {

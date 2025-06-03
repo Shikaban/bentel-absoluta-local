@@ -1,7 +1,6 @@
 package protocol.dsc.commands;
 
 import com.google.common.collect.ImmutableList;
-
 import protocol.dsc.base.DscArray;
 import protocol.dsc.base.DscBinary;
 import protocol.dsc.base.DscOptional;
@@ -10,7 +9,6 @@ import protocol.dsc.base.DscVariableBytes;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Configuration extends DscRequestableCommand {
@@ -31,7 +29,8 @@ public class Configuration extends DscRequestableCommand {
    public static final int ABSOLUTA_PARTITION_LABEL = 3;
    public static final int ABSOLUTA_COMMAND_LABELS = 4;
    public static final int ABSOLUTA_ARMING_MODE_LABEL = 13;
-   private final Configuration.Helper helper = new Configuration.Helper();
+
+   private final Helper helper = new Helper();
    private final DscVariableBytes optionId = new DscVariableBytes();
    private final DscVariableBytes optionIdOffsetFrom = new DscVariableBytes();
    private final DscOptional<DscVariableBytes> optionIdOffsetTo;
@@ -39,90 +38,93 @@ public class Configuration extends DscRequestableCommand {
    private final DscArray<DscBinary> data;
 
    public Configuration() {
-      this.optionIdOffsetTo = new DscOptional(new DscVariableBytes(), this.helper);
+      this.optionIdOffsetTo = new DscOptional<>(new DscVariableBytes(), this.helper);
       this.dataLength = new DscVariableBytes();
-      this.data = new DscArray(this.helper);
+      this.data = new DscArray<>(this.helper);
    }
 
+   @Override
    protected List<DscSerializable> getRequestFields() {
       return ImmutableList.of(this.optionId, this.optionIdOffsetFrom, this.optionIdOffsetTo);
    }
 
+   @Override
    protected List<DscSerializable> getOtherFields() {
       return ImmutableList.of(this.dataLength, this.data);
    }
 
+   @Override
    public int getCommandNumber() {
       return 1905;
    }
 
-   public boolean match(DscRequestableCommand var1) {
-      if (var1 instanceof Configuration) {
-         Configuration var2 = (Configuration)var1;
-         if (this.getOptionId() != var2.getOptionId()) {
-            return false;
-         } else {
-            Integer var3 = this.getOptionIdOffsetFrom();
-            return var3 == null ? true : var3.equals(var2.getOptionIdOffsetFrom());
+   @Override
+   public boolean match(DscRequestableCommand other) {
+      if (other instanceof Configuration) {
+         Configuration conf = (Configuration) other;
+         if (this.getOptionId() != conf.getOptionId()) {
+               return false;
          }
-      } else {
-         return false;
+         Integer from = this.getOptionIdOffsetFrom();
+         return from == null || from.equals(conf.getOptionIdOffsetFrom());
       }
+      return false;
    }
 
-   public void setOptionId(int var1) {
-      this.optionId.setPositiveInt(var1);
+   public void setOptionId(int optionId) {
+      this.optionId.setPositiveInt(optionId);
    }
 
    public int getOptionId() {
       return this.optionId.toPositiveInt();
    }
 
-   public void setOptionIdOffsetFrom(Integer var1) {
-      this.optionIdOffsetFrom.setPositiveInteger(var1);
+   public void setOptionIdOffsetFrom(Integer offsetFrom) {
+      this.optionIdOffsetFrom.setPositiveInteger(offsetFrom);
    }
 
    public Integer getOptionIdOffsetFrom() {
-      return this.get(this.optionIdOffsetFrom);
+      return getInteger(this.optionIdOffsetFrom);
    }
 
-   public void setOptionIdOffsetTo(Integer var1) {
-      ((DscVariableBytes)this.optionIdOffsetTo.getAnyway()).setPositiveInteger(var1);
+   public void setOptionIdOffsetTo(Integer offsetTo) {
+      ((DscVariableBytes) this.optionIdOffsetTo.getAnyway()).setPositiveInteger(offsetTo);
    }
 
    public Integer getOptionIdOffsetTo() {
-      return this.get((DscVariableBytes)this.optionIdOffsetTo.get());
+      return getInteger((DscVariableBytes) this.optionIdOffsetTo.get());
    }
 
-   public List<String> getStrings(Charset var1) {
-      List<String> var2 = new ArrayList(this.data.size());
+   public List<String> getStrings(Charset charset) {
+      List<String> result = new ArrayList<>(this.data.size());
       for (DscBinary binary : this.data) {
-         var2.add(binary.toString(var1));
+         result.add(binary.toString(charset));
       }
-
-      return var2;
+      return result;
    }
 
-   private Integer get(DscVariableBytes var1) {
-      return var1 == null ? null : var1.toPositiveInteger();
+   private Integer getInteger(DscVariableBytes bytes) {
+      return bytes == null ? null : bytes.toPositiveInteger();
    }
 
    private class Helper implements DscOptional.PresenceProvider, DscArray.ElementProvider<DscBinary> {
-      private Helper() {
-      }
-
+      @Override
       public boolean isPresent() {
          return Configuration.this.optionIdOffsetFrom.length() > 0;
       }
 
+      @Override
       public int numberOfElements() {
-         DscVariableBytes var1 = (DscVariableBytes)Configuration.this.optionIdOffsetTo.get();
-         return var1 != null && Configuration.this.optionIdOffsetFrom.length() != 0 ? var1.toPositiveInt() - Configuration.this.optionIdOffsetFrom.toPositiveInt() + 1 : 1;
+         DscVariableBytes to = (DscVariableBytes) Configuration.this.optionIdOffsetTo.get();
+         if (to != null && Configuration.this.optionIdOffsetFrom.length() != 0) {
+               return to.toPositiveInt() - Configuration.this.optionIdOffsetFrom.toPositiveInt() + 1;
+         }
+         return 1;
       }
 
+      @Override
       public DscBinary newElement() {
          return new DscBinary(Configuration.this.dataLength.toPositiveInt());
       }
-
    }
 }
