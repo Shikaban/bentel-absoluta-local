@@ -1,4 +1,3 @@
-
 package plugin.absoluta.connection;
 
 import com.google.common.collect.ImmutableList;
@@ -33,6 +32,7 @@ class StatusListener implements MessageListener {
    private static final int ZI_ALARM_IN_MEMORY = 6;
    private static final int ZI_BYPASSED = 7;
    private final PanelStatus panelStatus;
+   private int updatePartitionStatusCallCount = 0;
 
    StatusListener(PanelStatus var1) {
       this.panelStatus = (PanelStatus)Objects.requireNonNull(var1);
@@ -108,6 +108,10 @@ class StatusListener implements MessageListener {
    }
 
    private void updatePartitionStatus(int selectedPartitionID, List<Boolean> dataPartitionMask) {
+      if (updatePartitionStatusCallCount < 20) {
+         updatePartitionStatusCallCount++;
+         return;
+      }
       Arming newPartitionmode;
       if (!(Boolean)dataPartitionMask.get(PI_ARMED)) {
          newPartitionmode = Arming.DISARMED;
