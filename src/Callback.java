@@ -58,13 +58,14 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    public void alert(String var1) {
    }
 
-   public void changeInputs(List<String> var1) {
-      this.sensorIDs = (String[])var1.toArray(new String[0]);
+   public void changeInputs(List<String> msg) {
+      this.sensorIDs = (String[])msg.toArray(new String[0]);
+      // Utilizzo l'ultimo ID come dimensione degli array per allineare il numero dell'ID all'indice dell'array
       this.sensorNames = new String[Integer.parseInt(this.sensorIDs[this.sensorIDs.length - 1]) + 1];
       this.sensorTopics = new String[Integer.parseInt(this.sensorIDs[this.sensorIDs.length - 1]) + 1];
       this.sensorStatuses = new String[Integer.parseInt(this.sensorIDs[this.sensorIDs.length - 1]) + 1];
       if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: Sensore ID: " + String.valueOf(var1));
+         System.out.println("DEBUG: Sensore ID: " + String.valueOf(msg));
       }
    }
 
@@ -72,13 +73,17 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void changePartitions(List<String> msg) {
-      //TODO: #STEFANO controllare dimensione array partitionIDs
+      // Predispongo l'ID zero vuoto perchè usato dalla globale
+      this.partitionIDs = new String[msg.size() + 1];
+      this.partitionIDs[0] = "0";
+      for (int i = 0; i < msg.size(); i++) {
+         this.partitionIDs[i + 1] = msg.get(i);
+      }
       //TODO: #STEFANO valutare se unire globale alle altre partizioni
-      this.partitionIDs = (String[])msg.toArray(new String[0]);
-      this.partitionNames = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
-      this.partitionTopics = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
-      this.partitionArmStatuses = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
-      this.partitionStatuses = new String[Integer.parseInt(this.partitionIDs[this.partitionIDs.length - 1]) + 1];
+      this.partitionNames = new String[this.partitionIDs.length];
+      this.partitionTopics = new String[this.partitionIDs.length];
+      this.partitionArmStatuses = new String[this.partitionIDs.length];
+      this.partitionStatuses = new String[this.partitionIDs.length];
       this.partitionNames[0] = "Globale";
       this.partitionTopics[0] = "ABS/global";
 
