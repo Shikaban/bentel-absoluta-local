@@ -2,7 +2,6 @@
 package plugin.absoluta.connection;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.UnmodifiableIterator;
 
 import cms.device.api.Output.Status;
 import cms.device.api.Partition.Arming;
@@ -11,7 +10,6 @@ import protocol.dsc.Message;
 import protocol.dsc.MessageListener;
 import protocol.dsc.NewValue;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import org.javatuples.Pair;
@@ -41,74 +39,66 @@ class StatusListener implements MessageListener {
    }
 
    public void newValue(NewValue msg) {
-      List var2;
       if (msg.isFor(Message.PARTITION_ASSIGNMENT_CONFIGURATION)) {
-         var2 = (List)msg.getValue(Message.PARTITION_ASSIGNMENT_CONFIGURATION);
-         this.panelStatus.setPartitions(ImmutableList.copyOf(var2));
+         List<Integer> partitions = (List<Integer>)msg.getValue(Message.PARTITION_ASSIGNMENT_CONFIGURATION);
+         this.panelStatus.setPartitions(ImmutableList.copyOf(partitions));
       } else {
-         List var3;
          if (msg.isFor(Message.PARTITION_ZONES)) {
-            Integer var6 = (Integer)msg.getParam(Message.PARTITION_ZONES);
-            if (var6 == null) {
-               var3 = (List)msg.getValue(Message.PARTITION_ZONES);
-               this.panelStatus.setZones(ImmutableList.copyOf(var3));
+            Integer partitionNumber = (Integer)msg.getParam(Message.PARTITION_ZONES);
+            if (partitionNumber == null) {
+               List<Integer> zones = (List<Integer>)msg.getValue(Message.PARTITION_ZONES);
+               this.panelStatus.setZones(ImmutableList.copyOf(zones));
             } else {
-               System.out.println("WARN: unexpected partition number for partition zones: " + var6);
+               System.out.println("WARN: unexpected partition number for partition zones: " + partitionNumber);
             }
          } else if (msg.isFor(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)) {
-            var2 = (List)((Pair)msg.getValue(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)).getValue0();
-            this.panelStatus.setOutputs(ImmutableList.copyOf(var2));
+            List<Integer> outputs = (List<Integer>) ((Pair<?, ?>) msg.getValue(Message.ABSOLUTA_ENABLED_OUTPUTS_AND_REMOTE_COMMANDS)).getValue0();
+            this.panelStatus.setOutputs(ImmutableList.copyOf(outputs));
          } else if (msg.isFor(Message.PARTITION_STATUSES)) {
-            var2 = (List)msg.getParam(Message.PARTITION_STATUSES);
-            var3 = (List)msg.getValue(Message.PARTITION_STATUSES);
+            List<Integer> partitionIds = (List<Integer>)msg.getParam(Message.PARTITION_STATUSES);
+            List<List<Boolean>> partitionStatuses = (List<List<Boolean>>)msg.getValue(Message.PARTITION_STATUSES);
 
-            assert var2.size() == var3.size();
+            assert partitionIds.size() == partitionStatuses.size();
 
-            for(int var4 = 0; var4 < var2.size(); ++var4) {
-               int var5 = (Integer)var2.get(var4);
-               this.updatePartitionStatus(var5, (List)var3.get(var4));
+            for(int i = 0; i < partitionIds.size(); ++i) {
+               int partitionId = partitionIds.get(i);
+               List<Boolean> statusMask = partitionStatuses.get(i);
+               this.updatePartitionStatus(partitionId, statusMask);
             }
          } else {
-            int intID;
             if (msg.isFor(Message.ZONE_STATUSES)) {
-               intID = (Integer)((Pair)msg.getParam(Message.ZONE_STATUSES)).getValue0();
-               var3 = (List)msg.getValue(Message.ZONE_STATUSES);
+               int zoneId = (Integer) ((Pair<?, ?>) msg.getParam(Message.ZONE_STATUSES)).getValue0();
+               List<List<Boolean>> zoneStatuses = (List<List<Boolean>>) msg.getValue(Message.ZONE_STATUSES);
 
-               for(Iterator var11 = var3.iterator(); var11.hasNext(); ++intID) {
-                  List<Boolean> var13 = (List)var11.next();
-                  this.updateZoneStatus(intID, var13);
+               for(List<Boolean> statusMask : zoneStatuses) {
+                  this.updateZoneStatus(zoneId, statusMask);
+                  zoneId++;
                }
             } else if (msg.isFor(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION)) {
-               var2 = (List)msg.getValue(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION);
-               UnmodifiableIterator var8 = this.panelStatus.getOutputs().iterator();
-
-               while(var8.hasNext()) {
-                  Integer var12 = (Integer)var8.next();
-                  Status var14 = var2.contains(var12) ? Status.CLOSED : Status.OPEN;
-                  this.panelStatus.setOutputStatus(var12, var14);
+               List<Integer> activeOutputs = (List<Integer>) msg.getValue(Message.ABSOLUTA_COMMAND_OUTPUT_ACTIVATION);
+               for (Integer outputId : this.panelStatus.getOutputs()) {
+                  Status outputStatus = activeOutputs.contains(outputId) ? Status.CLOSED : Status.OPEN;
+                  this.panelStatus.setOutputStatus(outputId, outputStatus);
                }
             } else if (msg.isFor(Message.ABSOLUTA_SYSTEM_LABEL)) {
-               String var9 = ((String)msg.getValue(Message.ABSOLUTA_SYSTEM_LABEL)).trim();
-               this.panelStatus.setSystemLabel(var9);
-            } else {
-               String label;
-               if (msg.isFor(Message.ABSOLUTA_PARTITION_LABEL)) {
-                  intID = (Integer)msg.getParam(Message.ABSOLUTA_PARTITION_LABEL);
-                  label = ((String)msg.getValue(Message.ABSOLUTA_PARTITION_LABEL)).trim();
-                  this.panelStatus.setPartitionLabel(intID, label);
-               } else if (msg.isFor(Message.ABSOLUTA_ZONE_LABEL)) {
-                  intID = (Integer)msg.getParam(Message.ABSOLUTA_ZONE_LABEL);
-                  label = ((String)msg.getValue(Message.ABSOLUTA_ZONE_LABEL)).trim();
-                  this.panelStatus.setZoneLabel(intID, label);
-               } else if (msg.isFor(Message.ABSOLUTA_OUTPUT_LABEL)) {
-                  intID = (Integer)msg.getParam(Message.ABSOLUTA_OUTPUT_LABEL);
-                  label = ((String)msg.getValue(Message.ABSOLUTA_OUTPUT_LABEL)).trim();
-                  this.panelStatus.setOutputLabel(intID, label);
-               } else if (msg.isFor(Message.ABSOLUTA_ARMING_MODE_LABEL)) {
-                  intID = (Integer)msg.getParam(Message.ABSOLUTA_ARMING_MODE_LABEL);
-                  label = ((String)msg.getValue(Message.ABSOLUTA_ARMING_MODE_LABEL)).trim();
-                  this.panelStatus.setArmingModeLabel(intID, label);
-               }
+               String systemLabel = ((String)msg.getValue(Message.ABSOLUTA_SYSTEM_LABEL)).trim();
+               this.panelStatus.setSystemLabel(systemLabel);
+            } else if (msg.isFor(Message.ABSOLUTA_PARTITION_LABEL)) {
+               int partitionId = (Integer) msg.getParam(Message.ABSOLUTA_PARTITION_LABEL);
+               String label = ((String) msg.getValue(Message.ABSOLUTA_PARTITION_LABEL)).trim();
+               this.panelStatus.setPartitionLabel(partitionId, label);
+            } else if (msg.isFor(Message.ABSOLUTA_ZONE_LABEL)) {
+               int zoneId = (Integer) msg.getParam(Message.ABSOLUTA_ZONE_LABEL);
+               String label = ((String) msg.getValue(Message.ABSOLUTA_ZONE_LABEL)).trim();
+               this.panelStatus.setZoneLabel(zoneId, label);
+            } else if (msg.isFor(Message.ABSOLUTA_OUTPUT_LABEL)) {
+                  int outputId = (Integer) msg.getParam(Message.ABSOLUTA_OUTPUT_LABEL);
+                  String label = ((String) msg.getValue(Message.ABSOLUTA_OUTPUT_LABEL)).trim();
+                  this.panelStatus.setOutputLabel(outputId, label);
+            } else if (msg.isFor(Message.ABSOLUTA_ARMING_MODE_LABEL)) {
+               int armingModeId = (Integer) msg.getParam(Message.ABSOLUTA_ARMING_MODE_LABEL);
+               String label = ((String) msg.getValue(Message.ABSOLUTA_ARMING_MODE_LABEL)).trim();
+               this.panelStatus.setArmingModeLabel(armingModeId, label);
             }
          }
       }
@@ -155,11 +145,9 @@ class StatusListener implements MessageListener {
       boolean systemArmed = false;
       boolean onePartitionDisarmed = false;
       boolean noValidData = false;
-      UnmodifiableIterator listPartition = this.panelStatus.getPartitions().iterator();
 
-      while(listPartition.hasNext()) {
-         int partitionID = (Integer)listPartition.next();
-         Arming partitionMode = this.panelStatus.getPartitionArming(partitionID);
+      for (Integer partitionId : this.panelStatus.getPartitions()) {
+         Arming partitionMode = this.panelStatus.getPartitionArming(partitionId);
          if (partitionMode == null) {
             noValidData = true;
          } else if (partitionMode == Arming.DISARMED) {
