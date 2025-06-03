@@ -96,11 +96,8 @@ public class Configuration extends DscRequestableCommand {
 
    public List<String> getStrings(Charset var1) {
       List<String> var2 = new ArrayList(this.data.size());
-      Iterator var3 = this.data.iterator();
-
-      while(var3.hasNext()) {
-         DscBinary var4 = (DscBinary)var3.next();
-         var2.add(var4.toString(var1));
+      for (DscBinary binary : this.data) {
+         var2.add(binary.toString(var1));
       }
 
       return var2;
