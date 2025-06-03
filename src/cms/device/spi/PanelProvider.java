@@ -19,13 +19,13 @@ public interface PanelProvider {
 
    void partitionArming(String var1, Partition.Arming var2);
 
-   void setBypassed(String var1, boolean var2);
+   void setBypassed(String zoneID, boolean setBypassed);
 
    void doOutputAction(String var1, Output.Action var2);
 
    boolean armingSupport(char var1);
 
-   void armingSet(char var1);
+   void armingSet(char mode);
 
    Map<String, String> getSettings();
 
