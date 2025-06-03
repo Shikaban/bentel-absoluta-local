@@ -24,3 +24,6 @@ proguard.pro
 
 # Docker Images
 *.tar
+
+# Private Configs
+*.properties

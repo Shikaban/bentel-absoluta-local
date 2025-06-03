@@ -1,4 +1,7 @@
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Properties;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -9,20 +12,36 @@ import cms.device.spi.PanelProvider;
 import plugin.absoluta.AbsolutaPlugin;
 
 public class Application {
-   private static final String MQTT_ADDRESS = System.getenv("MQTT_ADDRESS");
-   private static final String MQTT_PORT = System.getenv("MQTT_PORT");
-   private static final String Username = System.getenv("MQTT_USERNAME");
-   private static final String Password = System.getenv("MQTT_PASSWORD");
-   private static final String ADDRESS = System.getenv("ALARM_ADDRESS");
-   private static final String PIN = System.getenv("ALARM_PIN");
-   private static final String PORT = System.getenv("ALARM_PORT");
-   private static final String MQTT_CONNECT_ATTEMPTS_STR = System.getenv("MQTT_CONNECT_ATTEMPTS");
-   private static final String HOME_ASSISTANT_DISCOVERY = System.getenv("HOME_ASSISTANT_DISCOVERY");
+   // Restituisce il valore della variabile d'ambiente o, se vuota/nulla, dal file di configurazione
+   private static String getConfigValue(Properties props, String envKey, String propKey) {
+      String value = System.getenv(envKey);
+      if (value == null || value.isEmpty()) {
+         value = props.getProperty(propKey);
+      }
+      return value;
+   }
 
    public Application() {
    }
 
    public static void main(String[] var0) {
+      Properties props = new Properties();
+      try (FileInputStream fis = new FileInputStream("config.properties")) {
+         props.load(fis);
+      } catch (IOException e) {
+         System.err.println("Impossibile caricare config.properties: " + e.getMessage());
+      }
+
+      String MQTT_ADDRESS = getConfigValue(props, "MQTT_ADDRESS", "MQTT_ADDRESS");
+      String MQTT_PORT = getConfigValue(props, "MQTT_PORT", "MQTT_PORT");
+      String Username = getConfigValue(props, "MQTT_USERNAME", "MQTT_USERNAME");
+      String Password = getConfigValue(props, "MQTT_PASSWORD", "MQTT_PASSWORD");
+      String ADDRESS = getConfigValue(props, "ALARM_ADDRESS", "ALARM_ADDRESS");
+      String PIN = getConfigValue(props, "ALARM_PIN", "ALARM_PIN");
+      String PORT = getConfigValue(props, "ALARM_PORT", "ALARM_PORT");
+      String MQTT_CONNECT_ATTEMPTS_STR = getConfigValue(props, "MQTT_CONNECT_ATTEMPTS", "MQTT_CONNECT_ATTEMPTS");
+      String HOME_ASSISTANT_DISCOVERY = getConfigValue(props, "HOME_ASSISTANT_DISCOVERY", "HOME_ASSISTANT_DISCOVERY");
+
       MemoryPersistence memPers = new MemoryPersistence();
 
       int MQTT_CONNECT_ATTEMPTS = 5; // Default value
