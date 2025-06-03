@@ -232,14 +232,14 @@ public class PanelStatus {
       return (String)this.outputLabels.get(outputID);
    }
 
-   void setArmingModeLabel(int var1, String newLabel) {
-      String oldLabel = (String)this.armingModeLabels.get(var1);
-      this.armingModeLabels.put(var1, newLabel);
-      this.changeSupport.fireIndexedPropertyChange("ARMING_MODE_LABEL", var1, oldLabel, newLabel);
+   void setArmingModeLabel(int modeID, String newLabel) {
+      String oldLabel = (String)this.armingModeLabels.get(modeID);
+      this.armingModeLabels.put(modeID, newLabel);
+      this.changeSupport.fireIndexedPropertyChange("ARMING_MODE_LABEL", modeID, oldLabel, newLabel);
    }
 
-   public String getArmingModeLabel(int var1) {
-      return (String)this.armingModeLabels.get(var1);
+   public String getArmingModeLabel(int modeID) {
+      return (String)this.armingModeLabels.get(modeID);
    }
 
    public static enum ConnectionStatus {
