@@ -120,6 +120,7 @@ public class CommandDecoder extends MessageToMessageDecoder<ByteBuf> {
    }
 
    @Override
+   @SuppressWarnings("deprecation")
    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
          throws DscProtocolException, CorruptedFrameException {
       assert in.order() == ByteOrder.BIG_ENDIAN;

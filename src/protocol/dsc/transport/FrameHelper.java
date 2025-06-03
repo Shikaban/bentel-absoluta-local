@@ -23,7 +23,7 @@ final class FrameHelper {
    }
 
    static {
-      UNESCAPE_MAP = ((ImmutableBiMap)ESCAPE_MAP).inverse();
+      UNESCAPE_MAP = ((ImmutableBiMap<Byte, Byte>) ESCAPE_MAP).inverse();
       MULTI_POINT_COMM_ID_CHARSET = DscCharsets.ASCII;
    }
 }

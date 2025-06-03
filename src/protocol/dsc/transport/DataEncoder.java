@@ -11,6 +11,8 @@ import java.nio.ByteOrder;
 
 @Sharable
 public class DataEncoder extends MessageToByteEncoder<ByteBuf> {
+
+   @SuppressWarnings("deprecation")
    protected void encode(ChannelHandlerContext var1, ByteBuf var2, ByteBuf var3) throws EncoderException {
       assert var3.order() == ByteOrder.BIG_ENDIAN;
 

@@ -7,7 +7,6 @@ import protocol.dsc.commands.DscCommandWithAppSeq;
 import protocol.dsc.commands.PartitionAssignments;
 import protocol.dsc.commands.PartitionAssignmentsResponse;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class PartitionAssignmentReading extends Reading<Integer, List<Integer>, PartitionAssignmentsResponse> {
@@ -17,10 +16,7 @@ public class PartitionAssignmentReading extends Reading<Integer, List<Integer>, 
 
    protected void parseResponse(ChannelHandlerContext var1, PartitionAssignmentsResponse var2, List<Message.Response> var3) {
       int var4 = var2.getUserNumberStart();
-      Iterator var5 = var2.getPartitionAssignments().iterator();
-
-      while(var5.hasNext()) {
-         List<Integer> var6 = (List)var5.next();
+      for (List<Integer> var6 : var2.getPartitionAssignments()) {
          var3.add(new NewValue(this, var4++, var6));
       }
 

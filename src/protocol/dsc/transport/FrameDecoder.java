@@ -17,6 +17,7 @@ public class FrameDecoder extends ByteToMessageDecoder {
    private boolean inFrame = false;
    private boolean discarding = false;
 
+   @SuppressWarnings("deprecation")
    protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws DecoderException {
       try {
          byte var4;

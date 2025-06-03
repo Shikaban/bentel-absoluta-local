@@ -27,7 +27,7 @@ public abstract class HandshakeHandler<C extends DscCommand> extends ChannelInbo
       if (this.isSharable()) {
          throw new IllegalStateException("@Sharable annotation is not allowed");
       } else {
-         this.cmdClass = (Class)Preconditions.checkNotNull(var1);
+         this.cmdClass = Preconditions.checkNotNull(var1);
       }
    }
 

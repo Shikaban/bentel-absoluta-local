@@ -23,6 +23,7 @@ public class DscITv2Server implements DscServer {
       this.port = port;
    }
 
+   @SuppressWarnings("deprecation")
    public void start() {
       if (this.bossGroup == null && this.workerGroup == null) {
          try {

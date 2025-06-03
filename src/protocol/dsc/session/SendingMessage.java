@@ -11,7 +11,7 @@ public class SendingMessage<P, V> {
    private final Priority priority;
 
    public SendingMessage(Message<P, V> var1, P var2, Priority var3) {
-      this.message = (Message)Preconditions.checkNotNull(var1);
+      this.message = Preconditions.checkNotNull(var1);
       this.param = var2;
       this.priority = (Priority)Preconditions.checkNotNull(var3);
    }

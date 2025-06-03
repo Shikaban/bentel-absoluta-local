@@ -9,7 +9,6 @@ import protocol.dsc.base.DscCharsets;
 import protocol.dsc.commands.Configuration;
 
 import java.nio.charset.Charset;
-import java.util.Iterator;
 import java.util.List;
 
 public class NumberedLabelReading extends RequestableCommandReading<Integer, String, Configuration> {
@@ -55,11 +54,11 @@ public class NumberedLabelReading extends RequestableCommandReading<Integer, Str
 
          int var6 = var4 - this.offset;
 
-         for(Iterator var7 = var5.iterator(); var7.hasNext(); ++var6) {
-            String var8 = (String)var7.next();
-            if (1 <= var6 && var6 <= this.max) {
-               var3.add(new NewValue(this, var6, var8));
-            }
+         for (String var8 : var5) {
+         if (1 <= var6 && var6 <= this.max) {
+            var3.add(new NewValue(this, var6, var8));
+         }
+         ++var6;
          }
       }
 

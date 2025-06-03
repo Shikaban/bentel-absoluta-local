@@ -14,6 +14,7 @@ import java.nio.ByteOrder;
 public class CommandEncoder extends MessageToByteEncoder<DscCommand> {
    private static final boolean VERBOSE_DEBUG = false;
 
+   @SuppressWarnings("deprecation")
    protected void encode(ChannelHandlerContext ctx, DscCommand cmd, ByteBuf buffer) throws Exception {
       assert buffer.order() == ByteOrder.BIG_ENDIAN;
 

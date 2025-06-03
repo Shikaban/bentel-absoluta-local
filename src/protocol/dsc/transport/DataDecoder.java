@@ -13,6 +13,8 @@ import java.util.List;
 
 @Sharable
 public class DataDecoder extends MessageToMessageDecoder<ByteBuf> {
+
+   @SuppressWarnings("deprecation")
    protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws CorruptedFrameException {
       assert var2.order() == ByteOrder.BIG_ENDIAN;
 

@@ -33,6 +33,7 @@ public class AbsolutaClient implements ITv2Client {
       this.port = var2;
    }
 
+   @SuppressWarnings("deprecation")
    public void connect(ITv2Client.Callback var1) throws InterruptedException {
       Preconditions.checkNotNull(var1);
       InetSocketAddress var2 = new InetSocketAddress(this.hostname, this.port);

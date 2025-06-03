@@ -19,7 +19,6 @@ import protocol.dsc.transport.command_handlers.PollHandler;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,28 +26,28 @@ import java.util.concurrent.ScheduledExecutorService;
 public class DscEndpoint implements Endpoint, Messenger {
    private final Channel channel;
    private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-   private final List<MessageListener> messageListeners = new CopyOnWriteArrayList();
+   private final List<MessageListener> messageListeners = new CopyOnWriteArrayList<>();
    private String panelId;
    private String pin;
    private boolean sessionful;
    private DscEndpointState state;
    private static final boolean VERBOSE_DEBUG = false;
 
-   public DscEndpoint(Channel var1) {
-      this.channel = (Channel)Preconditions.checkNotNull(var1);
+   public DscEndpoint(Channel channel) {
+      this.channel = Preconditions.checkNotNull(channel);
    }
 
    public String getPanelId() {
       return this.panelId;
    }
 
-   public void setPanelId(String newpanelID) {
-      if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: setting panel id: " + newpanelID);
+   public void setPanelId(String newPanelId) {
+      if (VERBOSE_DEBUG) {
+         System.out.println("DEBUG: setting panel id: " + newPanelId);
       }
-      String oldPanelID = this.panelId;
-      this.panelId = newpanelID;
-      this.changeSupport.firePropertyChange("panelId", oldPanelID, newpanelID);
+      String oldPanelId = this.panelId;
+      this.panelId = newPanelId;
+      this.changeSupport.firePropertyChange("panelId", oldPanelId, newPanelId);
    }
 
    public String getPin() {
@@ -56,7 +55,7 @@ public class DscEndpoint implements Endpoint, Messenger {
    }
 
    public void setPin(String newPin) {
-      if(VERBOSE_DEBUG) {
+      if (VERBOSE_DEBUG) {
          System.out.println("DEBUG: setting pin: " + newPin);
       }
       String oldPin = this.pin;
@@ -69,54 +68,54 @@ public class DscEndpoint implements Endpoint, Messenger {
       return this.sessionful;
    }
 
-   public void setSessionful(boolean var1) {
-      if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: setting sessionful: " + var1);
+   public void setSessionful(boolean sessionful) {
+      if (VERBOSE_DEBUG) {
+         System.out.println("DEBUG: setting sessionful: " + sessionful);
       }
-      boolean var2 = this.sessionful;
-      this.sessionful = var1;
+      boolean oldSessionful = this.sessionful;
+      this.sessionful = sessionful;
       this.setPoller();
-      this.changeSupport.firePropertyChange("sessionful", var2, var1);
+      this.changeSupport.firePropertyChange("sessionful", oldSessionful, sessionful);
    }
 
    public DscEndpointState getState() {
       return this.state;
    }
 
-   public void setState(DscEndpointState var1) {
-      DscEndpointState var2 = this.state;
-      if (var2 == DscEndpointState.CLOSED) {
-         System.out.println("WARN: Current status is CLOSED: ignoring the request to change to " + var1);
+   public void setState(DscEndpointState newState) {
+      DscEndpointState oldState = this.state;
+      if (oldState == DscEndpointState.CLOSED) {
+         System.out.println("WARN: Current status is CLOSED: ignoring the request to change to " + newState);
       } else {
-         System.out.println("INFO: setting state: " + var1);
-         this.state = var1;
+         System.out.println("INFO: setting state: " + newState);
+         this.state = newState;
          this.setPoller();
-         this.changeSupport.firePropertyChange("state", var2, var1);
+         this.changeSupport.firePropertyChange("state", oldState, newState);
       }
    }
 
-   public void addPropertyChangeListener(PropertyChangeListener var1) {
-      this.changeSupport.addPropertyChangeListener(var1);
+   public void addPropertyChangeListener(PropertyChangeListener listener) {
+      this.changeSupport.addPropertyChangeListener(listener);
    }
 
-   public void removePropertyChangeListener(PropertyChangeListener var1) {
-      this.changeSupport.removePropertyChangeListener(var1);
+   public void removePropertyChangeListener(PropertyChangeListener listener) {
+      this.changeSupport.removePropertyChangeListener(listener);
    }
 
    public void close() {
       if (this.state != DscEndpointState.CLOSING && this.state != DscEndpointState.CLOSED) {
          if (this.channel.isActive()) {
-            if(VERBOSE_DEBUG) {
-               System.out.println("DEBUG: closing endpoint: sending end session");
-            }
-            EndSession var1 = new EndSession();
-            var1.setPriority(Priority.HIGH);
-            this.channel.write(var1);
+               if (VERBOSE_DEBUG) {
+                  System.out.println("DEBUG: closing endpoint: sending end session");
+               }
+               EndSession endSession = new EndSession();
+               endSession.setPriority(Priority.HIGH);
+               this.channel.write(endSession);
          } else {
-            if(VERBOSE_DEBUG) {
-               System.out.println("DEBUG: closing endpoint: closing channel");
-            }
-            this.channel.close();
+               if (VERBOSE_DEBUG) {
+                  System.out.println("DEBUG: closing endpoint: closing channel");
+               }
+               this.channel.close();
          }
       }
    }
@@ -129,67 +128,60 @@ public class DscEndpoint implements Endpoint, Messenger {
       return this.channel.eventLoop();
    }
 
-   public <V> void send(Message<Void, V> var1) {
-      this.send(var1, Priority.NORMAL);
+   public <V> void send(Message<Void, V> message) {
+      this.send(message, Priority.NORMAL);
    }
 
-   public <V> void send(Message<Void, V> var1, Priority var2) {
-      this.send(var1, null, var2);
+   public <V> void send(Message<Void, V> message, Priority priority) {
+      this.send(message, null, priority);
    }
 
-   public <P, V> void send(Message<P, V> var1, P var2) {
-      this.send(var1, var2, Priority.NORMAL);
+   public <P, V> void send(Message<P, V> message, P param) {
+      this.send(message, param, Priority.NORMAL);
    }
 
-   public <P, V> void send(final Message<P, V> var1, final P var2, Priority var3) {
-      Preconditions.checkNotNull(var1);
-      Preconditions.checkNotNull(var3);
-      SendingMessage<P, V> var4 = new SendingMessage(var1, var2, var3);
-      if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: sending: " + var4);
+   public <P, V> void send(final Message<P, V> message, final P param, Priority priority) {
+      Preconditions.checkNotNull(message);
+      Preconditions.checkNotNull(priority);
+      SendingMessage<P, V> sendingMessage = new SendingMessage<>(message, param, priority);
+      if (VERBOSE_DEBUG) {
+         System.out.println("DEBUG: sending: " + sendingMessage);
       }
-      this.channel.write(var4).addListener(new ChannelFutureListener() {
-         public void operationComplete(ChannelFuture var1x) throws Exception {
-            Throwable var2x = var1x.cause();
-            if (var2x != null) {
-               DscEndpoint.this.broadcastError(DscError.newMessageError(var1, var2, var2x));
-            }
-
+      this.channel.write(sendingMessage).addListener(new ChannelFutureListener() {
+         @Override
+         public void operationComplete(ChannelFuture future) throws Exception {
+               Throwable cause = future.cause();
+               if (cause != null) {
+                  DscEndpoint.this.broadcastError(DscError.newMessageError(message, param, cause));
+               }
          }
       });
    }
 
-   public void addMessageListener(MessageListener var1) {
-      this.messageListeners.add(var1);
+   public void addMessageListener(MessageListener listener) {
+      this.messageListeners.add(listener);
    }
 
-   public void removeMessageListener(MessageListener var1) {
-      this.messageListeners.remove(var1);
+   public void removeMessageListener(MessageListener listener) {
+      this.messageListeners.remove(listener);
    }
 
-   public void broadcastNewValue(NewValue var1) {
-      if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: new value received: " + var1);
+   public void broadcastNewValue(NewValue value) {
+      if (VERBOSE_DEBUG) {
+         System.out.println("DEBUG: new value received: " + value);
       }
-      Iterator var2 = this.messageListeners.iterator();
-
-      while(var2.hasNext()) {
-         MessageListener var3 = (MessageListener)var2.next();
-         var3.newValue(var1);
+      for (MessageListener listener : this.messageListeners) {
+         listener.newValue(value);
       }
    }
 
-   public void broadcastError(DscError var1) {
-      if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: error received: " + var1);
+   public void broadcastError(DscError error) {
+      if (VERBOSE_DEBUG) {
+         System.out.println("DEBUG: error received: " + error);
       }
-      Iterator var2 = this.messageListeners.iterator();
-
-      while(var2.hasNext()) {
-         MessageListener var3 = (MessageListener)var2.next();
-         var3.error(var1);
+      for (MessageListener listener : this.messageListeners) {
+         listener.error(error);
       }
-
    }
 
    private void setPoller() {

@@ -8,13 +8,12 @@ import protocol.dsc.commands.DscCommandWithAppSeq;
 import protocol.dsc.commands.DscGeneralResponse;
 import protocol.dsc.commands.DscResponse;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class ResponseHandler extends ChannelDuplexHandler {
    private static final int MAX_WAITING_CMDS = 32;
-   private final Queue<DscCommandWithAppSeq> waitingCmds = new LinkedList();
+   private final Queue<DscCommandWithAppSeq> waitingCmds = new LinkedList<DscCommandWithAppSeq>();
    private static final boolean VERBOSE_DEBUG = false;
 
    public void channelInactive(ChannelHandlerContext var1) throws Exception {
@@ -41,19 +40,16 @@ public class ResponseHandler extends ChannelDuplexHandler {
       boolean var3 = false;
       if (var2 instanceof DscResponse) {
          DscResponse var4 = (DscResponse)var2;
-         Iterator var5 = this.waitingCmds.iterator();
-
-         while(var5.hasNext()) {
-            DscCommandWithAppSeq var6 = (DscCommandWithAppSeq)var5.next();
+         for (DscCommandWithAppSeq var6 : waitingCmds) {
             if (var6.matchAsResponse(var4)) {
-               if(VERBOSE_DEBUG) {
-                  System.out.println("DEBUG: response " + var4 + " received for " + var6);
+               if (VERBOSE_DEBUG) {
+               System.out.println("DEBUG: response " + var4 + " received for " + var6);
                }
-               var5.remove();
+               waitingCmds.remove(var6);
                var3 = true;
                if (var4 instanceof DscGeneralResponse) {
-                  DscGeneralResponse var7 = (DscGeneralResponse)var4;
-                  var6.generalResponseReceived(var1.channel(), var7);
+               DscGeneralResponse var7 = (DscGeneralResponse) var4;
+               var6.generalResponseReceived(var1.channel(), var7);
                }
                break;
             }

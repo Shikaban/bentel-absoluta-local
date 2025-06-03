@@ -12,6 +12,8 @@ import java.util.List;
 
 @Sharable
 public class MultiplePacketsDecoder extends MessageToMessageDecoder<ByteBuf> {
+
+   @SuppressWarnings("deprecation")
    protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws Exception {
       assert var2.order() == ByteOrder.BIG_ENDIAN;
 

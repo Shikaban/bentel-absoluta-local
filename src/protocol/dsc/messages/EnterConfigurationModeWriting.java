@@ -11,11 +11,11 @@ public class EnterConfigurationModeWriting<P> extends Writing<P> {
    private final boolean readWrite;
 
    public static EnterConfigurationModeWriting<Pair<Integer, String>> withPartitionAndCodeParam(int var0, boolean var1) {
-      return new EnterConfigurationModeWriting(var0, var1);
+      return new EnterConfigurationModeWriting<Pair<Integer, String>>(var0, var1);
    }
 
    public static EnterConfigurationModeWriting<Integer> withPartitionParam(int var0, boolean var1) {
-      return new EnterConfigurationModeWriting(var0, var1);
+      return new EnterConfigurationModeWriting<Integer>(var0, var1);
    }
 
    private EnterConfigurationModeWriting(int var1, boolean var2) {
