@@ -8,7 +8,6 @@ import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -76,13 +75,11 @@ class CallbackListener implements PropertyChangeListener {
                   this.callback.changePartitions(toStringList(this.panelStatus.getPartitions()));
                   break;
                case "ZONES":
-                  List<String> var10 = toStringList(this.panelStatus.getZones());
-                  this.callback.changeInputs(var10);
-                  List<String> var13 = toStringList(this.panelStatus.getPartitions());
-                  Iterator var12 = var13.iterator();
-                  while(var12.hasNext()) {
-                     String var7 = (String)var12.next();
-                     this.callback.tagInputIntoPartition(var7, var10);
+                  List<String> zoneStrings = toStringList(this.panelStatus.getZones());
+                  this.callback.changeInputs(zoneStrings);
+                  List<String> partitionStrings = toStringList(this.panelStatus.getPartitions());
+                  for (String partitionId : partitionStrings) {
+                     this.callback.tagInputIntoPartition(partitionId, zoneStrings);
                   }
                   return;
                case "OUTPUTS":
@@ -95,14 +92,11 @@ class CallbackListener implements PropertyChangeListener {
       }
    }
 
-   private static List<String> toStringList(List<Integer> var0) {
-      List<String> var1 = new ArrayList(var0.size());
-      Iterator var2 = var0.iterator();
-
-      while(var2.hasNext()) {
-         Integer var3 = (Integer)var2.next();
-         var1.add(var3.toString());
+   private static List<String> toStringList(List<Integer> intList) {
+      List<String> stringList = new ArrayList<>(intList.size());
+      for (Integer value : intList) {
+         stringList.add(value.toString());
       }
-      return var1;
+      return stringList;
    }
 }
