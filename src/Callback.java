@@ -261,6 +261,10 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void setInputStatus(String sensorID, Input.Status sensorStatus) {
+      if (this.panel.getBypassInput(sensorID)) {
+         //TODO @Alessandro, qui ricevi se il sensore è bypassato o meno
+         return;
+      }
       int sensorIDInt = Integer.parseInt(sensorID);
       if (sensorStatus != Status.ACTIVE && sensorStatus != Status.ALARM) {
          this.sensorStatuses[sensorIDInt] = "Off";

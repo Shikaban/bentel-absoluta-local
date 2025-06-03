@@ -163,6 +163,10 @@ public final class Panel implements DeviceOrPanel {
       this.impl.setBypassed(zoneID, setBypassed);
    }
 
+   public boolean getBypassInput(String zoneID) {
+      return this.impl.getBypassed(zoneID);
+   }
+
    private void doOutputAction(String var1, Output.Action var2) {
       this.impl.doOutputAction(var1, var2);
    }

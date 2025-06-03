@@ -82,6 +82,11 @@ public class AbsolutaPanelProvider implements PanelProvider {
       this.connectionHandler.getCommander().setBypassed(zoneID, setBypassed);
    }
 
+   public boolean getBypassed(String zoneID) {
+      int zoneInt = Integer.parseInt(zoneID);
+      return this.panelStatus.getZoneBypass(zoneInt);
+   }
+
    public void doOutputAction(String var1, Action var2) {
       switch(var2) {
       case DO_CLOSE:

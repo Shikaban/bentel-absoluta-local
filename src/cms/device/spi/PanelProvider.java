@@ -21,6 +21,8 @@ public interface PanelProvider {
 
    void setBypassed(String zoneID, boolean setBypassed);
 
+   boolean getBypassed(String zoneID);
+
    void doOutputAction(String var1, Output.Action var2);
 
    boolean armingSupport(char var1);
