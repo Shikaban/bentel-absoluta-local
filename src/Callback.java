@@ -563,7 +563,9 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             this.commandMode(msg);
          }
       } else if (topic.equals("homeassistant/status")) {
-         //TODO: #ALESSANDRO Gestione del reinvio degli stati quando home assistant si riavvia
+         if(msg.toString().equals("online")){
+            //TODO: #Stefano Richiamo funzioni callback per stati sensori e partizioni
+         }
       } else {
          // Comando non riconosciuto
          System.out.println("WARN: Comando non riconosciuto per il topic: " + topic);
