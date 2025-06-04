@@ -1,7 +1,6 @@
 package protocol.dsc.base;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 import protocol.dsc.util.DscUtils;
@@ -12,52 +11,58 @@ import java.util.Arrays;
 public final class DscBinary implements DscSerializable {
    private final byte[] bytes;
 
-   public DscBinary(int var1) {
-      this.bytes = new byte[var1];
+   public DscBinary(int length) {
+      this.bytes = new byte[length];
    }
 
-   public DscBinary(byte[] var1) {
-      this.bytes = (byte[])Preconditions.checkNotNull(var1);
+   public DscBinary(byte[] bytes) {
+      this.bytes = Preconditions.checkNotNull(bytes);
    }
 
    public int length() {
       return this.bytes.length;
    }
 
-   public byte[] bytes() {
+   public byte[] getBytes() {
       return this.bytes;
    }
 
-   public String toString(Charset var1) {
-      return new String(this.bytes, var1);
+   public String toString(Charset charset) {
+      return new String(this.bytes, charset);
    }
 
+   @Override
    public String toString() {
       return DscUtils.hexDump(this.bytes);
    }
 
+   @Override
    public int hashCode() {
       return Arrays.hashCode(this.bytes);
    }
 
-   public boolean equals(Object var1) {
-      if (var1 != null && this.getClass() == var1.getClass()) {
-         DscBinary var2 = (DscBinary)var1;
-         return Arrays.equals(this.bytes, var2.bytes);
+   @Override
+   public boolean equals(Object obj) {
+      if (obj != null && this.getClass() == obj.getClass()) {
+         DscBinary other = (DscBinary) obj;
+         return Arrays.equals(this.bytes, other.bytes);
       } else {
          return false;
       }
    }
 
-   public void readFrom(ByteBuf var1) throws IndexOutOfBoundsException, DecoderException {
-      var1.readBytes(this.bytes);
+   @Override
+   public void readFrom(ByteBuf buffer) throws IndexOutOfBoundsException, DecoderException {
+      buffer.readBytes(this.bytes);
    }
 
-   public void writeTo(ByteBuf var1) {
-      var1.writeBytes(this.bytes);
+   @Override
+   public void writeTo(ByteBuf buffer) {
+      buffer.writeBytes(this.bytes);
    }
 
-   public boolean isEquivalent(DscSerializable var1) {
-      return this.equals(var1);
+   @Override
+   public boolean isEquivalent(DscSerializable other) {
+      return this.equals(other);
    }
 }

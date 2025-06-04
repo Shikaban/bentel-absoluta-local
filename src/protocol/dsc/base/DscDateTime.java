@@ -9,56 +9,63 @@ public final class DscDateTime implements DscSerializable {
    private final byte[] bytes = new byte[]{0, 0, 0, 33};
 
    public Calendar get() {
-      Calendar var1 = Calendar.getInstance();
-      var1.clear();
-      var1.set(11, (this.bytes[0] & 248) >>> 3);
-      var1.set(12, (this.bytes[0] & 7) << 3 | (this.bytes[1] & 224) >>> 5);
-      var1.set(13, (this.bytes[1] & 31) << 1 | (this.bytes[2] & 128) >>> 7);
-      var1.set(1, ((this.bytes[2] & 126) >>> 1) + 2000);
-      var1.set(2, ((this.bytes[2] & 1) << 3 | (this.bytes[3] & 224) >>> 5) - 1);
-      var1.set(5, this.bytes[3] & 31);
-      return var1;
+      Calendar calendar = Calendar.getInstance();
+      calendar.clear();
+      calendar.set(Calendar.HOUR_OF_DAY, (this.bytes[0] & 0b11111000) >>> 3);
+      calendar.set(Calendar.MINUTE, ((this.bytes[0] & 0b00000111) << 3) | ((this.bytes[1] & 0b11100000) >>> 5));
+      calendar.set(Calendar.SECOND, ((this.bytes[1] & 0b00011111) << 1) | ((this.bytes[2] & 0b10000000) >>> 7));
+      calendar.set(Calendar.YEAR, ((this.bytes[2] & 0b01111110) >>> 1) + 2000);
+      calendar.set(Calendar.MONTH, (((this.bytes[2] & 0b00000001) << 3) | ((this.bytes[3] & 0b11100000) >>> 5)) - 1);
+      calendar.set(Calendar.DAY_OF_MONTH, this.bytes[3] & 0b00011111);
+      return calendar;
    }
 
-   public DscDateTime set(Calendar var1) {
-      int var2 = var1.get(11);
-      int var3 = var1.get(12);
-      int var4 = var1.get(13);
-      int var5 = var1.get(1) - 2000;
-      int var6 = var1.get(2) + 1;
-      int var7 = var1.get(5);
-      this.bytes[0] = (byte)((var2 & 31) << 3 | (var3 & 56) >>> 3);
-      this.bytes[1] = (byte)((var3 & 7) << 5 | (var4 & 62) >>> 1);
-      this.bytes[2] = (byte)((var4 & 1) << 7 | (var5 & 63) << 1 | (var6 & 8) >> 3);
-      this.bytes[3] = (byte)((var6 & 7) << 5 | var7 & 31);
+   public DscDateTime set(Calendar calendar) {
+      int hour = calendar.get(Calendar.HOUR_OF_DAY);
+      int minute = calendar.get(Calendar.MINUTE);
+      int second = calendar.get(Calendar.SECOND);
+      int year = calendar.get(Calendar.YEAR) - 2000;
+      int month = calendar.get(Calendar.MONTH) + 1;
+      int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+      this.bytes[0] = (byte) (((hour & 0b00011111) << 3) | ((minute & 0b00111000) >>> 3));
+      this.bytes[1] = (byte) (((minute & 0b00000111) << 5) | ((second & 0b00111110) >>> 1));
+      this.bytes[2] = (byte) (((second & 0b00000001) << 7) | ((year & 0b00111111) << 1) | ((month & 0b00001000) >> 3));
+      this.bytes[3] = (byte) (((month & 0b00000111) << 5) | (day & 0b00011111));
       return this;
    }
 
-   public boolean equals(Object var1) {
-      if (var1 != null && this.getClass() == var1.getClass()) {
-         DscDateTime var2 = (DscDateTime)var1;
-         return Arrays.equals(this.bytes, var2.bytes);
+   @Override
+   public boolean equals(Object obj) {
+      if (obj != null && this.getClass() == obj.getClass()) {
+         DscDateTime other = (DscDateTime) obj;
+         return Arrays.equals(this.bytes, other.bytes);
       } else {
          return false;
       }
    }
 
+   @Override
    public int hashCode() {
       return Arrays.hashCode(this.bytes);
    }
 
-   public void readFrom(ByteBuf var1) throws IndexOutOfBoundsException, DecoderException {
-      var1.readBytes(this.bytes);
+   @Override
+   public void readFrom(ByteBuf buffer) throws IndexOutOfBoundsException, DecoderException {
+      buffer.readBytes(this.bytes);
    }
 
-   public void writeTo(ByteBuf var1) {
-      var1.writeBytes(this.bytes);
+   @Override
+   public void writeTo(ByteBuf buffer) {
+      buffer.writeBytes(this.bytes);
    }
 
-   public boolean isEquivalent(DscSerializable var1) {
-      return this.equals(var1);
+   @Override
+   public boolean isEquivalent(DscSerializable other) {
+      return this.equals(other);
    }
 
+   @Override
    public String toString() {
       return this.get().getTime().toString();
    }
