@@ -586,28 +586,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       } else if (topic.equals("homeassistant/status")) {
          if(msg.toString().equals("online")){
-            //TODO @Alessandro: mi va in crisi MQTT perchè sparo troppi messaggi in un colpo solo, quando puoi intercedi e mi aiuti?
-            // Ripubblica tutti gli status di sensori e partizioni su MQTT
-            // Stato globale (centrale)
-            if (this.partitionArmStatuses != null && this.partitionArmStatuses.length > 0) {
-               this.sendMessageOnsetArming();
-            }
-            // Stati partizioni
-            if (this.partitionIDs != null) {
-               for (int i = 1; i < this.partitionIDs.length; i++) {
-                  if (this.partitionArmStatuses != null && this.partitionArmStatuses[i] != null) {
-                     this.sendMessageOnsetPartitionArming(this.partitionIDs[i]);
-                  }
-               }
-            }
-            // Stati sensori
-            if (this.sensorIDs != null) {
-               for (int i = 0; i < this.sensorIDs.length; i++) {
-                  if (this.sensorStatuses != null && this.sensorStatuses[this.sensorIDs[i]] != null) {
-                     this.sendMessageOnsetInputStatus(this.sensorIDs[i]);
-                  }
-               }
-            }
+            commandOnline();
          }
       } else {
          // Comando non riconosciuto
@@ -686,6 +665,32 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    }
 
    public void deliveryComplete(IMqttDeliveryToken var1) {
+   }
+
+   private void commandOnline() {
+      if(VERBOSE_DEBUG) {
+         System.out.println("DEBUG: Comando ricevuto per Home Assistant online");
+      }
+      // Stato globale (centrale)
+      if (this.partitionArmStatuses != null && this.partitionArmStatuses.length > 0) {
+         this.sendMessageOnsetArming();
+      }
+      // Stati partizioni
+      if (this.partitionIDs != null) {
+         for (int i = 1; i < this.partitionIDs.length; i++) {
+            if (this.partitionArmStatuses != null && this.partitionArmStatuses[i] != null) {
+               this.sendMessageOnsetPartitionArming(this.partitionIDs[i]);
+            }
+         }
+      }
+      // Stati sensori
+      if (this.sensorIDs != null) {
+         for (int i = 0; i < this.sensorIDs.length; i++) {
+            if (this.sensorStatuses != null && this.sensorStatuses[this.sensorIDs[i]] != null) {
+               this.sendMessageOnsetInputStatus(this.sensorIDs[i]);
+            }
+         }
+      }
    }
 
    private void reconnectWithDelay(String objName) {
