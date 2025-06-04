@@ -11,35 +11,35 @@ import org.javatuples.Triplet;
 import org.openide.util.NbBundle;
 
 class AlertListener implements MessageListener {
-   private final AlertCallback alertCallback;
-   private final PanelStatus panelStatus;
+	private final AlertCallback alertCallback;
+	private final PanelStatus panelStatus;
 
-   public AlertListener(AlertCallback alertCallback, PanelStatus panelStatus) {
-      this.alertCallback = alertCallback;
-      this.panelStatus = panelStatus;
-   }
+	public AlertListener(AlertCallback alertCallback, PanelStatus panelStatus) {
+		this.alertCallback = alertCallback;
+		this.panelStatus = panelStatus;
+	}
 
-   public void newValue(NewValue newValue) {
-   }
+	public void newValue(NewValue newValue) {
+	}
 
-   public void error(DscError error) {
-      if (error.getResponseCode() == null) {
+	public void error(DscError error) {
+		if (error.getResponseCode() == null) {
          return;
-      }
+		}
 
-      System.out.println("DEBUG: error received: " + error);
+		System.out.println("DEBUG: error received: " + error);
 
-      if (error.isFor(Message.ARM)) {
+		if (error.isFor(Message.ARM)) {
          // ARM error: check if it's global or for a specific partition
          Pair<Integer, ?> armParam = (Pair<Integer, ?>) error.getParam(Message.ARM);
          Integer partitionId = armParam.getValue0();
          if (partitionId == null) {
-               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.global"));
+            alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.global"));
          } else {
-               String partitionLabel = panelStatus.getPartitionLabel(partitionId);
-               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.partition", partitionLabel));
+            String partitionLabel = panelStatus.getPartitionLabel(partitionId);
+            alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.arm.partition", partitionLabel));
          }
-      } else if (error.isFor(Message.SINGLE_ZONE_BYPASS_WRITE)) {
+		} else if (error.isFor(Message.SINGLE_ZONE_BYPASS_WRITE)) {
          // Zone bypass/unbypass error
          Triplet<?, Integer, Boolean> bypassParam = (Triplet<?, Integer, Boolean>) error.getParam(Message.SINGLE_ZONE_BYPASS_WRITE);
          Integer zoneId = bypassParam.getValue1();
@@ -47,9 +47,9 @@ class AlertListener implements MessageListener {
          String zoneLabel = panelStatus.getZoneLabel(zoneId);
 
          if (isBypass) {
-               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.bypass.zone", zoneLabel));
+            alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.bypass.zone", zoneLabel));
          } else {
-               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.unbypass.zone", zoneLabel));
+            alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.unbypass.zone", zoneLabel));
          }
 
          // Output set error (if present)
@@ -59,10 +59,10 @@ class AlertListener implements MessageListener {
          String outputLabel = panelStatus.getOutputLabel(outputId);
 
          if (outputState == 1) {
-               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.close", outputLabel));
+            alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.close", outputLabel));
          } else if (outputState == 2) {
-               alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.open", outputLabel));
+            alertCallback.alert(NbBundle.getMessage(AlertListener.class, "Alert.output.open", outputLabel));
          }
-      }
-   }
+		}
+	}
 }
