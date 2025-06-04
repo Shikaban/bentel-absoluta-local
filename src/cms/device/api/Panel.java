@@ -228,12 +228,6 @@ public final class Panel implements DeviceOrPanel {
          Panel.this.getPartitions().get(partitionId).setRemoteName(remoteName);
       }
 
-      public void setPartitionsArming(Partition.Arming arming) {
-         for (Partition partition : Panel.this.getPartitions().values()) {
-               partition.setArming(arming);
-         }
-      }
-
       public void setPartitionArming(String partitionId, Partition.Arming arming) {
          Panel.this.getPartitions().get(partitionId).setArming(arming);
       }

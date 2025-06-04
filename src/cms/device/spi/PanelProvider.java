@@ -41,8 +41,6 @@ public interface PanelProvider {
 
       void setPartitionRemoteName(String var1, String var2);
 
-      void setPartitionsArming(Partition.Arming var1);
-
       void setPartitionArming(String var1, Partition.Arming var2);
 
       void setPartitionStatus(String var1, Partition.Status var2);
