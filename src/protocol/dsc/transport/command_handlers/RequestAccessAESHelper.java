@@ -3,7 +3,6 @@ package protocol.dsc.transport.command_handlers;
 import com.google.common.base.Preconditions;
 
 import io.netty.handler.codec.DecoderException;
-import io.netty.util.internal.ThreadLocalRandom;
 import protocol.dsc.base.DscVariableBytes;
 import protocol.dsc.commands.RequestAccess;
 import protocol.dsc.util.DscUtils;
@@ -18,6 +17,7 @@ public class RequestAccessAESHelper {
    private static final int KEY_LENGTH = 16;
    private static final int IDENTIFIER_LENGTH = 48;
    private final DscVariableBytes identifier;
+   private static final java.security.SecureRandom SECURE_RANDOM = new java.security.SecureRandom();
 
    public RequestAccessAESHelper(RequestAccess var1) {
       this.identifier = var1.identifier();
@@ -103,8 +103,8 @@ public class RequestAccessAESHelper {
    }
 
    public static byte[] getRandomBytes() {
-      byte[] var0 = new byte[16];
-      ThreadLocalRandom.current().nextBytes(var0);
-      return var0;
+      byte[] bytes = new byte[16];
+      SECURE_RANDOM.nextBytes(bytes);
+      return bytes;
    }
 }
