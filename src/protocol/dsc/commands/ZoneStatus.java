@@ -15,7 +15,7 @@ public class ZoneStatus extends DscRequestableCommand implements DscArray.Elemen
    private final DscVariableBytes zoneNumber = new DscVariableBytes();
    private final DscVariableBytes numberOfZones = new DscVariableBytes();
    private final DscNumber lengthOfStatusBytes = DscNumber.newUnsignedNum(1);
-   private final DscArray<DscBitMask> zoneStatuses = new DscArray(this);
+   private final DscArray<DscBitMask> zoneStatuses = new DscArray<DscBitMask>(this);
 
    protected List<DscSerializable> getRequestFields() {
       return ImmutableList.of(this.zoneNumber, this.numberOfZones);

@@ -9,7 +9,6 @@ import protocol.dsc.base.DscOptional;
 import protocol.dsc.base.DscSerializable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class SectionRead extends DscCommandWithResponse {
@@ -18,11 +17,11 @@ public class SectionRead extends DscCommandWithResponse {
    private static final int MODULE_NUMBER_BIT = 2;
    private static final int VIRTUAL_SECTION_NUMBER_BIT = 3;
    private final DscBitMask flags = new DscBitMask(COUNT_BIT, INDEX_BIT);
-   private final DscOptional<DscNumber> moduleNumber = new DscOptional(DscNumber.newUnsignedNum(COUNT_BIT), new SectionRead.FieldPresenceProvider(MODULE_NUMBER_BIT));
+   private final DscOptional<DscNumber> moduleNumber = new DscOptional<DscNumber>(DscNumber.newUnsignedNum(COUNT_BIT), new SectionRead.FieldPresenceProvider(MODULE_NUMBER_BIT));
    private final DscNumber mainSectionNumber = DscNumber.newUnsignedNum(MODULE_NUMBER_BIT);
-   private final DscArray<DscNumber> subSectionNumbers = new DscArray(new SectionRead.SubSectionElementProvider());
-   private final DscOptional<DscNumber> index = new DscOptional(DscNumber.newUnsignedNum(COUNT_BIT), new SectionRead.FieldPresenceProvider(INDEX_BIT));
-   private final DscOptional<DscNumber> count = new DscOptional(DscNumber.newUnsignedNum(COUNT_BIT), new SectionRead.FieldPresenceProvider(COUNT_BIT));
+   private final DscArray<DscNumber> subSectionNumbers = new DscArray<DscNumber>(new SectionRead.SubSectionElementProvider());
+   private final DscOptional<DscNumber> index = new DscOptional<DscNumber>(DscNumber.newUnsignedNum(COUNT_BIT), new SectionRead.FieldPresenceProvider(INDEX_BIT));
+   private final DscOptional<DscNumber> count = new DscOptional<DscNumber>(DscNumber.newUnsignedNum(COUNT_BIT), new SectionRead.FieldPresenceProvider(COUNT_BIT));
 
    protected List<DscSerializable> getFields() {
       return ImmutableList.of(this.flags, this.moduleNumber, this.mainSectionNumber, this.subSectionNumbers, this.index, this.count);
@@ -53,11 +52,9 @@ public class SectionRead extends DscCommandWithResponse {
    }
 
    public List<Integer> getSubSectionNumbers() {
-      List<Integer> var1 = new ArrayList(this.subSectionNumbers.size());
-      Iterator var2 = this.subSectionNumbers.iterator();
-
-      while(var2.hasNext()) {
-         DscNumber var3 = (DscNumber)var2.next();
+      List<Integer> var1 = new ArrayList<>(this.subSectionNumbers.size());
+      for (int i = 0; i < this.subSectionNumbers.size(); i++) {
+         DscNumber var3 = (DscNumber) this.subSectionNumbers.get(i);
          var1.add(var3.toInt());
       }
 
@@ -71,11 +68,8 @@ public class SectionRead extends DscCommandWithResponse {
          byte[] var10000 = this.flags.bytes();
          var10000[0] = (byte)(var10000[0] | var1.size() << 4);
          this.subSectionNumbers.clear();
-         Iterator var2 = var1.iterator();
-
-         while(var2.hasNext()) {
-            Integer var3 = (Integer)var2.next();
-            ((DscNumber)this.subSectionNumbers.addNewElement()).set((long)var3);
+         for (Integer num : var1) {
+            ((DscNumber)this.subSectionNumbers.addNewElement()).set((long)num);
          }
 
          assert this.subSectionNumbers.getExpectedNumberOfElements() == this.subSectionNumbers.size();

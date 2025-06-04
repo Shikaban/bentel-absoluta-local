@@ -8,13 +8,12 @@ import protocol.dsc.base.DscNumber;
 import protocol.dsc.base.DscSerializable;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class PartitionStatus extends DscRequestableCommand implements DscArray.ElementProvider<DscBitMask> {
    private final DscBitMask partitions = new DscBitMask(true, 1);
    private final DscNumber bytesOfStatus = DscNumber.newUnsignedNum(1);
-   private final DscArray<DscBitMask> statuses = new DscArray(this);
+   private final DscArray<DscBitMask> statuses = new DscArray<DscBitMask>(this);
 
    protected List<DscSerializable> getRequestFields() {
       return ImmutableList.of(this.partitions);
@@ -41,11 +40,8 @@ public class PartitionStatus extends DscRequestableCommand implements DscArray.E
    public void setPartitions(List<Integer> var1) {
       this.partitions.reset();
       this.partitions.setMinNumberOfBits(var1.isEmpty() ? 0 : (Integer)Collections.max(var1));
-      Iterator var2 = var1.iterator();
-
-      while(var2.hasNext()) {
-         Integer var3 = (Integer)var2.next();
-         this.partitions.set(var3, true);
+      for (Integer partition : var1) {
+         this.partitions.set(partition, true);
       }
 
    }

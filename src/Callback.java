@@ -288,9 +288,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          System.out.println("Sensore ID: " + sensorID + " stato cambiato in: " + sensorStatus.toString());
       }
 
-      //TODO: #STEFANO esiste funzione dedicata per il feedback del bypass dei sensori?
       String bypassStatus = "";
-      String topic = "ABS/sensor/" + sensorID + "_bypass";  
+      String topic = "ABS/sensor/" + sensorID + "_bypass";
       if (this.panel.getBypassInput(sensorID)) {
          bypassStatus = "ON";
       } else {

@@ -93,14 +93,14 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
    }
 
    protected Queue<HandshakeHandler<?>> buildHandshakeHandlers() {
-      Queue<HandshakeHandler<?>> var1 = new ArrayDeque(2);
+      Queue<HandshakeHandler<?>> var1 = new ArrayDeque<HandshakeHandler<?>>(2);
       var1.add(new OpenSessionHandler());
       var1.add(new RequestAccessHandler());
       return var1;
    }
 
    protected List<ChannelHandler> buildNormalModeHandlers() {
-      List<ChannelHandler> var1 = new ArrayList(6);
+      List<ChannelHandler> var1 = new ArrayList<ChannelHandler>(6);
       var1.add(new RequestedReadingHandler());
       var1.add(WRITING_HANDLER);
       var1.add(TEXT_NOTIFICATION_HANDLER);

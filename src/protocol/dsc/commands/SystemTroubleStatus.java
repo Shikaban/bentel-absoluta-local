@@ -10,13 +10,12 @@ import protocol.dsc.base.DscVariableBytes;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class SystemTroubleStatus extends DscRequestableCommand implements DscArray.ElementProvider<SystemTroubleStatus.Trouble> {
    private static final int SYSTEM = 0;
    private static final int ALL_TROUBLES_NO_TROUBLES = 0;
-   private final DscArray<SystemTroubleStatus.Trouble> troubles = new DscArray(this);
+   private final DscArray<SystemTroubleStatus.Trouble> troubles = new DscArray<SystemTroubleStatus.Trouble>(this);
 
    protected List<DscSerializable> getRequestFields() {
       return ImmutableList.of(this.troubles);
@@ -58,7 +57,7 @@ public class SystemTroubleStatus extends DscRequestableCommand implements DscArr
    public static class Trouble extends DscStruct implements DscArray.ElementProvider<DscVariableBytes> {
       private final DscVariableBytes deviceModuleType = new DscVariableBytes();
       private final DscNumber numberOfTroubleTypes = DscNumber.newUnsignedNum(1);
-      private final DscArray<DscVariableBytes> troubleTypes = new DscArray(this);
+      private final DscArray<DscVariableBytes> troubleTypes = new DscArray<DscVariableBytes>(this);
 
       protected List<DscSerializable> getFields() {
          return ImmutableList.of(this.deviceModuleType, this.numberOfTroubleTypes, this.troubleTypes);
@@ -69,14 +68,11 @@ public class SystemTroubleStatus extends DscRequestableCommand implements DscArr
       }
 
       public List<Integer> getTroubleTypes() {
-         List<Integer> var1 = new ArrayList(this.troubleTypes.size());
-         Iterator var2 = this.troubleTypes.iterator();
-
-         while(var2.hasNext()) {
-            DscVariableBytes var3 = (DscVariableBytes)var2.next();
-            int var4 = var3.toPositiveInt();
-            if (var4 != ALL_TROUBLES_NO_TROUBLES) {
-               var1.add(var4);
+         List<Integer> var1 = new ArrayList<Integer>(this.troubleTypes.size());
+         for (DscVariableBytes troubleType : this.troubleTypes) {
+            int value = troubleType.toPositiveInt();
+            if (value != ALL_TROUBLES_NO_TROUBLES) {
+               var1.add(value);
             }
          }
 

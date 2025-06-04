@@ -108,6 +108,7 @@ class StatusReader implements MessageListener {
    }
 
    @Override
+   @SuppressWarnings("unchecked")
    public void newValue(NewValue newValue) {
       if (notificationWaitStartTime != null) {
          waitForNotifications();

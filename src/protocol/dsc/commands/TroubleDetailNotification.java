@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class TroubleDetailNotification extends DscAbstractCommand implements DscArray.ElementProvider<TroubleDetailNotification.Trouble> {
-   private final DscArray<TroubleDetailNotification.Trouble> troubles = new DscArray(this);
+   private final DscArray<TroubleDetailNotification.Trouble> troubles = new DscArray<TroubleDetailNotification.Trouble>(this);
 
    protected List<DscSerializable> getFields() {
       return ImmutableList.of(this.troubles);

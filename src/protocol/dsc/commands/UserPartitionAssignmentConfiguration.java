@@ -9,7 +9,6 @@ import protocol.dsc.base.DscSerializable;
 import protocol.dsc.base.DscVariableBytes;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ public class UserPartitionAssignmentConfiguration extends DscAbstractCommand imp
    private final DscVariableBytes userNumberStart = new DscVariableBytes();
    private final DscVariableBytes numberOfUsers = new DscVariableBytes();
    private final DscNumber numberOfBytes = DscNumber.newUnsignedNum(1);
-   private final DscArray<DscBitMask> partitionAssignments = new DscArray(this);
+   private final DscArray<DscBitMask> partitionAssignments = new DscArray<DscBitMask>(this);
 
    protected List<DscSerializable> getFields() {
       return ImmutableList.of(this.userNumberStart, this.numberOfUsers, this.numberOfBytes, this.partitionAssignments);
@@ -28,13 +27,10 @@ public class UserPartitionAssignmentConfiguration extends DscAbstractCommand imp
    }
 
    public Map<Integer, List<Integer>> getPartitionAssignments() {
-      Map<Integer, List<Integer>> var1 = new HashMap();
+      Map<Integer, List<Integer>> var1 = new HashMap<Integer, List<Integer>>();
       int var2 = this.userNumberStart.toPositiveInt();
-      Iterator var3 = this.partitionAssignments.iterator();
-
-      while(var3.hasNext()) {
-         DscBitMask var4 = (DscBitMask)var3.next();
-         var1.put(var2++, var4.getTrueIndexes());
+      for (DscBitMask bitMask : this.partitionAssignments) {
+         var1.put(var2++, bitMask.getTrueIndexes());
       }
 
       return var1;

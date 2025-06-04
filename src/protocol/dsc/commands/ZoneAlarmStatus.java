@@ -15,7 +15,7 @@ import java.util.List;
 public class ZoneAlarmStatus extends DscRequestableCommand implements DscArray.ElementProvider<ZoneAlarmStatus.ZoneAlarm> {
    private final DscVariableBytes partitionNumber = new DscVariableBytes();
    private final DscVariableBytes numberOfZones = new DscVariableBytes();
-   private final DscArray<ZoneAlarmStatus.ZoneAlarm> alarms = new DscArray(this);
+   private final DscArray<ZoneAlarmStatus.ZoneAlarm> alarms = new DscArray<ZoneAlarmStatus.ZoneAlarm>(this);
 
    protected List<DscSerializable> getRequestFields() {
       return ImmutableList.of(this.partitionNumber, this.numberOfZones);

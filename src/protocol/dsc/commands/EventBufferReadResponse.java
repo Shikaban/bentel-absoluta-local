@@ -15,7 +15,7 @@ import java.util.List;
 
 public class EventBufferReadResponse extends DscCommandWithResponse.Response<EventBufferRead> implements DscArray.ElementProvider<EventBufferReadResponse.Event> {
    public static final int ABSOLUTA_EVENT_FLAGS = 9;
-   private final DscArray<EventBufferReadResponse.Event> events = new DscArray(this);
+   private final DscArray<EventBufferReadResponse.Event> events = new DscArray<EventBufferReadResponse.Event>(this);
 
    public EventBufferReadResponse() {
       super(new EventBufferRead());

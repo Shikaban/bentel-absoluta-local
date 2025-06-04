@@ -46,15 +46,15 @@ public class PanelStatus {
 
    public PanelStatus() {
       this.connectionStatus = PanelStatus.ConnectionStatus.DISCONNECTED;
-      this.partitionArmings = new HashMap();
-      this.partitionStatuses = new HashMap();
-      this.partitionLabels = new HashMap();
-      this.zoneStatuses = new HashMap();
-      this.zoneBypass = new HashMap();
-      this.zoneLabels = new HashMap();
-      this.outputStatuses = new HashMap();
-      this.outputLabels = new HashMap();
-      this.armingModeLabels = new HashMap();
+      this.partitionArmings = new HashMap<Integer, cms.device.api.Partition.Arming>();
+      this.partitionStatuses = new HashMap<Integer, Status>();
+      this.partitionLabels = new HashMap<Integer, String>();
+      this.zoneStatuses = new HashMap<Integer, cms.device.api.Input.Status>();
+      this.zoneBypass = new HashMap<Integer, Boolean>();
+      this.zoneLabels = new HashMap<Integer, String>();
+      this.outputStatuses = new HashMap<Integer, cms.device.api.Output.Status>();
+      this.outputLabels = new HashMap<Integer, String>();
+      this.armingModeLabels = new HashMap<Integer, String>();
    }
 
    public void addPropertyChangeListener(PropertyChangeListener var1) {
