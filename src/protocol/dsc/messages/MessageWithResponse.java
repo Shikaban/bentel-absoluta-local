@@ -12,7 +12,6 @@ import protocol.dsc.commands.DscGeneralResponse;
 import protocol.dsc.session.SendingMessage;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 abstract class MessageWithResponse<P, V> extends Message<P, V> {
@@ -75,16 +74,12 @@ abstract class MessageWithResponse<P, V> extends Message<P, V> {
          if (var2 instanceof CommandResponse) {
             try {
                CommandResponse var3 = (CommandResponse)var2;
-               List<Message.Response> var4 = new ArrayList();
+               List<Message.Response> var4 = new ArrayList<Message.Response>();
                MessageWithResponse.this.parseCommandResponse(this.ctx, this.param, var3, var4);
                if (!var4.isEmpty()) {
-                  Iterator var5 = var4.iterator();
-
-                  while(var5.hasNext()) {
-                     Message.Response var6 = (Message.Response)var5.next();
-                     this.ctx.fireChannelRead(var6);
+                  for (Message.Response response : var4) {
+                     this.ctx.fireChannelRead(response);
                   }
-
                   return;
                }
             } catch (RuntimeException ex) {

@@ -19,7 +19,7 @@ abstract class SectionReading<V> extends Reading<Void, V, SectionReadResponse> {
    protected SectionReading(int var1, ImmutableList<Integer> var2) {
       super(SectionReadResponse.class);
       this.mainSection = var1;
-      this.subSections = (ImmutableList)Preconditions.checkNotNull(var2);
+      this.subSections = Preconditions.checkNotNull(var2);
    }
 
    protected void parseResponse(ChannelHandlerContext var1, SectionReadResponse var2, List<Message.Response> var3) {

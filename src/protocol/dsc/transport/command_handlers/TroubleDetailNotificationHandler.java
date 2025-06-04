@@ -8,7 +8,6 @@ import protocol.dsc.NewValue;
 import protocol.dsc.commands.TroubleDetailNotification;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.javatuples.Quartet;
 
@@ -20,14 +19,11 @@ public class TroubleDetailNotificationHandler extends ChannelInboundHandlerAdapt
       if (var2 instanceof TroubleDetailNotification) {
          TroubleDetailNotification var3 = (TroubleDetailNotification)var2;
          List<TroubleDetailNotification.Trouble> var4 = var3.getTroubles();
-         List<Quartet<Integer, Integer, Integer, Integer>> var5 = new ArrayList(var4.size());
-         Iterator var6 = var4.iterator();
-
-         while(var6.hasNext()) {
-            TroubleDetailNotification.Trouble var7 = (TroubleDetailNotification.Trouble)var6.next();
-            var5.add(Quartet.with(var7.getDeviceModuleType(), var7.getTroubleType(), var7.getDeviceModuleNumber(), var7.getStatus()));
-            if (ZONE_DEVICE.equals(var7.getDeviceModuleType())) {
-               var1.fireChannelRead(new NewValue(Message.ZONE_STATUS_CHANGED, var7.getDeviceModuleNumber()));
+         List<Quartet<Integer, Integer, Integer, Integer>> var5 = new ArrayList<Quartet<Integer, Integer, Integer, Integer>>(var4.size());
+         for (TroubleDetailNotification.Trouble trouble : var4) {
+            var5.add(Quartet.with(trouble.getDeviceModuleType(), trouble.getTroubleType(), trouble.getDeviceModuleNumber(), trouble.getStatus()));
+            if (ZONE_DEVICE.equals(trouble.getDeviceModuleType())) {
+               var1.fireChannelRead(new NewValue(Message.ZONE_STATUS_CHANGED, trouble.getDeviceModuleNumber()));
             }
          }
 

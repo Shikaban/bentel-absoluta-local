@@ -8,11 +8,10 @@ import protocol.dsc.commands.DscCommandWithAppSeq;
 import protocol.dsc.messages.Reading;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class RequestedReadingHandler extends ChannelDuplexHandler {
-   private final List<Message.Response> out = new ArrayList();
+   private final List<Message.Response> out = new ArrayList<Message.Response>();
 
    public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
       DscCommandWithAppSeq var4 = Reading.tryToPrepare(var1, var2);
@@ -28,11 +27,8 @@ public class RequestedReadingHandler extends ChannelDuplexHandler {
       try {
          Reading.tryToParse(var1, var2, this.out);
          if (!this.out.isEmpty()) {
-            Iterator var3 = this.out.iterator();
-
-            while(var3.hasNext()) {
-               Message.Response var4 = (Message.Response)var3.next();
-               var1.fireChannelRead(var4);
+            for (Message.Response response : this.out) {
+               var1.fireChannelRead(response);
             }
          } else {
             super.channelRead(var1, var2);

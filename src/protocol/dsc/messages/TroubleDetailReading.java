@@ -23,7 +23,7 @@ public class TroubleDetailReading extends RequestableCommandReading<Pair<Integer
    }
 
    protected void parseResponse(ChannelHandlerContext var1, TroubleDetail var2, List<Message.Response> var3) {
-      Pair<Integer, Integer> var4 = new Pair(var2.getDeviceModuleType(), var2.getTroubleType());
+      Pair<Integer, Integer> var4 = Pair.with(var2.getDeviceModuleType(), var2.getTroubleType());
       var3.add(new NewValue(this, var4, var2.getDeviceModuleNumbers()));
    }
 

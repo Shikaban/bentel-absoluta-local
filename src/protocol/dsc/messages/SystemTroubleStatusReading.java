@@ -8,7 +8,6 @@ import protocol.dsc.commands.SystemTroubleStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import org.javatuples.Pair;
 
@@ -25,17 +24,11 @@ public class SystemTroubleStatusReading extends RequestableCommandReading<Void, 
 
    protected void parseResponse(ChannelHandlerContext var1, SystemTroubleStatus var2, List<Message.Response> var3) {
       List<SystemTroubleStatus.Trouble> var4 = var2.getTroubles();
-      List<Pair<Integer, Integer>> var5 = new ArrayList();
-      Iterator var6 = var4.iterator();
-
-      while(var6.hasNext()) {
-         SystemTroubleStatus.Trouble var7 = (SystemTroubleStatus.Trouble)var6.next();
-         int var8 = var7.getDeviceModuleType();
-         Iterator var9 = var7.getTroubleTypes().iterator();
-
-         while(var9.hasNext()) {
-            Integer var10 = (Integer)var9.next();
-            var5.add(Pair.with(var8, var10));
+      List<Pair<Integer, Integer>> var5 = new ArrayList<Pair<Integer, Integer>>();
+      for (SystemTroubleStatus.Trouble trouble : var4) {
+         int deviceModuleType = trouble.getDeviceModuleType();
+         for (Integer troubleType : trouble.getTroubleTypes()) {
+         var5.add(Pair.with(deviceModuleType, troubleType));
          }
       }
 

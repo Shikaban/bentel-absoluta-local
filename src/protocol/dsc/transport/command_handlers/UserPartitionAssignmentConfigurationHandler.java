@@ -7,7 +7,6 @@ import protocol.dsc.Message;
 import protocol.dsc.NewValue;
 import protocol.dsc.commands.UserPartitionAssignmentConfiguration;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import org.javatuples.Pair;
@@ -17,13 +16,10 @@ public class UserPartitionAssignmentConfigurationHandler extends ChannelInboundH
    public void channelRead(ChannelHandlerContext var1, Object var2) throws Exception {
       if (var2 instanceof UserPartitionAssignmentConfiguration) {
          UserPartitionAssignmentConfiguration var3 = (UserPartitionAssignmentConfiguration)var2;
-         Iterator var4 = var3.getPartitionAssignments().entrySet().iterator();
-
-         while(var4.hasNext()) {
-            Entry<Integer, List<Integer>> var5 = (Entry)var4.next();
-            Integer var6 = (Integer)var5.getKey();
-            List<Integer> var7 = (List)var5.getValue();
-            var1.fireChannelRead(new NewValue(Message.USER_PARTITION_ASSIGNMENT_CONFIGURATION, Pair.with(var6, var7)));
+         for (Entry<Integer, List<Integer>> entry : var3.getPartitionAssignments().entrySet()) {
+            Integer key = entry.getKey();
+            List<Integer> value = entry.getValue();
+            var1.fireChannelRead(new NewValue(Message.USER_PARTITION_ASSIGNMENT_CONFIGURATION, Pair.with(key, value)));
          }
       } else {
          super.channelRead(var1, var2);
