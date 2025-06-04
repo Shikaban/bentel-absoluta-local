@@ -9,26 +9,29 @@ import protocol.dsc.commands.ZoneStatus;
 import java.util.List;
 
 public class ZoneStatusReading extends RequestableCommandReading<Integer, List<Boolean>, ZoneStatus> {
+
    public ZoneStatusReading() {
       super(ZoneStatus.class);
    }
 
-   protected ZoneStatus prepareRequest(ChannelHandlerContext var1, Integer var2) {
-      ZoneStatus var3 = new ZoneStatus();
-      var3.setZoneNumber(var2);
-      var3.setNumberOfZones(1);
-      return var3;
+   @Override
+   protected ZoneStatus prepareRequest(ChannelHandlerContext ctx, Integer zoneNumber) {
+      ZoneStatus request = new ZoneStatus();
+      request.setZoneNumber(zoneNumber);
+      request.setNumberOfZones(1);
+      return request;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, ZoneStatus var2, List<Message.Response> var3) {
-      int var4 = var2.getZoneNumber();
-      int var5 = var2.getNumberOfZones();
-      List<DscBitMask> var6 = var2.getZoneStatuses();
+   @Override
+   protected void parseResponse(ChannelHandlerContext ctx, ZoneStatus response, List<Message.Response> out) {
+      int startZone = response.getZoneNumber();
+      int zoneCount = response.getNumberOfZones();
+      List<DscBitMask> zoneStatuses = response.getZoneStatuses();
 
-      for(int var7 = 0; var7 < var5; ++var7) {
-         List<Boolean> var8 = (List)var6.get(var7);
-         var3.add(new NewValue(this, var4 + var7, var8));
+      for (int i = 0; i < zoneCount; i++) {
+         DscBitMask bitMask = zoneStatuses.get(i);
+         List<Boolean> statusList = bitMask;
+         out.add(new NewValue(this, startZone + i, statusList));
       }
-
    }
 }
