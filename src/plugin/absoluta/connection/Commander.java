@@ -77,9 +77,9 @@ public class Commander {
       Boolean currentBypassed = panelStatus.getZoneBypass(zoneIDInteger);
       if (currentBypassed == null || currentBypassed != setBypassed) {
          System.out.println("DEBUG: setting zone " + zoneID + " bypass to " + setBypassed);
-         panelStatus.setZoneBypass(zoneIDInteger, setBypassed);
+         // Adesso abbbiamo un feedback reale, valutare se è veramente necessario fare una finta per homeassistant
+         //panelStatus.setZoneBypass(zoneIDInteger, setBypassed);
          this.messageHandler.sendCommand(Message.SINGLE_ZONE_BYPASS_WRITE, Triplet.with((Integer)null, zoneIDInteger, setBypassed));
-         
       } else {
          System.out.println("DEBUG: zone " + zoneID + " bypass already " + setBypassed + ", skipping command.");
       }
