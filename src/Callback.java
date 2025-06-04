@@ -40,12 +40,14 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    private HashSet<Integer> partitionDiscoverySent = new HashSet<>();
    private HashSet<Integer> modeDiscoverySent = new HashSet<>();
    private Boolean discoveryEnabled;
+   private MqttMessageDispatcher mqttDispatcher;
 
    public Callback(MqttClient mqttClient, Panel panel, MqttConnectOptions mqttOption, Boolean discoveryEnabled) {
       this.mqttClient = mqttClient;
       this.panel = panel;
       this.connOpts = mqttOption;
       this.discoveryEnabled = discoveryEnabled;
+      this.mqttDispatcher = new MqttMessageDispatcher(mqttClient);
    }
 
    public void connectionLost(Throwable var1) {
@@ -133,7 +135,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
             discoveryMsg.setRetained(true);
-            this.mqttClient.publish(topic, discoveryMsg);
+            this.mqttDispatcher.publish(topic, discoveryMsg);
             partitionDiscoverySent.add(0);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery partizione globale: " + topic);
@@ -150,7 +152,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          try {
                MqttMessage mqttMessage = new MqttMessage("Status: Connesso".getBytes());
                mqttMessage.setQos(1);
-               this.mqttClient.publish("ABS/conn", mqttMessage);
+               this.mqttDispatcher.publish("ABS/conn", mqttMessage);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + "ABS/conn");
             System.out.println("ERROR: " + ex.getMessage());
@@ -188,7 +190,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
-         this.mqttClient.publish(this.partitionTopics[0], msg);
+         this.mqttDispatcher.publish(this.partitionTopics[0], msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + this.partitionTopics[0]);
          System.out.println("ERROR: " + ex.getMessage());
@@ -221,7 +223,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
             discoveryMsg.setRetained(true);
-            this.mqttClient.publish(topic, discoveryMsg);
+            this.mqttDispatcher.publish(topic, discoveryMsg);
             sensorDiscoverySent.add(sensorIDInt);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore: " + topic);
@@ -246,7 +248,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
             discoveryMsg.setRetained(true);
-            this.mqttClient.publish(topic, discoveryMsg);
+            this.mqttDispatcher.publish(topic, discoveryMsg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore Bypass: " + topic);
          }
@@ -260,7 +262,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
-         this.mqttClient.publish(this.sensorTopics[sensorIDInt], msg);
+         this.mqttDispatcher.publish(this.sensorTopics[sensorIDInt], msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + this.sensorTopics[sensorIDInt]);
          System.out.println("ERROR: " + ex.getMessage());
@@ -303,7 +305,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
-            this.mqttClient.publish(this.sensorTopics[sensorID], msg);
+            this.mqttDispatcher.publish(this.sensorTopics[sensorID], msg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + this.sensorTopics[sensorID]);
          }
@@ -317,7 +319,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       try {
          MqttMessage discoveryMsg = new MqttMessage(this.sensorBypass[sensorID].getBytes());
          discoveryMsg.setQos(1);
-         this.mqttClient.publish(topic, discoveryMsg);
+         this.mqttDispatcher.publish(topic, discoveryMsg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio comando Bypass sensore: " + topic);
       }
@@ -382,7 +384,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             discoveryMsg.setQos(1);
             discoveryMsg.setRetained(true);
             modeDiscoverySent.add(modeIDInt);
-            this.mqttClient.publish(topic, discoveryMsg);
+            this.mqttDispatcher.publish(topic, discoveryMsg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery sensore Bypass: " + topic);
          }
@@ -429,7 +431,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
-            this.mqttClient.publish(this.partitionTopics[partitionID], msg);
+            this.mqttDispatcher.publish(this.partitionTopics[partitionID], msg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionID]);
             System.out.println("ERROR: " + ex.getMessage());
@@ -471,7 +473,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             MqttMessage discoveryMsg = new MqttMessage(payload.getBytes());
             discoveryMsg.setQos(1);
             discoveryMsg.setRetained(true);
-            this.mqttClient.publish(topic, discoveryMsg);
+            this.mqttDispatcher.publish(topic, discoveryMsg);
             partitionDiscoverySent.add(partitionIDInt);
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery partizione: " + topic);
@@ -493,7 +495,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
-         this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
+         this.mqttDispatcher.publish(this.partitionTopics[partitionIDInt], msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionIDInt]);
          System.out.println("ERROR: " + ex.getMessage());
@@ -532,7 +534,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
-            this.mqttClient.publish(this.partitionTopics[partitionIDInt], msg);
+            this.mqttDispatcher.publish(this.partitionTopics[partitionIDInt], msg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + this.partitionTopics[partitionIDInt]);
             System.out.println("ERROR: " + ex.getMessage());
@@ -693,7 +695,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       try {
          MqttMessage msg = new MqttMessage("Status: Scollegato".getBytes());
          msg.setQos(1);
-         this.mqttClient.publish("ABS/conn", msg);
+         this.mqttDispatcher.publish("ABS/conn", msg);
       } catch (Exception ex) {
          System.out.println("ERROR: invio messaggio: " + "ABS/conn");
       }
@@ -716,7 +718,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          try {
             MqttMessage msg = new MqttMessage("Status: Connesso".getBytes());
             msg.setQos(1);
-            this.mqttClient.publish("ABS/conn", msg);
+            this.mqttDispatcher.publish("ABS/conn", msg);
          } catch (Exception ex) {
             System.out.println("ERROR: invio messaggio: " + "ABS/conn");
          }
