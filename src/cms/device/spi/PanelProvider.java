@@ -11,7 +11,7 @@ import cms.device.api.Partition;
 public interface PanelProvider {
    void initialize(PanelProvider.PanelCallback var1);
 
-   Panel.connStatus connect();
+   Panel.ConnStatus connect();
 
    void disconnect();
 

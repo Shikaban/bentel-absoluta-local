@@ -39,6 +39,7 @@ class CallbackListener implements PropertyChangeListener {
                   this.callback.setPartitionRemoteName(indexProperyString, this.panelStatus.getPartitionLabel(indexProperty));
                   break;
                case "ZONE_STATUS":
+               case "ZONE_BYPASS":
                   this.callback.setInputStatus(indexProperyString, this.panelStatus.getZoneStatus(indexProperty));
                   break;
                case "ZONE_LABEL":

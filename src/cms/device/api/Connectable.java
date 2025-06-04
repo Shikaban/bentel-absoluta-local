@@ -1,7 +1,7 @@
 package cms.device.api;
 
 public interface Connectable {
-   Panel.connStatus connect();
+   Panel.ConnStatus connect();
 
    void disconnect();
 

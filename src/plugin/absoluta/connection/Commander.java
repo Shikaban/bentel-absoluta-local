@@ -16,9 +16,11 @@ public class Commander {
    static final int ACTIVATE_OUTPUT = 1;
    static final int DEACTIVATE_OUTPUT = 2;
    private final MessageHandler messageHandler;
+   private final PanelStatus panelStatus;
 
-   Commander(MessageHandler var1) {
-      this.messageHandler = (MessageHandler)Objects.requireNonNull(var1);
+   Commander(MessageHandler messageHandler, PanelStatus panelStatus) {
+      this.messageHandler = Objects.requireNonNull(messageHandler);
+      this.panelStatus = Objects.requireNonNull(panelStatus);
    }
 
    public void arming(Arming newArmingStatus) {
@@ -71,9 +73,15 @@ public class Commander {
    }
 
    public void setBypassed(String zoneID, boolean setBypassed) {
-      System.out.println("DEBUG: setting zone " + zoneID + " bypass to " + setBypassed);
       Integer zoneIDInteger = Integer.valueOf(zoneID);
-      this.messageHandler.sendCommand(Message.SINGLE_ZONE_BYPASS_WRITE, Triplet.with((Integer)null, zoneIDInteger, setBypassed));
+      Boolean currentBypassed = panelStatus.getZoneBypass(zoneIDInteger);
+      if (currentBypassed == null || currentBypassed != setBypassed) {
+         System.out.println("DEBUG: setting zone " + zoneID + " bypass to " + setBypassed);
+         this.messageHandler.sendCommand(Message.SINGLE_ZONE_BYPASS_WRITE, Triplet.with((Integer)null, zoneIDInteger, setBypassed));
+         panelStatus.setZoneBypass(zoneIDInteger, setBypassed);
+      } else {
+         System.out.println("DEBUG: zone " + zoneID + " bypass already " + setBypassed + ", skipping command.");
+      }
    }
 
    public void setOutput(String outputID, boolean setStatus) {

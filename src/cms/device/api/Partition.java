@@ -7,80 +7,80 @@ import org.openide.util.ChangeSupport;
 
 public class Partition {
    private String remoteName;
-   private Partition.Arming arming;
-   private Partition.Status status;
-   private final List<String> inputsIds;
+   private Arming arming;
+   private Status status;
+   private final List<String> inputIds;
    private final ChangeSupport changeSupport;
 
-   public Partition(Panel var1) {
-      this.arming = Partition.Arming.NOT_AVAILABLE;
-      this.status = Partition.Status.OK;
-      this.inputsIds = new ArrayList();
+   public Partition(Panel panel) {
+      this.arming = Arming.NOT_AVAILABLE;
+      this.status = Status.OK;
+      this.inputIds = new ArrayList<>();
       this.changeSupport = new ChangeSupport(this);
    }
 
    public String getRemoteName() {
-      return this.remoteName;
+      return remoteName;
    }
 
    void setRemoteName(String name) {
-      this.remoteName = name != null && !name.trim().isEmpty() ? name.trim() : null;
-      this.fireChange();
+      this.remoteName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+      fireChange();
    }
 
-   public Partition.Arming getArming() {
-      return this.arming;
+   public Arming getArming() {
+      return arming;
    }
 
-   void setArming(Partition.Arming var1) {
-      this.arming = var1;
-      this.fireChange();
+   void setArming(Arming arming) {
+      this.arming = arming;
+      fireChange();
    }
 
-   public Partition.Status getStatus() {
-      return this.status;
+   public Status getStatus() {
+      return status;
    }
 
-   void setStatus(Partition.Status var1) {
-      this.status = var1;
-      this.fireChange();
+   void setStatus(Status status) {
+      this.status = status;
+      fireChange();
    }
 
    public void fireChange() {
-      this.changeSupport.fireChange();
+      changeSupport.fireChange();
    }
 
    public synchronized void addInputs(List<String> newInputIds) {
       // Rimuovi gli input che non sono più presenti
-      inputsIds.removeIf(existingId -> !newInputIds.contains(existingId));
+      inputIds.removeIf(existingId -> !newInputIds.contains(existingId));
 
       // Aggiungi i nuovi input che non sono già presenti
       for (String inputId : newInputIds) {
-         if (!inputsIds.contains(inputId)) {
-            inputsIds.add(inputId);
+         if (!inputIds.contains(inputId)) {
+               inputIds.add(inputId);
          }
       }
    }
 
    public List<String> getInputs() {
-      return Collections.unmodifiableList(this.inputsIds);
+      return Collections.unmodifiableList(inputIds);
    }
 
-   public static enum Arming {
+   public enum Arming {
       DISARMED,
       AWAY,
       STAY,
       NODELAY,
       TRIGGERED,
-      NOT_AVAILABLE;
+      NOT_AVAILABLE
    }
 
-   public static enum Status {
+   public enum Status {
       FIRE,
       TAMPER,
       FAULTS,
       ALARMS,
       ACTIVE,
-      OK;
+      OK
    }
 }

@@ -14,7 +14,7 @@ import cms.device.api.Panel;
 import cms.device.api.Partition;
 import cms.device.api.Input.Status;
 import cms.device.api.Panel.Arming;
-import cms.device.api.Panel.connStatus;
+import cms.device.api.Panel.ConnStatus;
 import cms.device.spi.PanelProvider;
 
 class Callback implements PanelProvider.PanelCallback, MqttCallback {
@@ -658,8 +658,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       try {
          TimeUnit.SECONDS.sleep((long)RECON_DELAY);
          if (objName.equals("centrale")) {
-            connStatus var2 = this.panel.connect();
-            if (var2 == connStatus.UNREACHABLE) {
+            ConnStatus var2 = this.panel.connect();
+            if (var2 == ConnStatus.UNREACHABLE) {
                if(VERBOSE_DEBUG) {
                   System.out.println("DEBUG: Rilevato 'busy panel'. Tentativo di riconnessione forzata...");
                }

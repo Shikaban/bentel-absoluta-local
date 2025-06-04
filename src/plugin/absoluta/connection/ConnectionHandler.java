@@ -29,7 +29,7 @@ public class ConnectionHandler {
    private MessageHandler messageHandler;
    private StatusReader statusReader;
    private Commander commander;
-   private Panel.connStatus connectionStatus;
+   private Panel.ConnStatus connectionStatus;
    private boolean loggedIn;
    private boolean closing;
    private static final boolean VERBOSE_DEBUG = false;
@@ -48,7 +48,7 @@ public class ConnectionHandler {
       }
    }
 
-   public synchronized Panel.connStatus waitConnection() throws InterruptedException {
+   public synchronized Panel.ConnStatus waitConnection() throws InterruptedException {
       while(this.connectionStatus == null) {
          this.wait();
       }
@@ -74,7 +74,7 @@ public class ConnectionHandler {
          this.endpoint = (Endpoint)Objects.requireNonNull(var1);
          this.messenger = (Messenger)Objects.requireNonNull(var1.getMessenger());
          this.messageHandler = new MessageHandler(var1, new ConnectionHandler.ErrorListener());
-         this.commander = new Commander(this.messageHandler);
+         this.commander = new Commander(this.messageHandler, this.panelStatus);
          this.endpoint.addPropertyChangeListener(new ConnectionHandler.HandlerEndpointListener());
          this.statusReader = new StatusReader(this.messageHandler, var1.getExecutor());
          this.messenger.addMessageListener(this.statusReader);
@@ -87,7 +87,7 @@ public class ConnectionHandler {
    void disconnected() {
       this.stop();
       this.panelStatus.setConnectionStatus(PanelStatus.ConnectionStatus.DISCONNECTED);
-      this.setConnectionStatus(Panel.connStatus.UNREACHABLE);
+      this.setConnectionStatus(Panel.ConnStatus.UNREACHABLE);
    }
 
    private void stop() {
@@ -101,7 +101,7 @@ public class ConnectionHandler {
       }
    }
 
-   private synchronized void setConnectionStatus(Panel.connStatus var1) {
+   private synchronized void setConnectionStatus(Panel.ConnStatus var1) {
       if (this.connectionStatus == null) {
          this.connectionStatus = var1;
          this.notifyAll();
@@ -155,7 +155,7 @@ public class ConnectionHandler {
          if (var1.isFor(Message.ENTER_ACCESS_LEVEL) && !ConnectionHandler.this.loggedIn) {
             ConnectionHandler.this.loggedIn = true;
             ConnectionHandler.this.panelStatus.setConnectionStatus(PanelStatus.ConnectionStatus.CONNECTED);
-            ConnectionHandler.this.setConnectionStatus(Panel.connStatus.SUCCESS);
+            ConnectionHandler.this.setConnectionStatus(Panel.ConnStatus.SUCCESS);
             ConnectionHandler.this.statusReader.startWaitingForNotificationsAfterLogin();
             ConnectionHandler.this.endpoint.setSessionful(true);
          }
@@ -164,9 +164,9 @@ public class ConnectionHandler {
       public void error(DscError var1) {
          if (var1.isFor(Message.ENTER_ACCESS_LEVEL)) {
             if (var1.getResponseCode() == INVALID_ACCESS_CODE) {
-               ConnectionHandler.this.setConnectionStatus(Panel.connStatus.UNAUTHORIZED);
+               ConnectionHandler.this.setConnectionStatus(Panel.ConnStatus.UNAUTHORIZED);
             } else {
-               ConnectionHandler.this.setConnectionStatus(Panel.connStatus.INCOMPATIBLE);
+               ConnectionHandler.this.setConnectionStatus(Panel.ConnStatus.INCOMPATIBLE);
             }
             ConnectionHandler.this.stop();
          }

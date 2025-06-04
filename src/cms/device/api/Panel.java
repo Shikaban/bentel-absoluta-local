@@ -13,10 +13,10 @@ import org.openide.util.ChangeSupport;
 
 public final class Panel implements DeviceOrPanel {
    private boolean connected;
-   private Panel.Arming arming;
-   public Panel.Status status;
+   private Arming arming;
+   public Status status;
    private boolean alarmed;
-   private final PanelProvider impl;
+   private final PanelProvider provider;
    private final ChangeSupport changeSupport;
    private final Map<Character, String> labelArming;
    private final Map<String, Partition> partitions;
@@ -24,42 +24,40 @@ public final class Panel implements DeviceOrPanel {
    final OutputSupport outputSupport;
 
    public Panel(PanelProvider provider) {
-      this.arming = Panel.Arming.NOT_AVAILABLE;
-      this.status = Panel.Status.OK;
-
+      this.arming = Arming.NOT_AVAILABLE;
+      this.status = Status.OK;
       this.connected = false;
       this.alarmed = false;
       this.changeSupport = new ChangeSupport(this);
-      this.labelArming = new LinkedHashMap();
-      this.partitions = new LinkedHashMap();
-      this.inputs = new LinkedHashMap();
+      this.labelArming = new LinkedHashMap<>();
+      this.partitions = new LinkedHashMap<>();
+      this.inputs = new LinkedHashMap<>();
       this.outputSupport = new OutputSupport(this, this::doOutputAction);
-      this.impl = provider;
-      provider.initialize(new Panel.Callback());
+      this.provider = provider;
+      provider.initialize(new Callback());
    }
 
-   public connStatus connect() {
+   public ConnStatus connect() {
       if (this.connected) {
-         return connStatus.SUCCESS;
+         return ConnStatus.SUCCESS;
       } else {
-         connStatus var1 = this.impl.connect();
-         if (var1 != connStatus.SUCCESS) {
-            return var1;
+         ConnStatus result = this.provider.connect();
+         if (result != ConnStatus.SUCCESS) {
+               return result;
          } else {
-            this.connected = true;
-            this.fireChange();
-            return connStatus.SUCCESS;
+               this.connected = true;
+               this.fireChange();
+               return ConnStatus.SUCCESS;
          }
       }
    }
 
    public void disconnect() {
       if (this.connected) {
-         this.impl.disconnect();
+         this.provider.disconnect();
          this.connected = false;
          this.fireChange();
       }
-
    }
 
    public boolean isConnected() {
@@ -70,33 +68,33 @@ public final class Panel implements DeviceOrPanel {
       return this.alarmed;
    }
 
-   public void setAlarmed(boolean var1) {
-      if (this.alarmed != var1) {
-         this.alarmed = var1;
+   public void setAlarmed(boolean alarmed) {
+      if (this.alarmed != alarmed) {
+         this.alarmed = alarmed;
          this.changeSupport.fireChange();
       }
    }
 
-   public void arming(Panel.Arming mode) {
-      this.impl.arming(mode);
+   public void arming(Arming mode) {
+      this.provider.arming(mode);
    }
 
-   public Panel.Arming getArming() {
+   public Arming getArming() {
       return this.arming;
    }
 
-   void setArming(Panel.Arming newMode) {
+   void setArming(Arming newMode) {
       if (this.arming != newMode) {
          this.arming = newMode;
          this.changeSupport.fireChange();
       }
    }
 
-   public Panel.Status getStatus() {
+   public Status getStatus() {
       return this.status;
    }
 
-   void setStatus(Panel.Status newStatus) {
+   void setStatus(Status newStatus) {
       if (this.status != newStatus) {
          this.status = newStatus;
          this.changeSupport.fireChange();
@@ -118,11 +116,11 @@ public final class Panel implements DeviceOrPanel {
       if (!Iterables.elementsEqual(currentPartitionIds, newPartitionIds)) {
          LinkedHashMap<String, Partition> updatedPartitions = Maps.newLinkedHashMap();
          for (String partitionId : newPartitionIds) {
-            if (this.partitions.containsKey(partitionId)) {
-               updatedPartitions.put(partitionId, this.partitions.remove(partitionId));
-            } else {
-               updatedPartitions.put(partitionId, new Partition(this));
-            }
+               if (this.partitions.containsKey(partitionId)) {
+                  updatedPartitions.put(partitionId, this.partitions.remove(partitionId));
+               } else {
+                  updatedPartitions.put(partitionId, new Partition(this));
+               }
          }
          this.partitions.clear();
          this.partitions.putAll(updatedPartitions);
@@ -134,8 +132,8 @@ public final class Panel implements DeviceOrPanel {
       return this.partitions;
    }
 
-   public void partitionArming(String var1, Partition.Arming var2) {
-      this.impl.partitionArming(var1, var2);
+   public void partitionArming(String partitionId, Partition.Arming armingMode) {
+      this.provider.partitionArming(partitionId, armingMode);
    }
 
    private void doChangeInputs(Iterable<String> newInputIds) {
@@ -143,11 +141,11 @@ public final class Panel implements DeviceOrPanel {
       if (!Iterables.elementsEqual(currentInputIds, newInputIds)) {
          LinkedHashMap<String, Input> updatedInputs = Maps.newLinkedHashMap();
          for (String inputId : newInputIds) {
-            if (this.inputs.containsKey(inputId)) {
-               updatedInputs.put(inputId, this.inputs.remove(inputId));
-            } else {
-               updatedInputs.put(inputId, new Input(this));
-            }
+               if (this.inputs.containsKey(inputId)) {
+                  updatedInputs.put(inputId, this.inputs.remove(inputId));
+               } else {
+                  updatedInputs.put(inputId, new Input(this));
+               }
          }
          this.inputs.clear();
          this.inputs.putAll(updatedInputs);
@@ -159,117 +157,117 @@ public final class Panel implements DeviceOrPanel {
       return this.inputs;
    }
 
-   public void bypassInput(String zoneID, boolean setBypassed) {
-      this.impl.setBypassed(zoneID, setBypassed);
+   public void bypassInput(String zoneId, boolean setBypassed) {
+      this.provider.setBypassed(zoneId, setBypassed);
    }
 
-   public boolean getBypassInput(String zoneID) {
-      return this.impl.getBypassed(zoneID);
+   public boolean getBypassInput(String zoneId) {
+      return this.provider.getBypassed(zoneId);
    }
 
-   private void doOutputAction(String var1, Output.Action var2) {
-      this.impl.doOutputAction(var1, var2);
+   private void doOutputAction(String outputId, Output.Action action) {
+      this.provider.doOutputAction(outputId, action);
    }
 
-   public boolean checkArmingSupport(char var1) {
-      return this.impl.armingSupport(var1);
+   public boolean checkArmingSupport(char mode) {
+      return this.provider.armingSupport(mode);
    }
 
    public void modalityArming(char mode) {
-      this.impl.armingSet(mode);
+      this.provider.armingSet(mode);
    }
 
-   public String getLabelArming(char var1) {
-      return (String)this.labelArming.get(var1);
+   public String getLabelArming(char mode) {
+      return this.labelArming.get(mode);
    }
 
-   void setLabelArming(char var1, String var2) {
-      this.labelArming.put(var1, var2);
+   void setLabelArming(char mode, String label) {
+      this.labelArming.put(mode, label);
    }
 
    public Map<String, Output> getOutputs() {
       return this.outputSupport.getOutputs();
    }
 
-   public static enum Arming {
+   public enum Arming {
       GLOBALLY_ARMED,
       PARTIALLY_ARMED,
       GLOBALLY_DISARMED,
-      NOT_AVAILABLE;
+      NOT_AVAILABLE
    }
 
-   public static enum Status {
+   public enum Status {
       TAMPER,
       FAULT,
-      OK;
+      OK
    }
 
-   public static enum connStatus {
+   public enum ConnStatus {
       USER_DISCONNECTED,
       SUCCESS,
       INCOMPATIBLE,
       UNAUTHORIZED,
-      UNREACHABLE;
+      UNREACHABLE
    }
 
    private class Callback implements PanelProvider.PanelCallback {
 
-      public void setArming(Panel.Arming var1) {
-         Panel.this.setArming(var1);
+      public void setArming(Arming arming) {
+         Panel.this.setArming(arming);
       }
 
-      public void setStatus(Panel.Status var1) {
-         Panel.this.setStatus(var1);
+      public void setStatus(Status status) {
+         Panel.this.setStatus(status);
       }
 
-      public void changePartitions(List<String> var1) {
-         Panel.this.doChangePartitions(var1);
+      public void changePartitions(List<String> partitionIds) {
+         Panel.this.doChangePartitions(partitionIds);
       }
 
-      public void setPartitionRemoteName(String var1, String var2) {
-         ((Partition)Panel.this.getPartitions().get(var1)).setRemoteName(var2);
+      public void setPartitionRemoteName(String partitionId, String remoteName) {
+         Panel.this.getPartitions().get(partitionId).setRemoteName(remoteName);
       }
 
-      public void setPartitionsArming(Partition.Arming var1) {
+      public void setPartitionsArming(Partition.Arming arming) {
          for (Partition partition : Panel.this.getPartitions().values()) {
-            partition.setArming(var1);
+               partition.setArming(arming);
          }
       }
 
-      public void setPartitionArming(String var1, Partition.Arming var2) {
-         ((Partition)Panel.this.getPartitions().get(var1)).setArming(var2);
+      public void setPartitionArming(String partitionId, Partition.Arming arming) {
+         Panel.this.getPartitions().get(partitionId).setArming(arming);
       }
 
-      public void setPartitionStatus(String var1, Partition.Status var2) {
-         ((Partition)Panel.this.getPartitions().get(var1)).setStatus(var2);
+      public void setPartitionStatus(String partitionId, Partition.Status status) {
+         Panel.this.getPartitions().get(partitionId).setStatus(status);
       }
 
-      public void changeInputs(List<String> var1) {
-         Panel.this.doChangeInputs(var1);
+      public void changeInputs(List<String> inputIds) {
+         Panel.this.doChangeInputs(inputIds);
       }
 
-      public void setInputRemoteName(String var1, String var2) {
-         ((Input)Panel.this.getInputs().get(var1)).setRemoteName(var2);
+      public void setInputRemoteName(String inputId, String remoteName) {
+         Panel.this.getInputs().get(inputId).setRemoteName(remoteName);
       }
 
-      public void setInputStatus(String var1, Input.Status var2) {
-         ((Input)Panel.this.getInputs().get(var1)).setStatus(var2);
+      public void setInputStatus(String inputId, Input.Status status) {
+         Panel.this.getInputs().get(inputId).setStatus(status);
       }
 
-      public void tagInputIntoPartition(String var1, List<String> var2) {
-         ((Partition)Panel.this.getPartitions().get(var1)).addInputs(var2);
+      public void tagInputIntoPartition(String partitionId, List<String> inputIds) {
+         Panel.this.getPartitions().get(partitionId).addInputs(inputIds);
       }
 
-      public void changeOutputs(List<String> var1) {
-         Panel.this.outputSupport.changeOutputs(var1);
+      public void changeOutputs(List<String> outputIds) {
+         Panel.this.outputSupport.changeOutputs(outputIds);
       }
 
-      public void setOutputRemoteName(String var1, String var2) {
-         ((Output)Panel.this.getOutputs().get(var1)).setRemoteName(var2);
+      public void setOutputRemoteName(String outputId, String remoteName) {
+         Panel.this.getOutputs().get(outputId).setRemoteName(remoteName);
       }
 
-      public void setOutputStatus(String var1, Output.Status var2) {
-         ((Output)Panel.this.getOutputs().get(var1)).setStatus(var2);
+      public void setOutputStatus(String outputId, Output.Status status) {
+         Panel.this.getOutputs().get(outputId).setStatus(status);
       }
 
       public void connectionLost() {
@@ -277,12 +275,12 @@ public final class Panel implements DeviceOrPanel {
          Panel.this.disconnect();
       }
 
-      public void setLabelArming(char var1, String var2) {
-         Panel.this.setLabelArming(var1, var2);
+      public void setLabelArming(char mode, String label) {
+         Panel.this.setLabelArming(mode, label);
       }
 
-      public void alert(String var1) {
-         AlertNotifier.getDefault().fire(Panel.this, var1);
+      public void alert(String message) {
+         AlertNotifier.getDefault().fire(Panel.this, message);
       }
    }
 }

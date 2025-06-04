@@ -42,10 +42,10 @@ public class AbsolutaPanelProvider implements PanelProvider {
       this.panelStatus.addPropertyChangeListener(new CallbackListener(var1, this.panelStatus));
    }
 
-   public Panel.connStatus connect() {
+   public Panel.ConnStatus connect() {
       this.connectionHandler = new ConnectionHandler(this.panelStatus, this.callback);
       if (!this.connectionHandler.setPin(this.pin)) {
-         return Panel.connStatus.UNAUTHORIZED;
+         return Panel.ConnStatus.UNAUTHORIZED;
       } else {
          (new ConnectionThread(this.address, this.port, this.connectionHandler)).start();
 
@@ -53,7 +53,7 @@ public class AbsolutaPanelProvider implements PanelProvider {
             return this.connectionHandler.waitConnection();
          } catch (InterruptedException var2) {
             Exceptions.printStackTrace(var2);
-            return Panel.connStatus.UNREACHABLE;
+            return Panel.ConnStatus.UNREACHABLE;
          }
       }
    }
