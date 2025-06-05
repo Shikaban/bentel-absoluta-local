@@ -140,6 +140,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          } catch (Exception ex) {
             System.out.println("ERROR: invio discovery partizione globale: " + topic);
          }
+
+         // Subscribe al topic di homeassistant
          try {
             this.mqttClient.subscribe("homeassistant/status");
          } catch (Exception ex) {
@@ -159,10 +161,12 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
 
+      // Subscribe di tutti i topic a 3 e 4 layer (ABS/layer1/layer2/layer3/layer4/set)
       try {
-         this.mqttClient.subscribe(this.partitionTopics[0] + "/set");
+         this.mqttClient.subscribe("ABS/+/set");
+         this.mqttClient.subscribe("ABS/+/+/set");
       } catch (Exception ex) {
-         System.out.println("ERROR: subscribe to: " + "ABS/global");
+         System.out.println("ERROR: subscribe to: ABS/+/set and ABS/+/+/set");
       }
       if(VERBOSE_DEBUG) {
          System.out.println("DEBUG: Partizione ID: " + String.valueOf(msg));
@@ -196,7 +200,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          System.out.println("ERROR: " + ex.getMessage());
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: Stato generale allarme cambiato in: " + this.partitionArmStatuses[0]);
+         System.out.println("DEBUG: Partition Name: " + this.partitionNames[0] + " Arming: " + this.partitionArmStatuses[0] + " Status: " + this.partitionStatuses[0]);
       }
    }
 
@@ -258,7 +262,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          if(discoveryEnabled){
             str = this.sensorStatuses[sensorIDInt].toUpperCase();
          } else {
-            str = "Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt];
+            str = "Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt] + " Bypass: " + this.sensorBypass[sensorIDInt];
          }
          MqttMessage msg = new MqttMessage(str.getBytes());
          msg.setQos(1);
@@ -268,12 +272,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          System.out.println("ERROR: " + ex.getMessage());
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("DEBUG: Sensore ID: " + sensorID + ", nome: " + sensorName);
-      }
-      try {
-         this.mqttClient.subscribe(this.sensorTopics[sensorIDInt] + "/set");
-      } catch (Exception ex) {
-         System.out.println("ERROR: subscribe to: " + this.sensorTopics[sensorIDInt]);
+         System.out.println("DEBUG: Sensor Name: " + this.sensorNames[sensorIDInt] + " Status: " + this.sensorStatuses[sensorIDInt] + " Bypass: " + this.sensorBypass[sensorIDInt]);
       }
    }
 
@@ -299,9 +298,17 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          try {
             String str = "";
             if(discoveryEnabled){
+               String topic = "ABS/sensor/" + sensorID + "_bypass";
+               try {
+                  MqttMessage discoveryMsg = new MqttMessage(this.sensorBypass[sensorID].getBytes());
+                  discoveryMsg.setQos(1);
+                  this.mqttDispatcher.publish(topic, discoveryMsg);
+               } catch (Exception ex) {
+                  System.out.println("ERROR: invio comando Bypass sensore: " + topic);
+               }
                str = this.sensorStatuses[sensorID].toUpperCase();
             } else {
-               str = "Name: " + this.sensorNames[sensorID] + " Status: " + this.sensorStatuses[sensorID];
+               str = "Name: " + this.sensorNames[sensorID] + " Status: " + this.sensorStatuses[sensorID] + " Bypass: " + this.sensorBypass[sensorID];
             }
             MqttMessage msg = new MqttMessage(str.getBytes());
             msg.setQos(1);
@@ -312,16 +319,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       }
 
       if(VERBOSE_DEBUG) {
-         System.out.println("Sensore ID: " + sensorID + " stato cambiato in: " + this.sensorStatuses[sensorID]);
-      }
-
-      String topic = "ABS/sensor/" + sensorID + "_bypass";
-      try {
-         MqttMessage discoveryMsg = new MqttMessage(this.sensorBypass[sensorID].getBytes());
-         discoveryMsg.setQos(1);
-         this.mqttDispatcher.publish(topic, discoveryMsg);
-      } catch (Exception ex) {
-         System.out.println("ERROR: invio comando Bypass sensore: " + topic);
+         System.out.println("DEBUG: Sensor Name: " + this.sensorNames[sensorID] + " Status: " + this.sensorStatuses[sensorID] + " Bypass: " + this.sensorBypass[sensorID]);
       }
    }
 
@@ -367,7 +365,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
       if (discoveryEnabled && !modeDiscoverySent.contains(modeIDInt)) {
          String topic = "homeassistant/button/absoluta_mode_" + modeChar + "/config";
          String payload = "{" +
-         "\"name\": \"Mode " + modeLabel + "\"," +
+         "\"name\": \"" + modeLabel + "\"," +
          "\"state_topic\": \"ABS/mode/" + modeChar + "\"," +
          "\"unique_id\": \"absoluta_mode_" + modeChar + "\"," +
          "\"command_topic\": \"ABS/mode/" + modeChar + "/set\"," +
@@ -386,14 +384,8 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
             modeDiscoverySent.add(modeIDInt);
             this.mqttDispatcher.publish(topic, discoveryMsg);
          } catch (Exception ex) {
-            System.out.println("ERROR: invio discovery sensore Bypass: " + topic);
+            System.out.println("ERROR: invio discovery button mode: " + topic);
          }
-      }
-
-      try {
-         this.mqttClient.subscribe("ABS/mode");
-      } catch (Exception ex) {
-         System.out.println("ERROR: subscribe to: " + "ABS/mode");
       }
    }
 
@@ -438,7 +430,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("Partizione ID: " + partitionID + " stato arming: " + this.partitionArmStatuses[partitionID]);
+         System.out.println("DEBUG: Partition Name: " + this.partitionNames[partitionID] + " Arming: " + this.partitionArmStatuses[partitionID] + " Status: " + this.partitionStatuses[partitionID]);
       }
    }
 
@@ -480,12 +472,6 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
 
-      try{
-         this.mqttClient.subscribe(this.partitionTopics[partitionIDInt] + "/set");
-      } catch (Exception ex) {
-         System.out.println("ERROR: subscribe to: " + this.partitionTopics[partitionIDInt]);
-      }
-
       try {
          String str = "";
          if(discoveryEnabled){
@@ -501,7 +487,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          System.out.println("ERROR: " + ex.getMessage());
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("Partizione ID: " + partitionID + ", nome: " + partitionName);
+         System.out.println("DEBUG: Partition Name: " + this.partitionNames[partitionIDInt] + " Arming: " + this.partitionArmStatuses[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt]);
       }
    }
 
@@ -541,7 +527,7 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
          }
       }
       if(VERBOSE_DEBUG) {
-         System.out.println("Partizione ID: " + partitionID + " stato cambiato in: " + actStatus.toString());
+         System.out.println("DEBUG: Partition Name: " + this.partitionNames[partitionIDInt] + " Arming: " + this.partitionArmStatuses[partitionIDInt] + " Status: " + this.partitionStatuses[partitionIDInt]);
       }
    }
 
