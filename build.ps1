@@ -7,7 +7,7 @@ if (!(Test-Path -Path "build")) {
 
 # 2. Compila tutti i file .java (output in build/)
 $javaFiles = Get-ChildItem -Path src -Recurse -Filter *.java | ForEach-Object { $_.FullName }
-javac -cp "lib/jars/*;secured/*" -d build $javaFiles
+javac --release 21 -cp "lib/jars/*;secured/*" -d build $javaFiles
 
 # 3. Crea il file MANIFEST.MF per specificare la Main-Class
 @"
@@ -18,4 +18,7 @@ Class-Path: lib/*
 # 4. Crea il JAR eseguibile
 jar cfm build/app.jar build/MANIFEST.MF -C build .
 
-Write-Host "Compilazione e creazione JAR completata. Il file build/app.jar è pronto."
+# 5. Copia il JAR anche nella cartella dell'addon
+Copy-Item -Path build/app.jar -Destination "absoluta-addon/app.jar" 
+
+Write-Host "Compilazione e creazione JAR completata. Il file app.jar è pronto."

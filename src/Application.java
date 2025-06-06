@@ -28,6 +28,7 @@ public class Application {
       Properties props = new Properties();
       try (FileInputStream fis = new FileInputStream("config.properties")) {
          props.load(fis);
+         
       } catch (IOException e) {
          System.err.println("Impossibile caricare config.properties: " + e.getMessage());
       }
@@ -71,7 +72,7 @@ public class Application {
             System.out.println("MQTT_USERNAME=" + Username);
             System.out.println("MQTT_PASSWORD=" + (Password != null ? "***" : "non definito"));
             System.out.println("ALARM_ADDRESS=" + ADDRESS);
-            System.out.println("ALARM_PIN=" + PIN != null ? "***" : "non definito");
+            System.out.println("ALARM_PIN=" + (PIN != null ? "***" : "non definito"));
             System.out.println("ALARM_PORT=" + PORT);
             System.out.println("HOME_ASSISTANT_DISCOVERY=" + discoveryEnabled);
             // Controllo variabili obbligatorie
