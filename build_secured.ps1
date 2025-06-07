@@ -7,7 +7,7 @@ if (!(Test-Path -Path "build")) {
 
 # 2. Compila i sorgenti
 $allJava = Get-ChildItem -Path src -Recurse -Filter *.java | ForEach-Object { $_.FullName }
-javac --release 21 -cp "lib/jars/*;secured/*" -d build $allJava
+javac --release 19 -cp "lib/jars/*;secured/*" -d build $allJava
 
 # 3. Crea i JAR
 jar cf secured/cms.jar -C build/cms .

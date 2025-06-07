@@ -6,7 +6,7 @@ mkdir -p build
 
 # 2. Compila tutti i file .java (output in build/)
 find src -name "*.java" > sources.txt
-javac --release 21 -cp "lib/jars/*:secured/*" -d build @sources.txt
+javac --release 19 -cp "lib/jars/*:secured/*" -d build @sources.txt
 rm sources.txt
 
 # 3. Crea il file MANIFEST.MF per specificare la Main-Class

@@ -7,7 +7,7 @@ if (!(Test-Path -Path "build")) {
 
 # 2. Compila tutti i file .java (output in build/)
 $javaFiles = Get-ChildItem -Path src -Recurse -Filter *.java | ForEach-Object { $_.FullName }
-javac --release 21 -cp "lib/jars/*;secured/*" -d build $javaFiles
+javac --release 19 -cp "lib/jars/*;secured/*" -d build $javaFiles
 
 # 3. Crea il file MANIFEST.MF per specificare la Main-Class
 @"

@@ -494,16 +494,16 @@ class Callback implements PanelProvider.PanelCallback, MqttCallback {
    public void setPartitionStatus(String partitionID, Partition.Status actStatus) {
       int partitionIDInt = Integer.parseInt(partitionID);
       switch(actStatus) {
-         case Partition.Status.FIRE:
+         case FIRE:
             this.partitionStatuses[partitionIDInt] = "Fire";
             break;
-         case Partition.Status.FAULTS:
+         case FAULTS:
             this.partitionStatuses[partitionIDInt] = "Faults";
             break;
-         case Partition.Status.ALARMS:
+         case ALARMS:
             this.partitionStatuses[partitionIDInt] = "Alarms";
             break;
-         case Partition.Status.OK:
+         case OK:
             this.partitionStatuses[partitionIDInt] = "Ok";
             break;
          default:
