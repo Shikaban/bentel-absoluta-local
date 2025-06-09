@@ -157,21 +157,26 @@ class StatusListener implements MessageListener {
       boolean anyPartitionArmed = false;
       boolean anyPartitionDisarmed = false;
       boolean missingData = false;
+      boolean anyPartitionTriggered = false;
 
       for (Integer id : panelStatus.getPartitions()) {
          Arming mode = panelStatus.getPartitionArming(id);
          if (mode == null) {
-               missingData = true;
-         } else if (mode == Arming.DISARMED) {
-               anyPartitionDisarmed = true;
+            missingData = true;
+         } else if (mode == Arming.TRIGGERED){
+            anyPartitionTriggered = true;
+         }else if (mode == Arming.DISARMED) {
+            anyPartitionDisarmed = true;
          } else {
-               anyPartitionArmed = true;
+            anyPartitionArmed = true;
          }
       }
 
       cms.device.api.Panel.Arming globalArming;
       if (missingData) {
          globalArming = null;
+      } else if (anyPartitionTriggered) {
+         globalArming = cms.device.api.Panel.Arming.TRIGGERED;
       } else if (anyPartitionArmed && anyPartitionDisarmed) {
          globalArming = cms.device.api.Panel.Arming.PARTIALLY_ARMED;
       } else if (anyPartitionArmed) {
