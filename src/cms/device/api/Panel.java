@@ -193,7 +193,8 @@ public final class Panel implements DeviceOrPanel {
       GLOBALLY_ARMED,
       PARTIALLY_ARMED,
       GLOBALLY_DISARMED,
-      NOT_AVAILABLE
+      NOT_AVAILABLE,
+      TRIGGERED
    }
 
    public enum Status {
