@@ -9,10 +9,11 @@ public final class DscNumber implements DscSerializable {
    private final byte[] bytes;
    private final boolean signed;
 
-   public DscNumber(int var1, boolean var2) {
-      Preconditions.checkArgument(1 <= var1 && var1 <= 4);
-      this.bytes = new byte[var1];
-      this.signed = var2;
+
+   public DscNumber(int numBytes, boolean signed) {
+      Preconditions.checkArgument(1 <= numBytes && numBytes <= 4);
+      this.bytes = new byte[numBytes];
+      this.signed = signed;
    }
 
    public int size() {
@@ -24,19 +25,19 @@ public final class DscNumber implements DscSerializable {
    }
 
    public long get() {
-      long var1;
+      long value;
       if (this.signed) {
-         var1 = (long)this.bytes[0];
+         value = (long)this.bytes[0];
       } else {
-         var1 = (long)(this.bytes[0] & 255);
+         value = (long)(this.bytes[0] & 0xFF);
       }
 
-      for(int var3 = 1; var3 < this.bytes.length; ++var3) {
-         var1 <<= 8;
-         var1 |= (long)(this.bytes[var3] & 255);
+      for (int i = 1; i < this.bytes.length; ++i) {
+         value <<= 8;
+         value |= (long)(this.bytes[i] & 0xFF);
       }
 
-      return var1;
+      return value;
    }
 
    public int toInt() {
@@ -49,35 +50,34 @@ public final class DscNumber implements DscSerializable {
       }
    }
 
-   public DscNumber set(long var1) {
-      if (var1 >= this.min() && var1 <= this.max()) {
-         for(int var3 = this.bytes.length - 1; var3 >= 0; --var3) {
-            this.bytes[var3] = (byte)((int)var1);
-            var1 >>= 8;
+   public DscNumber set(long value) {
+      if (value >= this.min() && value <= this.max()) {
+         for (int i = this.bytes.length - 1; i >= 0; --i) {
+               this.bytes[i] = (byte)((int)value);
+               value >>= 8;
          }
-
          return this;
       } else {
-         throw new IllegalArgumentException(String.format("%d not in range [%d, %d]", var1, this.min(), this.max()));
+         throw new IllegalArgumentException(String.format("%d not in range [%d, %d]", value, this.min(), this.max()));
       }
    }
 
    public long min() {
-      return this.signed ? -1L << 8 * this.bytes.length - 1 : 0L;
+      return this.signed ? -1L << (8 * this.bytes.length - 1) : 0L;
    }
 
    public long max() {
-      return -1L >>> 64 - 8 * this.bytes.length + (this.signed ? 1 : 0);
+      return -1L >>> (64 - 8 * this.bytes.length + (this.signed ? 1 : 0));
    }
 
    public String toString() {
       return Long.toString(this.get());
    }
 
-   public boolean equals(Object var1) {
-      if (var1 != null && this.getClass() == var1.getClass()) {
-         DscNumber var2 = (DscNumber)var1;
-         return Arrays.equals(this.bytes, var2.bytes) && this.signed == var2.signed;
+   public boolean equals(Object obj) {
+      if (obj != null && this.getClass() == obj.getClass()) {
+         DscNumber other = (DscNumber)obj;
+         return Arrays.equals(this.bytes, other.bytes) && this.signed == other.signed;
       } else {
          return false;
       }
@@ -87,26 +87,26 @@ public final class DscNumber implements DscSerializable {
       return Arrays.hashCode(this.bytes) ^ (this.signed ? -1 : 0);
    }
 
-   public void readFrom(ByteBuf var1) throws IndexOutOfBoundsException, DecoderException {
-      var1.readBytes(this.bytes);
+   public void readFrom(ByteBuf buf) throws IndexOutOfBoundsException, DecoderException {
+      buf.readBytes(this.bytes);
    }
 
-   public void writeTo(ByteBuf var1) {
-      var1.writeBytes(this.bytes);
+   public void writeTo(ByteBuf buf) {
+      buf.writeBytes(this.bytes);
    }
 
-   public static DscNumber newSignedNum(int var0) {
-      return new DscNumber(var0, true);
+   public static DscNumber newSignedNum(int numBytes) {
+      return new DscNumber(numBytes, true);
    }
 
-   public static DscNumber newUnsignedNum(int var0) {
-      return new DscNumber(var0, false);
+   public static DscNumber newUnsignedNum(int numBytes) {
+      return new DscNumber(numBytes, false);
    }
 
-   public boolean isEquivalent(DscSerializable var1) {
-      if (var1 instanceof DscNumber) {
-         DscNumber var2 = (DscNumber)var1;
-         return this.get() == var2.get();
+   public boolean isEquivalent(DscSerializable other) {
+      if (other instanceof DscNumber) {
+         DscNumber otherNum = (DscNumber)other;
+         return this.get() == otherNum.get();
       } else {
          return false;
       }

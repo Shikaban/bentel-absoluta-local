@@ -9,9 +9,9 @@ public final class DscOptional<T extends DscSerializable> implements DscSerializ
    private final T object;
    private final DscOptional.PresenceProvider presenceProvider;
 
-   public DscOptional(T var1, DscOptional.PresenceProvider var2) {
-      this.object = Preconditions.checkNotNull(var1);
-      this.presenceProvider = (DscOptional.PresenceProvider)Preconditions.checkNotNull(var2);
+   public DscOptional(T object, DscOptional.PresenceProvider presenceProvider) {
+      this.object = Preconditions.checkNotNull(object);
+      this.presenceProvider = Preconditions.checkNotNull(presenceProvider);
    }
 
    public T get() {
@@ -26,44 +26,45 @@ public final class DscOptional<T extends DscSerializable> implements DscSerializ
       return this.presenceProvider.isPresent();
    }
 
+   @Override
    public int hashCode() {
-      return Objects.hash(new Object[]{this.get()});
+      return Objects.hash(this.get());
    }
 
-   public boolean equals(Object var1) {
-      if (var1 != null && this.getClass() == var1.getClass()) {
-         DscOptional<?> var2 = (DscOptional<?>)var1;
-         return Objects.equals(this.get(), var2.get());
+   @Override
+   public boolean equals(Object other) {
+      if (other != null && this.getClass() == other.getClass()) {
+         DscOptional<?> otherOpt = (DscOptional<?>)other;
+         return Objects.equals(this.get(), otherOpt.get());
       } else {
          return false;
       }
    }
 
+   @Override
    public String toString() {
       return Objects.toString(this.get());
    }
 
-   public void readFrom(ByteBuf var1) throws IndexOutOfBoundsException, DecoderException {
+   public void readFrom(ByteBuf buf) throws IndexOutOfBoundsException, DecoderException {
       if (this.presenceProvider.isPresent()) {
-         this.object.readFrom(var1);
+         this.object.readFrom(buf);
       }
-
    }
 
-   public void writeTo(ByteBuf var1) {
+   public void writeTo(ByteBuf buf) {
       if (this.presenceProvider.isPresent()) {
-         this.object.writeTo(var1);
+         this.object.writeTo(buf);
       }
-
    }
 
-   public boolean isEquivalent(DscSerializable var1) {
-      if (var1 instanceof DscOptional) {
-         DscOptional<?> var2 = (DscOptional<?>)var1;
-         if (this.isPresent() != var2.isPresent()) {
-            return false;
+   public boolean isEquivalent(DscSerializable other) {
+      if (other instanceof DscOptional) {
+         DscOptional<?> otherOpt = (DscOptional<?>)other;
+         if (this.isPresent() != otherOpt.isPresent()) {
+               return false;
          } else {
-            return this.isPresent() ? this.get().isEquivalent(var2.get()) : true;
+               return this.isPresent() ? this.get().isEquivalent(otherOpt.get()) : true;
          }
       } else {
          return false;

@@ -28,7 +28,6 @@ public class Application {
       Properties props = new Properties();
       try (FileInputStream fis = new FileInputStream("config.properties")) {
          props.load(fis);
-         
       } catch (IOException e) {
          System.err.println("Impossibile caricare config.properties: " + e.getMessage());
       }
