@@ -14,9 +14,4 @@ jar cf secured/protocol.jar -C build/protocol .
 jar cf secured/cms.jar -C build/cms .
 jar cf secured/plugin.jar -C build/plugin .
 
-# 4. Copia i JAR anche nella cartella dell'addon
-Copy-Item -Path secured/cms.jar -Destination "absoluta-addon/secured/cms.jar"
-Copy-Item -Path secured/plugin.jar -Destination "absoluta-addon/secured/plugin.jar"
-Copy-Item -Path secured/protocol.jar -Destination "absoluta-addon/secured/protocol.jar"
-
 Write-Host "Compilazione e creazione dei JAR in secured/ completata."

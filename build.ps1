@@ -18,7 +18,4 @@ Class-Path: lib/*
 # 4. Crea il JAR eseguibile
 jar cfm build/app.jar build/MANIFEST.MF -C build .
 
-# 5. Copia il JAR anche nella cartella dell'addon
-Copy-Item -Path build/app.jar -Destination "absoluta-addon/app.jar" 
-
 Write-Host "Compilazione e creazione JAR completata. Il file app.jar è pronto."
