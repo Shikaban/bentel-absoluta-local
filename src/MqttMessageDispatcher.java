@@ -21,8 +21,11 @@ public class MqttMessageDispatcher {
         worker.interrupt();
     }
 
-    public void publish(String topic, MqttMessage message) {
-        queue.offer(new PublishRequest(topic, message));
+    public void publishString(String topic, String payload, int qos, boolean retained) {
+        MqttMessage msg = new MqttMessage(payload.getBytes());
+        msg.setQos(qos);
+        msg.setRetained(retained);
+        queue.offer(new PublishRequest(topic, msg));
     }
 
     private void processQueue() {
