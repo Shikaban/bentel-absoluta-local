@@ -10,9 +10,9 @@ $allJava = Get-ChildItem -Path src -Recurse -Filter *.java | ForEach-Object { $_
 javac --release 19 -cp "lib/jars/*;secured/*" -d build $allJava
 
 # 3. Crea i JAR
+jar cf secured/protocol.jar -C build/protocol .
 jar cf secured/cms.jar -C build/cms .
 jar cf secured/plugin.jar -C build/plugin .
-jar cf secured/protocol.jar -C build/protocol .
 
 # 4. Copia i JAR anche nella cartella dell'addon
 Copy-Item -Path secured/cms.jar -Destination "absoluta-addon/secured/cms.jar"
