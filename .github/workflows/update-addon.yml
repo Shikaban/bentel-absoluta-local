@@ -1,0 +1,73 @@
+name: Build Jars and Update Repo Addon
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '19'
+
+      - name: Build cms.jar, plugin.jar, protocol.jar
+        run: |
+          mkdir -p build
+
+          # Compila e crea cms.jar
+          find src/cms -name "*.java" > cms_sources.txt
+          javac --release 19 -cp "lib/jars/*:secured/*" -d build @cms_sources.txt
+          jar cf secured/cms.jar -C build/cms .
+          rm cms_sources.txt
+
+          # Compila e crea plugin.jar
+          find src/plugin -name "*.java" > plugin_sources.txt
+          javac --release 19 -cp "lib/jars/*:secured/*:build" -d build @plugin_sources.txt
+          jar cf secured/plugin.jar -C build/plugin .
+          rm plugin_sources.txt
+
+          # Compila e crea protocol.jar
+          find src/protocol -name "*.java" > protocol_sources.txt
+          javac --release 19 -cp "lib/jars/*:secured/*:build" -d build @protocol_sources.txt
+          jar cf secured/protocol.jar -C build/protocol .
+          rm protocol_sources.txt
+
+      - name: Build app.jar
+        run: |
+          mkdir -p build
+          find src -name "*.java" > sources.txt
+          javac --release 19 -cp "lib/jars/*:secured/*" -d build @sources.txt
+          rm sources.txt
+
+          echo "Main-Class: Application" > build/MANIFEST.MF
+          echo "Class-Path: lib/*" >> build/MANIFEST.MF
+
+          jar cfm build/app.jar build/MANIFEST.MF -C build .
+
+      - name: Clone Repo Addon
+        run: |
+          git clone https://x-access-token:${{ secrets.ADDONTOKEN }}@github.com/AlessandroTischer/absoluta-local-addon.git
+
+      - name: Copy JARs to Repo Addon
+        run: |
+          cp secured/*.jar absoluta-local-addon/absoluta_local/secured/
+          cp build/app.jar absoluta-local-addon/absoluta_local/app.jar
+
+      - name: Commit and Push to Repo Addon
+        run: |
+          cd absoluta-local-addon
+          git config user.name "GitHub Action"
+          git config user.email "actions@github.com"
+          git add .
+          COMMIT_MSG="Update to jars because of update on main repository: $(git -C .. log -1 --pretty=%B)"
+          git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+          git push
