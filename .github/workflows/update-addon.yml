@@ -22,25 +22,19 @@ jobs:
       - name: Build cms.jar, plugin.jar, protocol.jar
         run: |
           mkdir -p build
-
-          # Compila e crea cms.jar
-          find src/cms -name "*.java" > cms_sources.txt
-          javac --release 19 -cp "lib/jars/*:secured/*" -d build @cms_sources.txt
-          jar cf secured/cms.jar -C build/cms .
-          rm cms_sources.txt
-
-          # Compila e crea plugin.jar
-          find src/plugin -name "*.java" > plugin_sources.txt
-          javac --release 19 -cp "lib/jars/*:secured/*:build" -d build @plugin_sources.txt
-          jar cf secured/plugin.jar -C build/plugin .
-          rm plugin_sources.txt
-
-          # Compila e crea protocol.jar
-          find src/protocol -name "*.java" > protocol_sources.txt
-          javac --release 19 -cp "lib/jars/*:secured/*:build" -d build @protocol_sources.txt
-          jar cf secured/protocol.jar -C build/protocol .
-          rm protocol_sources.txt
-
+          
+          # Trova tutti i file Java nei tre moduli
+          find src/cms src/plugin src/protocol -name "*.java" > all_sources.txt
+          
+          # Compila tutto insieme, assicurandoti che il classpath includa tutte le librerie richieste
+          javac --release 19 -cp "lib/jars/*" -d build @all_sources.txt
+          rm all_sources.txt
+          
+          # Crea i jar separati prendendo i relativi package dalla build
+          jar cf secured/cms.jar -C build src/cms
+          jar cf secured/plugin.jar -C build src/plugin
+          jar cf secured/protocol.jar -C build src/protocol
+          
       - name: Build app.jar
         run: |
           mkdir -p build
