@@ -1,5 +1,13 @@
 public class HomeAssistantManager {
 
+    private static final String DEVICE_JSON =
+        "\"device\": {" +
+            "\"identifiers\": [\"absoluta_panel\"]," +
+            "\"name\": \"Centrale Absoluta\"," +
+            "\"manufacturer\": \"Bentel\"," +
+            "\"model\": \"Absoluta\"" +
+        "}";
+
     public static String buildPartition(String partitionID, String partitionName) {
         return "{" +
             "\"name\": \"" + partitionName + "\"," +
@@ -11,12 +19,7 @@ public class HomeAssistantManager {
             "\"supported_features\": [\"arm_away\"]," +
             "\"payload_arm_away\": \"ARM_AWAY\"," +
             "\"payload_disarm\": \"DISARM\"," +
-            "\"device\": {" +
-                "\"identifiers\": [\"absoluta_panel\"]," +
-                "\"name\": \"Centrale Absoluta\"," +
-                "\"manufacturer\": \"Bentel\"," +
-                "\"model\": \"Absoluta\"" +
-            "}" +
+            DEVICE_JSON +
         "}";
     }
 
@@ -26,12 +29,7 @@ public class HomeAssistantManager {
             "\"state_topic\": \"ABS/sensor/" + sensorID + "\"," +
             "\"unique_id\": \"absoluta_sensor_" + sensorID + "\"," +
             "\"device_class\": \"motion\"," +
-            "\"device\": {" +
-                "\"identifiers\": [\"absoluta_panel\"]," +
-                "\"name\": \"Centrale Absoluta\"," +
-                "\"manufacturer\": \"Bentel\"," +
-                "\"model\": \"Absoluta\"" +
-            "}" +
+            DEVICE_JSON +
         "}";
     }
 
@@ -44,12 +42,7 @@ public class HomeAssistantManager {
             "\"payload_on\": \"ON\"," +
             "\"payload_off\": \"OFF\"," +
             "\"device_class\": \"switch\"," +
-            "\"device\": {" +
-                "\"identifiers\": [\"absoluta_panel\"]," +
-                "\"name\": \"Centrale Absoluta\"," +
-                "\"manufacturer\": \"Bentel\"," +
-                "\"model\": \"Absoluta\"" +
-            "}" +
+            DEVICE_JSON +
         "}";
     }
 
@@ -60,12 +53,7 @@ public class HomeAssistantManager {
             "\"unique_id\": \"absoluta_mode_" + modeChar + "\"," +
             "\"command_topic\": \"ABS/mode/" + modeChar + "/set\"," +
             "\"payload_press\": \"MODE_" + modeChar + "\"," +
-            "\"device\": {" +
-                "\"identifiers\": [\"absoluta_panel\"]," +
-                "\"name\": \"Centrale Absoluta\"," +
-                "\"manufacturer\": \"Bentel\"," +
-                "\"model\": \"Absoluta\"" +
-            "}" +
+            DEVICE_JSON +
         "}";
     }
 }
