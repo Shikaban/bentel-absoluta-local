@@ -10,6 +10,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import org.javatuples.Pair;
+
 import protocol.dsc.DscError;
 import protocol.dsc.Endpoint;
 import protocol.dsc.Message;
@@ -49,19 +51,32 @@ public class MessageHandler {
    }
 
    public <P> void sendCommand(Message<P, ?> message, P param) {
-      this.send(message, param, MessageType.COMMAND);
+      this.send(message, param, MessageType.COMMAND, null);
    }
 
    public <P> void sendHighPriorityReading(Message<P, ?> message, P param) {
-      this.send(message, param, MessageType.HIGH_PRIORITY_READING);
+      this.send(message, param, MessageType.HIGH_PRIORITY_READING, null);
+   }
+
+   /**
+    * Sends a high priority reading that must not abort the connection if it keeps timing out.
+    * When the retries are exhausted, {@code onAbandon} is run (e.g. to enqueue a fallback) and
+    * message processing continues instead of raising a fatal error.
+    */
+   public <P> void sendHighPriorityReading(Message<P, ?> message, P param, Runnable onAbandon) {
+      this.send(message, param, MessageType.HIGH_PRIORITY_READING, onAbandon);
    }
 
    public <P> void sendMidPriorityReading(Message<P, ?> message, P param) {
-      this.send(message, param, MessageType.MID_PRIORITY_READING);
+      this.send(message, param, MessageType.MID_PRIORITY_READING, null);
+   }
+
+   public <P> void sendMidPriorityReading(Message<P, ?> message, P param, Runnable onAbandon) {
+      this.send(message, param, MessageType.MID_PRIORITY_READING, onAbandon);
    }
 
    public <P> void sendLowPriorityReading(Message<P, ?> message, P param) {
-      this.send(message, param, MessageType.LOW_PRIORITY_READING);
+      this.send(message, param, MessageType.LOW_PRIORITY_READING, null);
    }
 
    public void scheduleIdleTimeTask(final Runnable task) {
@@ -93,8 +108,8 @@ public class MessageHandler {
       });
    }
 
-   private <P> void send(final Message<P, ?> message, final P param, final MessageType type) {
-      this.executor.submit(() -> MessageHandler.this.enqueue(new EnqueuedMessage<>(message, param, type)));
+   private <P> void send(final Message<P, ?> message, final P param, final MessageType type, final Runnable onAbandon) {
+      this.executor.submit(() -> MessageHandler.this.enqueue(new EnqueuedMessage<>(message, param, type, onAbandon)));
    }
 
    private void enqueue(EnqueuedMessage<?> msg) {
@@ -141,6 +156,13 @@ public class MessageHandler {
       } else if (this.lastMessage.attemptNum < RETRY_NUMBER) {
          logger.finer("Retry N° " + this.lastMessage.attemptNum + ": " + this.lastMessage + " ...");
          this.sendMessage(this.lastMessage);
+      } else if (this.lastMessage.onAbandon != null) {
+         // The caller provided a fallback: never fatal — run it and keep going.
+         logger.warning("Too many attempts for " + this.lastMessage + ", running fallback");
+         Runnable onAbandon = this.lastMessage.onAbandon;
+         this.lastMessage = null;
+         onAbandon.run();
+         this.sendNext();
       } else if (this.lastMessage.type == MessageType.MID_PRIORITY_READING
                || this.lastMessage.type == MessageType.LOW_PRIORITY_READING) {
          // Transient panel unavailability (e.g. busy arming) — skip and continue
@@ -171,26 +193,53 @@ public class MessageHandler {
    }
 
    private boolean checkResponse(Response response) {
-      if (this.lastMessage != null && this.lastMessage.message == response.getMessage()) {
-         this.lastMessage.responseReceived = true;
-         return true;
-      } else {
+      if (this.lastMessage == null || this.lastMessage.message != response.getMessage()) {
          return false;
       }
+
+      if (this.lastMessage.message == Message.ZONE_STATUSES && response instanceof NewValue
+            && !zoneStatusResponseCoversRequest(
+                  this.lastMessage.param, response.getParam(Message.ZONE_STATUSES))) {
+         return false;
+      }
+
+      this.lastMessage.responseReceived = true;
+      return true;
+   }
+
+   static boolean zoneStatusResponseCoversRequest(Object requestedParam, Pair<Integer, Integer> responseRange) {
+      if (!(requestedParam instanceof Pair) || responseRange == null) {
+         return false;
+      }
+
+      Pair<?, ?> requestedRange = (Pair<?, ?>)requestedParam;
+      if (!(requestedRange.getValue0() instanceof Integer)
+            || !(requestedRange.getValue1() instanceof Integer)) {
+         return false;
+      }
+
+      int requestedStart = (Integer)requestedRange.getValue0();
+      int requestedCount = (Integer)requestedRange.getValue1();
+      int responseStart = responseRange.getValue0();
+      int responseCount = responseRange.getValue1();
+      return responseStart <= requestedStart
+            && requestedStart + requestedCount <= responseStart + responseCount;
    }
 
    private class EnqueuedMessage<P> {
       private final Message<P, ?> message;
       private final P param;
       private final MessageType type;
+      private final Runnable onAbandon;
       private final int n;
       private boolean responseReceived;
       private int attemptNum;
 
-      EnqueuedMessage(Message<P, ?> message, P param, MessageType type) {
+      EnqueuedMessage(Message<P, ?> message, P param, MessageType type, Runnable onAbandon) {
          this.message = Objects.requireNonNull(message);
          this.param = param;
          this.type = Objects.requireNonNull(type);
+         this.onAbandon = onAbandon;
          this.n = MessageHandler.this.messageCount++;
       }
 

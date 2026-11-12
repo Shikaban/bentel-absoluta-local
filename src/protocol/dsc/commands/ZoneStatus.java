@@ -29,16 +29,16 @@ public class ZoneStatus extends DscRequestableCommand implements DscArray.Elemen
       return 2065;
    }
 
-   public boolean match(DscRequestableCommand var1) {
-      if (!(var1 instanceof ZoneStatus)) {
+   public boolean match(DscRequestableCommand requestableCommand) {
+      if (!(requestableCommand instanceof ZoneStatus)) {
          return false;
       } else {
-         ZoneStatus var2 = (ZoneStatus)var1;
-         int var3 = this.getZoneNumber();
-         int var4 = this.getZoneNumber();
-         int var5 = var2.getZoneNumber();
-         int var6 = var2.getZoneNumber();
-         return var5 <= var3 && var3 + var4 <= var5 + var6;
+         ZoneStatus zoneStatus2 = (ZoneStatus)requestableCommand;
+         int requestedStart = this.getZoneNumber();
+         int requestedEnd = requestedStart + this.getNumberOfZones();
+         int responseStart = zoneStatus2.getZoneNumber();
+         int responseEnd = responseStart + zoneStatus2.getNumberOfZones();
+         return responseStart <= requestedStart && requestedEnd <= responseEnd;
       }
    }
 
@@ -46,16 +46,16 @@ public class ZoneStatus extends DscRequestableCommand implements DscArray.Elemen
       return this.zoneNumber.toPositiveInt();
    }
 
-   public void setZoneNumber(int var1) {
-      this.zoneNumber.setPositiveInt(var1);
+   public void setZoneNumber(int value) {
+      this.zoneNumber.setPositiveInt(value);
    }
 
    public int getNumberOfZones() {
       return this.numberOfZones.toPositiveInt();
    }
 
-   public void setNumberOfZones(int var1) {
-      this.numberOfZones.setPositiveInt(var1);
+   public void setNumberOfZones(int value) {
+      this.numberOfZones.setPositiveInt(value);
    }
 
    public int getLengthOfStatusBytes() {
