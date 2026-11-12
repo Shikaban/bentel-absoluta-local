@@ -16,26 +16,26 @@ abstract class SectionReading<V> extends Reading<Void, V, SectionReadResponse> {
    protected final int mainSection;
    protected final ImmutableList<Integer> subSections;
 
-   protected SectionReading(int var1, ImmutableList<Integer> var2) {
+   protected SectionReading(int mainSection, ImmutableList<Integer> immutableList2) {
       super(SectionReadResponse.class);
-      this.mainSection = var1;
-      this.subSections = Preconditions.checkNotNull(var2);
+      this.mainSection = mainSection;
+      this.subSections = Preconditions.checkNotNull(immutableList2);
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, SectionReadResponse var2, List<Message.Response> var3) {
-      if (null == var2.getModuleNumber() && this.mainSection == var2.getMainSectionNumber() && this.subSections.equals(var2.getSubSectionNumbers()) && null == var2.getIndex() && null == var2.getCount() && !var2.isVirtualSectionNumber()) {
-         V var4 = this.getResponseValue(var2);
-         var3.add(new NewValue(this, var4));
+   protected void parseResponse(ChannelHandlerContext context, SectionReadResponse sectionReadResponse2, List<Message.Response> responses) {
+      if (null == sectionReadResponse2.getModuleNumber() && this.mainSection == sectionReadResponse2.getMainSectionNumber() && this.subSections.equals(sectionReadResponse2.getSubSectionNumbers()) && null == sectionReadResponse2.getIndex() && null == sectionReadResponse2.getCount() && !sectionReadResponse2.isVirtualSectionNumber()) {
+         V responseValue = this.getResponseValue(sectionReadResponse2);
+         responses.add(new NewValue(this, responseValue));
       }
 
    }
 
-   protected abstract V getResponseValue(SectionReadResponse var1);
+   protected abstract V getResponseValue(SectionReadResponse sectionReadResponse2);
 
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, Void var2) throws Exception {
-      SectionRead var3 = new SectionRead();
-      var3.setMainSectionNumber(this.mainSection);
-      var3.setSubSectionNumbers(this.subSections);
-      return var3;
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext context, Void void2) throws Exception {
+      SectionRead sectionRead2 = new SectionRead();
+      sectionRead2.setMainSectionNumber(this.mainSection);
+      sectionRead2.setSubSectionNumbers(this.subSections);
+      return sectionRead2;
    }
 }

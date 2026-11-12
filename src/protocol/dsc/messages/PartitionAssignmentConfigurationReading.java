@@ -12,11 +12,11 @@ public class PartitionAssignmentConfigurationReading extends RequestableCommandR
       super(PartitionAssignmentConfiguration.class);
    }
 
-   protected PartitionAssignmentConfiguration prepareRequest(ChannelHandlerContext var1, Void var2) {
+   protected PartitionAssignmentConfiguration prepareRequest(ChannelHandlerContext context, Void void2) {
       return new PartitionAssignmentConfiguration();
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, PartitionAssignmentConfiguration var2, List<Message.Response> var3) {
-      var3.add(new NewValue(this, var2.getAssignedPartitions()));
+   protected void parseResponse(ChannelHandlerContext context, PartitionAssignmentConfiguration partitionAssignmentConfiguration2, List<Message.Response> responses) {
+      responses.add(new NewValue(this, partitionAssignmentConfiguration2.getAssignedPartitions()));
    }
 }

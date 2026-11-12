@@ -22,32 +22,32 @@ public class EventReportingConfigurationWrite extends DscCommandWithAppSeq {
       return 1890;
    }
 
-   public boolean getReportingType(int var1) {
-      return this.reportingType.get(var1);
+   public boolean getReportingType(int numericValue) {
+      return this.reportingType.get(numericValue);
    }
 
-   public void setReportingType(int var1, boolean var2) {
-      this.reportingType.set(var1, var2);
+   public void setReportingType(int value, boolean enabled) {
+      this.reportingType.set(value, enabled);
    }
 
    public int getEventType() {
       return this.eventType.toInt();
    }
 
-   public void setEventType(int var1) {
-      this.eventType.set((long)var1);
+   public void setEventType(int value) {
+      this.eventType.set((long)value);
    }
 
    public List<Boolean> getSettings() {
       return Collections.unmodifiableList(this.settings);
    }
 
-   public void setSettings(List<Boolean> var1) {
-      int var2 = var1.size();
-      this.settings.setMinNumberOfBits(var2);
+   public void setSettings(List<Boolean> items) {
+      int value = items.size();
+      this.settings.setMinNumberOfBits(value);
 
-      for(int var3 = 0; var3 < var2; ++var3) {
-         this.settings.set(var3, (Boolean)var1.get(var3));
+      for(int index = 0; index < value; ++index) {
+         this.settings.set(index, (Boolean)items.get(index));
       }
 
    }

@@ -19,29 +19,29 @@ public class PollHandler extends ChannelInboundHandlerAdapter {
    private static final AttributeKey<Boolean> POLL_KEY = AttributeKey.valueOf("PollHandler.poll");
    private final PollHandler.PollFactory pollFactory;
 
-   public PollHandler(PollHandler.PollFactory var1) {
-      this.pollFactory = (PollHandler.PollFactory)Preconditions.checkNotNull(var1);
+   public PollHandler(PollHandler.PollFactory pollFactory2) {
+      this.pollFactory = (PollHandler.PollFactory)Preconditions.checkNotNull(pollFactory2);
    }
 
-   public void userEventTriggered(ChannelHandlerContext var1, Object var2) throws Exception {
-      if (var2 instanceof IdleStateEvent && ((IdleStateEvent)var2).state() == IdleState.WRITER_IDLE) {
-         if (isPollEnabled(var1.channel())) {
+   public void userEventTriggered(ChannelHandlerContext context, Object object2) throws Exception {
+      if (object2 instanceof IdleStateEvent && ((IdleStateEvent)object2).state() == IdleState.WRITER_IDLE) {
+         if (isPollEnabled(context.channel())) {
             logger.finer("Sending poll");
-            DscCommand var3 = this.pollFactory.createPoll();
-            var1.write(var3).addListener(LogOnFailure.INSTANCE);
+            DscCommand command = this.pollFactory.createPoll();
+            context.write(command).addListener(LogOnFailure.INSTANCE);
          }
       } else {
-         super.userEventTriggered(var1, var2);
+         super.userEventTriggered(context, object2);
       }
 
    }
 
-   public static boolean isPollEnabled(Channel var0) {
-      return Boolean.TRUE.equals(var0.attr(POLL_KEY).get());
+   public static boolean isPollEnabled(Channel channel2) {
+      return Boolean.TRUE.equals(channel2.attr(POLL_KEY).get());
    }
 
-   public static void setPollEnabled(Channel var0, boolean var1) {
-      var0.attr(POLL_KEY).set(var1);
+   public static void setPollEnabled(Channel channel2, boolean enabled) {
+      channel2.attr(POLL_KEY).set(enabled);
    }
 
    public interface PollFactory {

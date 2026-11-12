@@ -25,23 +25,23 @@ public class SingleZoneBypassWrite extends DscCommandWithAppSeq {
       return this.partitionNumber.toPositiveInteger();
    }
 
-   public void setPartitionNumber(Integer var1) {
-      this.partitionNumber.setPositiveInteger(var1);
+   public void setPartitionNumber(Integer positiveInteger) {
+      this.partitionNumber.setPositiveInteger(positiveInteger);
    }
 
    public int getZoneNumber() {
       return this.zoneNumber.toPositiveInt();
    }
 
-   public void setZoneNumber(int var1) {
-      this.zoneNumber.setPositiveInt(var1);
+   public void setZoneNumber(int value) {
+      this.zoneNumber.setPositiveInt(value);
    }
 
    public boolean isBypass() {
       return this.bypassState.get(0);
    }
 
-   public void setBypass(boolean var1) {
-      this.bypassState.set(0, (Boolean)var1);
+   public void setBypass(boolean enabled) {
+      this.bypassState.set(0, (Boolean)enabled);
    }
 }

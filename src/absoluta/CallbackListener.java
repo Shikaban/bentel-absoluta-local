@@ -22,9 +22,9 @@ class CallbackListener implements PropertyChangeListener {
    private final PanelCallback callback;
    private final PanelStatus panelStatus;
 
-   CallbackListener(PanelCallback var1, PanelStatus var2) {
-      this.callback = (PanelCallback)Objects.requireNonNull(var1);
-      this.panelStatus = (PanelStatus)Objects.requireNonNull(var2);
+   CallbackListener(PanelCallback panelCallback2, PanelStatus panelStatus2) {
+      this.callback = (PanelCallback)Objects.requireNonNull(panelCallback2);
+      this.panelStatus = (PanelStatus)Objects.requireNonNull(panelStatus2);
    }
 
    public void propertyChange(PropertyChangeEvent property) {

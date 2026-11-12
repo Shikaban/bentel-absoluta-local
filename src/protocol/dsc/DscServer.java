@@ -5,8 +5,8 @@ public interface DscServer {
 
    void stop() throws InterruptedException;
 
-   void addIncomingConnectionListener(IncomingConnectionListener var1);
+   void addIncomingConnectionListener(IncomingConnectionListener incomingConnectionListener2);
 
-   void removeIncomingConnectionListener(IncomingConnectionListener var1);
+   void removeIncomingConnectionListener(IncomingConnectionListener incomingConnectionListener2);
 
 }

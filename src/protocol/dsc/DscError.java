@@ -8,35 +8,35 @@ public class DscError extends Message.Response {
    private final String description;
    private final Integer responseCode;
 
-   private <P> DscError(DscError.Type var1, String var2, Message<P, ?> var3, P var4, Integer var5) {
-      super(var3, var4);
-      this.type = (DscError.Type)Preconditions.checkNotNull(var1);
-      this.description = (String)Preconditions.checkNotNull(var2);
-      this.responseCode = var5;
+   private <P> DscError(DscError.Type type2, String text, Message<P, ?> message2, P p2, Integer responseCode) {
+      super(message2, p2);
+      this.type = (DscError.Type)Preconditions.checkNotNull(type2);
+      this.description = (String)Preconditions.checkNotNull(text);
+      this.responseCode = responseCode;
    }
 
-   public static DscError newFatalError(String var0) {
-      return new DscError(DscError.Type.FATAL, var0, (Message<Object, ?>)null, (Object)null, (Integer)null);
+   public static DscError newFatalError(String text) {
+      return new DscError(DscError.Type.FATAL, text, (Message<Object, ?>)null, (Object)null, (Integer)null);
    }
 
-   public static DscError newFatalError(Throwable var0) {
-      return newFatalError(getDescription(var0));
+   public static DscError newFatalError(Throwable exception) {
+      return newFatalError(getDescription(exception));
    }
 
-   public static DscError newGenericError(String var0) {
-      return new DscError(DscError.Type.GENERIC, var0, (Message<Object, ?>)null, (Object)null, (Integer)null);
+   public static DscError newGenericError(String text) {
+      return new DscError(DscError.Type.GENERIC, text, (Message<Object, ?>)null, (Object)null, (Integer)null);
    }
 
-   public static DscError newGenericError(Throwable var0) {
-      return newGenericError(getDescription(var0));
+   public static DscError newGenericError(Throwable exception) {
+      return newGenericError(getDescription(exception));
    }
 
-   public static <P> DscError newMessageError(Message<P, ?> var0, P var1, Integer var2, String var3) {
-      return new DscError(DscError.Type.MESSAGE, var3, Preconditions.checkNotNull(var0), var1, var2);
+   public static <P> DscError newMessageError(Message<P, ?> message2, P p2, Integer integerValue, String text) {
+      return new DscError(DscError.Type.MESSAGE, text, Preconditions.checkNotNull(message2), p2, integerValue);
    }
 
-   public static <P> DscError newMessageError(Message<P, ?> var0, P var1, Throwable var2) {
-      return newMessageError(var0, var1, (Integer)null, getDescription(var2));
+   public static <P> DscError newMessageError(Message<P, ?> message2, P p2, Throwable exception) {
+      return newMessageError(message2, p2, (Integer)null, getDescription(exception));
    }
 
    public DscError.Type getType() {
@@ -64,8 +64,8 @@ public class DscError extends Message.Response {
       }
    }
 
-   private static String getDescription(Throwable var0) {
-      return (String)MoreObjects.firstNonNull(var0.getMessage(), MoreObjects.firstNonNull(var0.toString(), var0.getClass().getSimpleName()));
+   private static String getDescription(Throwable exception) {
+      return (String)MoreObjects.firstNonNull(exception.getMessage(), MoreObjects.firstNonNull(exception.toString(), exception.getClass().getSimpleName()));
    }
 
    public static enum Type {

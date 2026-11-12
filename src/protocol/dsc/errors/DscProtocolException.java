@@ -6,9 +6,9 @@ import protocol.dsc.util.DscUtils;
 public abstract class DscProtocolException extends DecoderException {
    private final int receivedCommand;
 
-   public DscProtocolException(int var1, String var2) {
-      super(var2);
-      this.receivedCommand = DscUtils.validateUShort(var1);
+   public DscProtocolException(int numericValue, String text) {
+      super(text);
+      this.receivedCommand = DscUtils.validateUShort(numericValue);
    }
 
    public abstract int getErrorCode();

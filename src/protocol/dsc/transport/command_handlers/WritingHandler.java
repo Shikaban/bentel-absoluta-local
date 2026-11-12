@@ -9,12 +9,12 @@ import protocol.dsc.messages.Writing;
 
 @Sharable
 public class WritingHandler extends ChannelOutboundHandlerAdapter {
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      DscCommandWithAppSeq var4 = Writing.tryToPrepare(var1, var2);
-      if (var4 != null) {
-         var1.write(var4, var3);
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      DscCommandWithAppSeq commandWithAppSeq = Writing.tryToPrepare(context, object2);
+      if (commandWithAppSeq != null) {
+         context.write(commandWithAppSeq, promise);
       } else {
-         super.write(var1, var2, var3);
+         super.write(context, object2, promise);
       }
 
    }

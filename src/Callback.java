@@ -133,7 +133,7 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
       commandManager.onMessageArrived(topic, msg);
    }
 
-   public void deliveryComplete(IMqttDeliveryToken var1) {
+   public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken2) {
    }
 
 }

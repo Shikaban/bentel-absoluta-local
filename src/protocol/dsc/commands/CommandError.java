@@ -15,9 +15,9 @@ public class CommandError extends DscAbstractCommand implements DscGeneralRespon
    public CommandError() {
    }
 
-   public CommandError(DscProtocolException var1) {
-      this.receivedCommand.set((long)var1.getReceivedCommand());
-      this.errorCode.set((long)var1.getErrorCode());
+   public CommandError(DscProtocolException exception) {
+      this.receivedCommand.set((long)exception.getReceivedCommand());
+      this.errorCode.set((long)exception.getErrorCode());
    }
 
    protected List<DscSerializable> getFields() {
@@ -40,16 +40,16 @@ public class CommandError extends DscAbstractCommand implements DscGeneralRespon
       return this.receivedCommand.toInt();
    }
 
-   public void setReceivedCommand(int var1) {
-      this.receivedCommand.set((long)var1);
+   public void setReceivedCommand(int value) {
+      this.receivedCommand.set((long)value);
    }
 
    public int getErrorCode() {
       return this.errorCode.toInt();
    }
 
-   public void setErrorCode(int var1) {
-      this.errorCode.set((long)var1);
+   public void setErrorCode(int value) {
+      this.errorCode.set((long)value);
    }
 
    public String toString() {

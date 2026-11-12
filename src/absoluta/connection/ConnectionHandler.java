@@ -38,9 +38,9 @@ public class ConnectionHandler {
    private boolean loggedIn;
    private boolean closing;
 
-   public ConnectionHandler(PanelStatus var1, AlertCallback var3) {
-      this.panelStatus = (PanelStatus)Objects.requireNonNull(var1);
-      this.alertCallback = (AlertCallback)Objects.requireNonNull(var3);
+   public ConnectionHandler(PanelStatus panelStatus2, AlertCallback alertCallback2) {
+      this.panelStatus = (PanelStatus)Objects.requireNonNull(panelStatus2);
+      this.alertCallback = (AlertCallback)Objects.requireNonNull(alertCallback2);
    }
 
    public boolean setPin(String pin) {
@@ -69,18 +69,18 @@ public class ConnectionHandler {
       this.endpoint.close();
    }
 
-   void setEndpoint(Endpoint var1) {
+   void setEndpoint(Endpoint endpoint2) {
       if (this.endpoint != null) {
          throw new IllegalStateException("connected called twice");
       } else if (this.pin == null) {
          throw new IllegalStateException("no password set");
       } else {
-         this.endpoint = (Endpoint)Objects.requireNonNull(var1);
-         this.messenger = (Messenger)Objects.requireNonNull(var1.getMessenger());
-         this.messageHandler = new MessageHandler(var1, new ConnectionHandler.ErrorListener());
+         this.endpoint = (Endpoint)Objects.requireNonNull(endpoint2);
+         this.messenger = (Messenger)Objects.requireNonNull(endpoint2.getMessenger());
+         this.messageHandler = new MessageHandler(endpoint2, new ConnectionHandler.ErrorListener());
          this.commander = new Commander(this.messageHandler, this.panelStatus);
          this.endpoint.addPropertyChangeListener(new ConnectionHandler.HandlerEndpointListener());
-         this.statusReader = new StatusReader(this.messageHandler, var1.getExecutor());
+         this.statusReader = new StatusReader(this.messageHandler, endpoint2.getExecutor());
          this.messenger.addMessageListener(this.statusReader);
          this.messenger.addMessageListener(new StatusListener(this.panelStatus));
          this.messenger.addMessageListener(new ConnectionHandler.HandlerMessageListener());
@@ -105,9 +105,9 @@ public class ConnectionHandler {
       }
    }
 
-   private synchronized void setConnectionStatus(providerConnStatus var1) {
+   private synchronized void setConnectionStatus(providerConnStatus providerConnStatus2) {
       if (this.connectionStatus == null) {
-         this.connectionStatus = var1;
+         this.connectionStatus = providerConnStatus2;
          this.notifyAll();
       }
    }
@@ -122,7 +122,7 @@ public class ConnectionHandler {
       }
 
       // $FF: synthetic method
-      ErrorListener(Object var2) {
+      ErrorListener(Object object2) {
          this();
       }
    }
@@ -131,10 +131,10 @@ public class ConnectionHandler {
       private HandlerEndpointListener() {
       }
 
-      public void propertyChange(PropertyChangeEvent var1) {
-         if ("state".equals(var1.getPropertyName())) {
-            logger.fine("Endpoint status: " + var1.getOldValue() + " -> " + var1.getNewValue());
-            switch((DscEndpointState)var1.getNewValue()) {
+      public void propertyChange(PropertyChangeEvent propertyChangeEvent2) {
+         if ("state".equals(propertyChangeEvent2.getPropertyName())) {
+            logger.fine("Endpoint status: " + propertyChangeEvent2.getOldValue() + " -> " + propertyChangeEvent2.getNewValue());
+            switch((DscEndpointState)propertyChangeEvent2.getNewValue()) {
             case READY:
                ConnectionHandler.this.endpoint.setPin("");
                ConnectionHandler.this.messenger.send(Message.ENTER_ACCESS_LEVEL, Pair.with(USER_ACCESS_LEVEL, ConnectionHandler.this.pin));
@@ -153,8 +153,8 @@ public class ConnectionHandler {
       private HandlerMessageListener() {
       }
 
-      public void newValue(NewValue var1) {
-         if (var1.isFor(Message.ENTER_ACCESS_LEVEL) && !ConnectionHandler.this.loggedIn) {
+      public void newValue(NewValue newValue2) {
+         if (newValue2.isFor(Message.ENTER_ACCESS_LEVEL) && !ConnectionHandler.this.loggedIn) {
             ConnectionHandler.this.loggedIn = true;
             ConnectionHandler.this.panelStatus.updateConnectionStatus(PanelConnStatus.CONNECTED);
             ConnectionHandler.this.setConnectionStatus(providerConnStatus.SUCCESS);
@@ -163,9 +163,9 @@ public class ConnectionHandler {
          }
       }
 
-      public void error(DscError var1) {
-         if (var1.isFor(Message.ENTER_ACCESS_LEVEL)) {
-            if (var1.getResponseCode() == INVALID_ACCESS_CODE) {
+      public void error(DscError error2) {
+         if (error2.isFor(Message.ENTER_ACCESS_LEVEL)) {
+            if (error2.getResponseCode() == INVALID_ACCESS_CODE) {
                ConnectionHandler.this.setConnectionStatus(providerConnStatus.UNAUTHORIZED);
             } else {
                ConnectionHandler.this.setConnectionStatus(providerConnStatus.INCOMPATIBLE);

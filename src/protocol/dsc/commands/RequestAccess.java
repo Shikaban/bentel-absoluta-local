@@ -29,8 +29,8 @@ public class RequestAccess extends DscCommandWithAppSeq {
       return this.identifier.toString(IDENTIFIER_CHARSET);
    }
 
-   public void setIdentifier(String var1) {
-      this.identifier.setString(IDENTIFIER_CHARSET, var1);
+   public void setIdentifier(String id) {
+      this.identifier.setString(IDENTIFIER_CHARSET, id);
    }
 
    static {

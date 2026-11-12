@@ -14,21 +14,21 @@ public class SoftwareVersionHandler extends HandshakeHandler<SoftwareVersion> {
       super(SoftwareVersion.class);
    }
 
-   public boolean validateOwnInfo(SessionInfo var1) {
-      return var1.getSoftwareVersionFields() != null;
+   public boolean validateOwnInfo(SessionInfo sessionInfo2) {
+      return sessionInfo2.getSoftwareVersionFields() != null;
    }
 
-   protected SoftwareVersion getCommand(Channel var1) {
-      String var2 = SessionInfo.getOwnInfo(var1).getSoftwareVersionFields();
-      SoftwareVersion var3 = new SoftwareVersion();
-      var3.setVersionFields(var2);
-      return var3;
+   protected SoftwareVersion getCommand(Channel channel2) {
+      String ownInfo = SessionInfo.getOwnInfo(channel2).getSoftwareVersionFields();
+      SoftwareVersion softwareVersion2 = new SoftwareVersion();
+      softwareVersion2.setVersionFields(ownInfo);
+      return softwareVersion2;
    }
 
-   protected int commandReceived(Channel var1, SoftwareVersion var2) {
-      String var3 = var2.getVersionFields();
-      SessionInfo.getPeerInfo(var1).setIdentifierOrInitKey(var3);
-      logger.fine("Peer software version fields:" + var3);
+   protected int commandReceived(Channel channel2, SoftwareVersion softwareVersion2) {
+      String versionFields = softwareVersion2.getVersionFields();
+      SessionInfo.getPeerInfo(channel2).setIdentifierOrInitKey(versionFields);
+      logger.fine("Peer software version fields:" + versionFields);
       return 0;
    }
 }

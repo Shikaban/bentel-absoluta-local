@@ -11,9 +11,9 @@ public abstract class DscAbstractCommand extends DscStruct implements DscCommand
       this(true);
    }
 
-   protected DscAbstractCommand(boolean var1) {
+   protected DscAbstractCommand(boolean enabled) {
       this.priority = Priority.NORMAL;
-      if (var1) {
+      if (enabled) {
          assert CommandDecoder.knows(this.getClass()) : "command can not be decoded because it is unknown to CommandDecoder";
       } else {
          assert !CommandDecoder.knows(this.getClass()) : "command can be decoded, but this is unexpected";
@@ -25,8 +25,8 @@ public abstract class DscAbstractCommand extends DscStruct implements DscCommand
       return this.priority;
    }
 
-   public final void setPriority(Priority var1) {
-      this.priority = var1;
+   public final void setPriority(Priority priority2) {
+      this.priority = priority2;
    }
 
    public String toString() {

@@ -12,13 +12,13 @@ public class ZoneAssignmentReading extends RequestableCommandReading<Integer, Li
       super(ZoneAssignmentConfiguration.class);
    }
 
-   protected ZoneAssignmentConfiguration prepareRequest(ChannelHandlerContext var1, Integer var2) throws Exception {
-      ZoneAssignmentConfiguration var3 = new ZoneAssignmentConfiguration();
-      var3.setPartitionNumber(var2);
-      return var3;
+   protected ZoneAssignmentConfiguration prepareRequest(ChannelHandlerContext context, Integer partitionNumber) throws Exception {
+      ZoneAssignmentConfiguration zoneAssignmentConfiguration2 = new ZoneAssignmentConfiguration();
+      zoneAssignmentConfiguration2.setPartitionNumber(partitionNumber);
+      return zoneAssignmentConfiguration2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, ZoneAssignmentConfiguration var2, List<Message.Response> var3) {
-      var3.add(new NewValue(this, var2.getPartitionNumber(), var2.getAssignedZones()));
+   protected void parseResponse(ChannelHandlerContext context, ZoneAssignmentConfiguration zoneAssignmentConfiguration2, List<Message.Response> responses) {
+      responses.add(new NewValue(this, zoneAssignmentConfiguration2.getPartitionNumber(), zoneAssignmentConfiguration2.getAssignedZones()));
    }
 }

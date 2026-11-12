@@ -7,11 +7,11 @@ import protocol.dsc.commands.UserActivity;
 import org.javatuples.Pair;
 
 public class ValidateUserCodeWriting extends Writing<Pair<Integer, String>> {
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, Pair<Integer, String> var2) throws Exception {
-      UserActivity var3 = new UserActivity();
-      var3.setPartitionNumber((Integer)var2.getValue0());
-      var3.setType(22);
-      var3.setUserCode((String)var2.getValue1());
-      return var3;
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext context, Pair<Integer, String> pair2) throws Exception {
+      UserActivity userActivity2 = new UserActivity();
+      userActivity2.setPartitionNumber((Integer)pair2.getValue0());
+      userActivity2.setType(22);
+      userActivity2.setUserCode((String)pair2.getValue1());
+      return userActivity2;
    }
 }

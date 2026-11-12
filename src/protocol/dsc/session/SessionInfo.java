@@ -32,114 +32,114 @@ public class SessionInfo {
       return this.client;
    }
 
-   public void setClient(Boolean var1) {
-      this.client = var1;
+   public void setClient(Boolean enabled) {
+      this.client = enabled;
    }
 
    public Integer getDeviceTypeOrVendorID() {
       return this.deviceTypeOrVendorID;
    }
 
-   public void setDeviceTypeOrVendorID(Integer var1) {
-      this.deviceTypeOrVendorID = var1;
+   public void setDeviceTypeOrVendorID(Integer deviceTypeOrVendorID) {
+      this.deviceTypeOrVendorID = deviceTypeOrVendorID;
    }
 
    public Integer getDeviceId() {
       return this.deviceId;
    }
 
-   public void setDeviceId(Integer var1) {
-      this.deviceId = var1;
+   public void setDeviceId(Integer deviceId) {
+      this.deviceId = deviceId;
    }
 
    public String getSoftwareVersion() {
       return this.softwareVersion;
    }
 
-   public void setSoftwareVersion(String var1) {
-      this.softwareVersion = var1;
+   public void setSoftwareVersion(String text) {
+      this.softwareVersion = text;
    }
 
    public String getProtocolVersion() {
       return this.protocolVersion;
    }
 
-   public void setProtocolVersion(String var1) {
-      this.protocolVersion = var1;
+   public void setProtocolVersion(String text) {
+      this.protocolVersion = text;
    }
 
    public Integer getTxSize() {
       return this.txSize;
    }
 
-   public void setTxSize(Integer var1) {
-      this.txSize = var1;
+   public void setTxSize(Integer txSize) {
+      this.txSize = txSize;
    }
 
    public Integer getRxSize() {
       return this.rxSize;
    }
 
-   public void setRxSize(Integer var1) {
-      this.rxSize = var1;
+   public void setRxSize(Integer rxSize) {
+      this.rxSize = rxSize;
    }
 
    public Integer getEncryptionType() {
       return this.encryptionType;
    }
 
-   public void setEncryptionType(Integer var1) {
-      this.encryptionType = var1;
+   public void setEncryptionType(Integer encryptionType) {
+      this.encryptionType = encryptionType;
    }
 
    public String getIdentifierOrInitKey() {
       return this.identifierOrInitKey;
    }
 
-   public void setIdentifierOrInitKey(String var1) {
-      this.identifierOrInitKey = var1;
+   public void setIdentifierOrInitKey(String id) {
+      this.identifierOrInitKey = id;
    }
 
    public String getSoftwareVersionFields() {
       return this.softwareVersionFields;
    }
 
-   public void setSoftwareVersionFields(String var1) {
-      this.softwareVersionFields = var1;
+   public void setSoftwareVersionFields(String text) {
+      this.softwareVersionFields = text;
    }
 
    public String getMultiPointCommId() {
       return this.multiPointCommId;
    }
 
-   public void setMultiPointCommId(String var1) {
-      this.multiPointCommId = var1;
+   public void setMultiPointCommId(String id) {
+      this.multiPointCommId = id;
    }
 
-   public static void initInfo(Channel var0, SessionInfo var1) {
-      if (var1.getClient() == null) {
+   public static void initInfo(Channel channel2, SessionInfo sessionInfo2) {
+      if (sessionInfo2.getClient() == null) {
          throw new IllegalArgumentException("invalid own info (null client)");
-      } else if (var0.attr(OWN_INFO).setIfAbsent(var1) != null) {
+      } else if (channel2.attr(OWN_INFO).setIfAbsent(sessionInfo2) != null) {
          throw new IllegalStateException("info already initialized");
       } else {
-         SessionInfo var2 = new SessionInfo();
-         var2.setClient(!var1.getClient());
-         var0.attr(PEER_INFO).set(var2);
+         SessionInfo sessionInfo3 = new SessionInfo();
+         sessionInfo3.setClient(!sessionInfo2.getClient());
+         channel2.attr(PEER_INFO).set(sessionInfo3);
       }
    }
 
-   public static SessionInfo getOwnInfo(Channel var0) {
-      return getInfo(OWN_INFO, var0);
+   public static SessionInfo getOwnInfo(Channel channel2) {
+      return getInfo(OWN_INFO, channel2);
    }
 
-   public static SessionInfo getPeerInfo(Channel var0) {
-      return getInfo(PEER_INFO, var0);
+   public static SessionInfo getPeerInfo(Channel channel2) {
+      return getInfo(PEER_INFO, channel2);
    }
 
-   private static SessionInfo getInfo(AttributeKey<SessionInfo> var0, Channel var1) {
-      SessionInfo var2 = (SessionInfo)var1.attr(var0).get();
-      if (var2 != null) {
-         return var2;
+   private static SessionInfo getInfo(AttributeKey<SessionInfo> attributeKey2, Channel channel2) {
+      SessionInfo sessionInfo2 = (SessionInfo)channel2.attr(attributeKey2).get();
+      if (sessionInfo2 != null) {
+         return sessionInfo2;
       } else {
          throw new IllegalStateException("info not initialized");
       }

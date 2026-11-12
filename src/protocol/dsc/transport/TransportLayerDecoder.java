@@ -15,42 +15,42 @@ import java.util.logging.Logger;
 public class TransportLayerDecoder extends MessageToMessageDecoder<ByteBuf> {
    private static final Logger logger = Logger.getLogger(TransportLayerDecoder.class.getName());
 
-   protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws WrongSequenceNumberException, CorruptedFrameException {
+   protected void decode(ChannelHandlerContext context, ByteBuf inputBuffer, List<Object> output) throws WrongSequenceNumberException, CorruptedFrameException {
 
-      if (var2.readableBytes() != 2 && var2.readableBytes() < 4) {
+      if (inputBuffer.readableBytes() != 2 && inputBuffer.readableBytes() < 4) {
          throw new CorruptedFrameException("invalid frame lenght");
       } else {
-         short var4 = var2.readUnsignedByte();
-         short var5 = var2.readUnsignedByte();
-         boolean var6 = SequenceHandlersHelper.isLowACK(var2);
-         SequenceHandlersHelper.Counters var7 = SequenceHandlersHelper.getCounters(var1);
-         int var8 = var6 ? 0 : var2.getUnsignedShort(var2.readerIndex());
+         short byteValue = inputBuffer.readUnsignedByte();
+         short byteValue2 = inputBuffer.readUnsignedByte();
+         boolean lowACK = SequenceHandlersHelper.isLowACK(inputBuffer);
+         SequenceHandlersHelper.Counters counters2 = SequenceHandlersHelper.getCounters(context);
+         int unsignedShort = lowACK ? 0 : inputBuffer.getUnsignedShort(inputBuffer.readerIndex());
 
          try {
-            if (!var6) {
-               if (var4 == 0) {
-                  if (!var7.isFirstMessage()) {
-                     throw new WrongSequenceNumberException(var8, "reset request");
+            if (!lowACK) {
+               if (byteValue == 0) {
+                  if (!counters2.isFirstMessage()) {
+                     throw new WrongSequenceNumberException(unsignedShort, "reset request");
                   }
                } else {
-                  if (var4 == var7.remoteSequenceNumber()) {
-                     logger.fine("Repeated sequence number " + Integer.valueOf(var4) + ": ignoring message");
+                  if (byteValue == counters2.remoteSequenceNumber()) {
+                     logger.fine("Repeated sequence number " + Integer.valueOf(byteValue) + ": ignoring message");
                      return;
                   }
 
-                  if (var4 != SequenceHandlersHelper.next(var7.remoteSequenceNumber())) {
-                     throw new WrongSequenceNumberException(var8, String.format("unexpected sequence number: %d instead of %d", Integer.valueOf(var4), SequenceHandlersHelper.next(var7.remoteSequenceNumber())));
+                  if (byteValue != SequenceHandlersHelper.next(counters2.remoteSequenceNumber())) {
+                     throw new WrongSequenceNumberException(unsignedShort, String.format("unexpected sequence number: %d instead of %d", Integer.valueOf(byteValue), SequenceHandlersHelper.next(counters2.remoteSequenceNumber())));
                   }
                }
             }
 
-            if (var5 != var7.sequenceNumber() && var5 != var7.prevSequenceNumber()) {
-               throw new WrongSequenceNumberException(var8, String.format("unexpected remote sequence number: %d instead of %d or %d", Integer.valueOf(var5), var7.sequenceNumber(), var7.prevSequenceNumber()));
+            if (byteValue2 != counters2.sequenceNumber() && byteValue2 != counters2.prevSequenceNumber()) {
+               throw new WrongSequenceNumberException(unsignedShort, String.format("unexpected remote sequence number: %d instead of %d or %d", Integer.valueOf(byteValue2), counters2.sequenceNumber(), counters2.prevSequenceNumber()));
             } else {
-               var3.add(var2.readSlice(var2.readableBytes()).retain());
+               output.add(inputBuffer.readSlice(inputBuffer.readableBytes()).retain());
             }
          } finally {
-            var7.messageReceived(var6, var4, var5);
+            counters2.messageReceived(lowACK, byteValue, byteValue2);
          }
       }
    }

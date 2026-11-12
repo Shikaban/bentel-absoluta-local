@@ -23,8 +23,8 @@ public class EventReportingConfigurationReadResponse extends DscCommandWithRespo
       return 18273;
    }
 
-   public boolean getReportingType(int var1) {
-      return ((EventReportingConfigurationRead)this.requestInstance).getReportingType(var1);
+   public boolean getReportingType(int numericValue) {
+      return ((EventReportingConfigurationRead)this.requestInstance).getReportingType(numericValue);
    }
 
    public int getEventType() {

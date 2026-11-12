@@ -21,79 +21,79 @@ public class CommandQueueHandler extends ChannelOutboundHandlerAdapter {
    private final Map<Priority, Queue<CommandQueueHandler.WaitingMsg>> queues;
 
    public CommandQueueHandler() {
-      Builder<Priority, Queue<CommandQueueHandler.WaitingMsg>> var1 = ImmutableMap.builder();
-      Priority[] var2 = Priority.values();
-      int var3 = var2.length;
+      Builder<Priority, Queue<CommandQueueHandler.WaitingMsg>> queueBuilder = ImmutableMap.builder();
+      Priority[] priorities = Priority.values();
+      int priorityCount = priorities.length;
 
-      for(int var4 = 0; var4 < var3; ++var4) {
-         Priority var5 = var2[var4];
-         var1.put(var5, new ArrayDeque<CommandQueueHandler.WaitingMsg>());
+      for(int index = 0; index < priorityCount; ++index) {
+         Priority priority = priorities[index];
+         queueBuilder.put(priority, new ArrayDeque<CommandQueueHandler.WaitingMsg>());
       }
 
-      this.queues = var1.build();
+      this.queues = queueBuilder.build();
    }
 
-   public void handlerRemoved(ChannelHandlerContext var1) throws Exception {
-      Priority[] var2 = Priority.values();
-      int var3 = var2.length;
+   public void handlerRemoved(ChannelHandlerContext context) throws Exception {
+      Priority[] priorities = Priority.values();
+      int priorityCount = priorities.length;
 
-      for(int var4 = 0; var4 < var3; ++var4) {
-         Priority var5 = var2[var4];
-         Queue<CommandQueueHandler.WaitingMsg> var6 = this.queues.get(var5);
-         if (!var6.isEmpty()) {
-            logger.finer("Removing " + var6.size() + " enqueued commands with priority " + var5);
-            CancellationException var7 = new CancellationException("channel inactivated before sending");
-            for (CommandQueueHandler.WaitingMsg var9 : var6) {
-               var9.promise.setFailure(var7);
+      for(int index = 0; index < priorityCount; ++index) {
+         Priority priority = priorities[index];
+         Queue<CommandQueueHandler.WaitingMsg> priorityQueue = this.queues.get(priority);
+         if (!priorityQueue.isEmpty()) {
+            logger.finer("Removing " + priorityQueue.size() + " enqueued commands with priority " + priority);
+            CancellationException cancellationException = new CancellationException("channel inactivated before sending");
+            for (CommandQueueHandler.WaitingMsg waitingMessage : priorityQueue) {
+               waitingMessage.promise.setFailure(cancellationException);
             }
 
-            var6.clear();
+            priorityQueue.clear();
          }
       }
    }
 
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      if (var2 instanceof DscCommand) {
-         DscCommand var4 = (DscCommand)var2;
-         if (var4.getPriority() == null) {
-            logger.finer("Sending immediately: " + var4);
-            var1.write(var4, var3);
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      if (object2 instanceof DscCommand) {
+         DscCommand command = (DscCommand)object2;
+         if (command.getPriority() == null) {
+            logger.finer("Sending immediately: " + command);
+            context.write(command, promise);
          } else {
-            this.enqueue(var1, var4, var3);
-            this.tryToSend(var1);
+            this.enqueue(context, command, promise);
+            this.tryToSend(context);
          }
       } else {
-         this.tryToSend(var1);
-         super.write(var1, var2, var3);
+         this.tryToSend(context);
+         super.write(context, object2, promise);
       }
 
    }
 
-   private void enqueue(ChannelHandlerContext var1, DscCommand var2, ChannelPromise var3) throws IllegalStateException {
-      Priority var4 = var2.getPriority();
-      Queue<CommandQueueHandler.WaitingMsg> var5 = this.queues.get(var4);
-      logger.finest("Enqueuing a command with priority " + var4 + ": " + var2);
-      if (var5.size() < 4096) {
-         var5.add(new CommandQueueHandler.WaitingMsg(var2, var3));
+   private void enqueue(ChannelHandlerContext context, DscCommand command, ChannelPromise promise) throws IllegalStateException {
+      Priority priority = command.getPriority();
+      Queue<CommandQueueHandler.WaitingMsg> priorityQueue = this.queues.get(priority);
+      logger.finest("Enqueuing a command with priority " + priority + ": " + command);
+      if (priorityQueue.size() < 4096) {
+         priorityQueue.add(new CommandQueueHandler.WaitingMsg(command, promise));
       } else {
          logger.warning("Command queue is full");
-         IllegalStateException var7 = new IllegalStateException("command queue is full");
-         var1.fireExceptionCaught(var7);
-         throw var7;
+         IllegalStateException exception = new IllegalStateException("command queue is full");
+         context.fireExceptionCaught(exception);
+         throw exception;
       }
    }
 
-   private void tryToSend(ChannelHandlerContext var1) {
-      if (TransportLayerEncoder.isReadyForANewCommand(var1)) {
-         Priority[] var2 = Priority.values();
-         int var3 = var2.length;
+   private void tryToSend(ChannelHandlerContext context) {
+      if (TransportLayerEncoder.isReadyForANewCommand(context)) {
+         Priority[] priorities = Priority.values();
+         int priorityCount = priorities.length;
 
-         for(int var4 = 0; var4 < var3; ++var4) {
-            Priority var5 = var2[var4];
-            CommandQueueHandler.WaitingMsg var6 = this.queues.get(var5).poll();
-            if (var6 != null) {
-               logger.finest("Sending enqueued command with priority " + var5 + ": " + var6.cmd);
-               var1.write(var6.cmd, var6.promise);
+         for(int index = 0; index < priorityCount; ++index) {
+            Priority priority = priorities[index];
+            CommandQueueHandler.WaitingMsg waitingMessage = this.queues.get(priority).poll();
+            if (waitingMessage != null) {
+               logger.finest("Sending enqueued command with priority " + priority + ": " + waitingMessage.cmd);
+               context.write(waitingMessage.cmd, waitingMessage.promise);
                break;
             }
          }
@@ -104,9 +104,9 @@ public class CommandQueueHandler extends ChannelOutboundHandlerAdapter {
       final DscCommand cmd;
       final ChannelPromise promise;
 
-      WaitingMsg(DscCommand var1, ChannelPromise var2) {
-         this.cmd = var1;
-         this.promise = var2;
+      WaitingMsg(DscCommand command, ChannelPromise promise2) {
+         this.cmd = command;
+         this.promise = promise2;
       }
 
       public String toString() {

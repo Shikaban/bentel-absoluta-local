@@ -1,8 +1,8 @@
 package protocol.dsc.errors;
 
 public class WrongCommandLengthException extends DscProtocolException {
-   public WrongCommandLengthException(int var1, String var2) {
-      super(var1, var2);
+   public WrongCommandLengthException(int numericValue, String text) {
+      super(numericValue, text);
    }
 
    public int getErrorCode() {

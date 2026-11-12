@@ -12,11 +12,11 @@ public class MaxUsersReading extends RequestableCommandReading<Void, Integer, Sy
       super(SystemCapabilities.class);
    }
 
-   protected SystemCapabilities prepareRequest(ChannelHandlerContext var1, Void var2) {
+   protected SystemCapabilities prepareRequest(ChannelHandlerContext context, Void void2) {
       return new SystemCapabilities();
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, SystemCapabilities var2, List<Message.Response> var3) {
-      var3.add(new NewValue(this, var2.getMaxUsers()));
+   protected void parseResponse(ChannelHandlerContext context, SystemCapabilities systemCapabilities2, List<Message.Response> responses) {
+      responses.add(new NewValue(this, systemCapabilities2.getMaxUsers()));
    }
 }

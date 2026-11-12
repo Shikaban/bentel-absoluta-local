@@ -23,92 +23,93 @@ public class RequestAccessAESHelper {
    private final DscVariableBytes identifier;
    private static final java.security.SecureRandom SECURE_RANDOM = new java.security.SecureRandom();
 
-   public RequestAccessAESHelper(RequestAccess var1) {
-      this.identifier = var1.identifier();
+   public RequestAccessAESHelper(RequestAccess requestAccess) {
+      this.identifier = requestAccess.identifier();
 
       assert this.identifier != null;
 
    }
 
-   public void encryptKey(String var1, byte[] var2) {
-      this.encryptKey(var1, var2, getRandomBytes());
+   public void encryptKey(String initializationKey, byte[] sessionKey) {
+      this.encryptKey(initializationKey, sessionKey, getRandomBytes());
    }
 
-   public void encryptKey(String var1, byte[] var2, byte[] var3) {
-      Preconditions.checkArgument(var2.length == KEY_LENGTH);
-      Preconditions.checkArgument(var3.length == KEY_LENGTH);
+   public void encryptKey(String initializationKey, byte[] sessionKey, byte[] challengeBytes) {
+      Preconditions.checkArgument(sessionKey.length == KEY_LENGTH);
+      Preconditions.checkArgument(challengeBytes.length == KEY_LENGTH);
       this.identifier.setLength(IDENTIFIER_LENGTH);
-      byte[] var4 = this.identifier.bytes();
+      byte[] identifierBytes = this.identifier.bytes();
 
-      for(int var5 = 0; var5 < KEY_LENGTH; ++var5) {
-         var4[var5] = var3[var5];
-         var4[KEY_LENGTH + 2 * var5] = var3[var5];
-         var4[KEY_LENGTH + 2 * var5 + 1] = var2[var5];
+      // The clear challenge is repeated and interleaved with the session key in the encrypted part.
+      for(int index = 0; index < KEY_LENGTH; ++index) {
+         identifierBytes[index] = challengeBytes[index];
+         identifierBytes[KEY_LENGTH + 2 * index] = challengeBytes[index];
+         identifierBytes[KEY_LENGTH + 2 * index + 1] = sessionKey[index];
       }
 
-      Cipher var8 = getCipher(1, var1);
+      Cipher cipher = getCipher(1, initializationKey);
 
       try {
-         var8.doFinal(var4, KEY_LENGTH, 32, var4, KEY_LENGTH);
-      } catch (IllegalBlockSizeException | BadPaddingException | ShortBufferException var7) {
-         throw new RuntimeException("unexpected exception", var7);
+         cipher.doFinal(identifierBytes, KEY_LENGTH, 32, identifierBytes, KEY_LENGTH);
+      } catch (IllegalBlockSizeException | BadPaddingException | ShortBufferException exception) {
+         throw new RuntimeException("unexpected exception", exception);
       }
    }
 
-   public byte[] decryptKey(String var1) {
+   public byte[] decryptKey(String initializationKey) {
       try {
          if (this.identifier.length() != IDENTIFIER_LENGTH) {
             throw new DecoderException(String.format("unexpected identifier length (%d istead of %d)", this.identifier.length(), IDENTIFIER_LENGTH));
          } else {
-            byte[] var2 = this.identifier.bytes();
-            Cipher var3 = getCipher(2, var1);
-            var3.doFinal(var2, KEY_LENGTH, 32, var2, KEY_LENGTH);
-            byte[] var4 = new byte[16];
+            byte[] identifierBytes = this.identifier.bytes();
+            Cipher cipher = getCipher(2, initializationKey);
+            cipher.doFinal(identifierBytes, KEY_LENGTH, 32, identifierBytes, KEY_LENGTH);
+            byte[] sessionKey = new byte[16];
 
-            for(int var5 = 0; var5 < KEY_LENGTH; ++var5) {
-               byte var6 = var2[var5];
-               byte var7 = var2[KEY_LENGTH + 2 * var5];
-               if (var6 != var7) {
-                  throw new DecoderException(String.format("unexpected byte (0x%02X istead of 0x%02X)", var7, var6));
+            for(int index = 0; index < KEY_LENGTH; ++index) {
+               byte challengeByte = identifierBytes[index];
+               byte repeatedChallengeByte = identifierBytes[KEY_LENGTH + 2 * index];
+               if (challengeByte != repeatedChallengeByte) {
+                  throw new DecoderException(String.format("unexpected byte (0x%02X istead of 0x%02X)", repeatedChallengeByte, challengeByte));
                }
 
-               var4[var5] = var2[KEY_LENGTH + 2 * var5 + 1];
+               sessionKey[index] = identifierBytes[KEY_LENGTH + 2 * index + 1];
             }
 
-            return var4;
+            return sessionKey;
          }
-      } catch (RuntimeException ex) {
-         logger.severe("Invalid access request: " + ex);
+      } catch (RuntimeException exception) {
+         logger.severe("Invalid access request: " + exception);
          return null;
-      } catch (IllegalBlockSizeException | BadPaddingException | ShortBufferException ex) {
-         throw new RuntimeException("unexpected exception", ex);
+      } catch (IllegalBlockSizeException | BadPaddingException | ShortBufferException exception) {
+         throw new RuntimeException("unexpected exception", exception);
       }
    }
 
-   private static Cipher getCipher(int var0, String var1) {
-      long var2;
+   private static Cipher getCipher(int operationMode, String initializationKey) {
+      long initializationKeyValue;
       try {
-         var2 = DscUtils.validateUInt(Long.parseLong(var1.substring(0, 8), 16));
-      } catch (IndexOutOfBoundsException | IllegalArgumentException ex) {
-         throw new IllegalArgumentException(String.format("invalid init key '%s': %s", var1, ex.getMessage()), ex);
+         initializationKeyValue = DscUtils.validateUInt(Long.parseLong(initializationKey.substring(0, 8), 16));
+      } catch (IndexOutOfBoundsException | IllegalArgumentException exception) {
+         throw new IllegalArgumentException(String.format("invalid init key '%s': %s", initializationKey, exception.getMessage()), exception);
       }
 
-      byte[] var4 = new byte[16];
+      byte[] keyBytes = new byte[16];
 
-      for(int var5 = 0; var5 < 4; ++var5) {
-         byte var6 = (byte)((int)(var2 >> 8 * (3 - var5)));
+      for(int index = 0; index < 4; ++index) {
+         byte initializationKeyByte = (byte)((int)(initializationKeyValue >> 8 * (3 - index)));
 
-         for(int var7 = 0; var7 < 4; ++var7) {
-            var4[4 * var7 + var5] = var6;
+         for(int index2 = 0; index2 < 4; ++index2) {
+            keyBytes[4 * index2 + index] = initializationKeyByte;
          }
       }
 
-      return DscUtils.getAESCipher(var4, var0);
+      return DscUtils.getAESCipher(keyBytes, operationMode);
    }
 
    public static byte[] getRandomBytes() {
-      byte[] bytes = new byte[16];
-      SECURE_RANDOM.nextBytes(bytes);
-      return bytes;
+      byte[] randomBytes = new byte[16];
+      SECURE_RANDOM.nextBytes(randomBytes);
+      return randomBytes;
    }
 }

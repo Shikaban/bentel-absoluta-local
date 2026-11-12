@@ -14,24 +14,24 @@ import java.util.List;
 @Sharable
 public class DataDecoder extends MessageToMessageDecoder<ByteBuf> {
 
-   protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws CorruptedFrameException {
+   protected void decode(ChannelHandlerContext context, ByteBuf inputBuffer, List<Object> output) throws CorruptedFrameException {
 
-      if (var2.readableBytes() < 5) {
+      if (inputBuffer.readableBytes() < 5) {
          throw new CorruptedFrameException("too short frame");
       } else {
-         int var4 = var2.readerIndex();
-         int var5 = Decoders.readBytesToFollow(var2);
-         if (var2.readableBytes() < var5) {
+         int frameStartIndex = inputBuffer.readerIndex();
+         int bytesToFollow = Decoders.readBytesToFollow(inputBuffer);
+         if (inputBuffer.readableBytes() < bytesToFollow) {
             throw new CorruptedFrameException("wrong frame length");
          } else {
-            ByteBuf var6 = var2.readSlice(var5 - 2);
-            int var7 = var2.readerIndex();
-            int var8 = var2.readUnsignedShort();
-            int var9 = Crc16.CRC_16_CCITT.calculate(var2.slice(var4, var7 - var4).retain());
-            if (var8 == var9) {
-               var3.add(var6.retain());
+            ByteBuf frameData = inputBuffer.readSlice(bytesToFollow - 2);
+            int crcPosition = inputBuffer.readerIndex();
+            int receivedCrc = inputBuffer.readUnsignedShort();
+            int calculatedCrc = Crc16.CRC_16_CCITT.calculate(inputBuffer.slice(frameStartIndex, crcPosition - frameStartIndex).retain());
+            if (receivedCrc == calculatedCrc) {
+               output.add(frameData.retain());
             } else {
-               throw new CorruptedFrameException(String.format("wrong crc (0x%04X instead of 0x%04X)", var9, var8));
+               throw new CorruptedFrameException(String.format("wrong crc (0x%04X instead of 0x%04X)", calculatedCrc, receivedCrc));
             }
          }
       }

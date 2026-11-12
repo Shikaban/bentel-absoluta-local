@@ -13,25 +13,25 @@ import java.util.List;
 public class RequestedReadingHandler extends ChannelDuplexHandler {
    private final List<Message.Response> out = new ArrayList<Message.Response>();
 
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      DscCommandWithAppSeq var4 = Reading.tryToPrepare(var1, var2);
-      if (var4 != null) {
-         var1.write(var4, var3);
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      DscCommandWithAppSeq commandWithAppSeq = Reading.tryToPrepare(context, object2);
+      if (commandWithAppSeq != null) {
+         context.write(commandWithAppSeq, promise);
       } else {
-         super.write(var1, var2, var3);
+         super.write(context, object2, promise);
       }
 
    }
 
-   public void channelRead(ChannelHandlerContext var1, Object var2) throws Exception {
+   public void channelRead(ChannelHandlerContext context, Object object2) throws Exception {
       try {
-         Reading.tryToParse(var1, var2, this.out);
+         Reading.tryToParse(context, object2, this.out);
          if (!this.out.isEmpty()) {
             for (Message.Response response : this.out) {
-               var1.fireChannelRead(response);
+               context.fireChannelRead(response);
             }
          } else {
-            super.channelRead(var1, var2);
+            super.channelRead(context, object2);
          }
       } finally {
          this.out.clear();

@@ -14,10 +14,10 @@ public class TestCommand extends DscCommandWithAppSeq {
    private final int commandNumber;
    private final DscString payload = DscString.newBCDString();
 
-   public TestCommand(int var1) {
+   public TestCommand(int numericValue) {
       super(false);
-      this.commandNumber = DscUtils.validateUShort(var1);
-      logger.info("New test command 0x%04X; use it only for test " + var1);
+      this.commandNumber = DscUtils.validateUShort(numericValue);
+      logger.info("New test command 0x%04X; use it only for test " + numericValue);
    }
 
    protected List<DscSerializable> getFields() {
@@ -32,7 +32,7 @@ public class TestCommand extends DscCommandWithAppSeq {
       return this.payload.toString();
    }
 
-   public void setPayload(String var1) {
-      this.payload.setString(var1);
+   public void setPayload(String text) {
+      this.payload.setString(text);
    }
 }

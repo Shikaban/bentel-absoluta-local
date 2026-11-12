@@ -20,48 +20,48 @@ public class NumberedLabelReading extends RequestableCommandReading<Integer, Str
    private final int max;
    private final Charset charset;
 
-   public NumberedLabelReading(int var1) {
-      this(var1, 0, DscCharsets.UNICODE);
+   public NumberedLabelReading(int optionId) {
+      this(optionId, 0, DscCharsets.UNICODE);
    }
 
-   public NumberedLabelReading(int var1, int var2, Charset var3) {
-      this(var1, var2, Integer.MAX_VALUE, var3);
+   public NumberedLabelReading(int optionId, int offset, Charset charset) {
+      this(optionId, offset, Integer.MAX_VALUE, charset);
    }
 
-   public NumberedLabelReading(int var1, int var2, int var3, Charset var4) {
+   public NumberedLabelReading(int optionId, int offset, int max, Charset charset) {
       super(Configuration.class);
-      this.optionId = var1;
-      this.offset = var2;
-      this.max = var3;
-      this.charset = (Charset)Preconditions.checkNotNull(var4);
+      this.optionId = optionId;
+      this.offset = offset;
+      this.max = max;
+      this.charset = (Charset)Preconditions.checkNotNull(charset);
    }
 
-   protected Configuration prepareRequest(ChannelHandlerContext var1, Integer var2) {
-      Preconditions.checkArgument(var2 >= 1, "label number must be >= 1");
-      Preconditions.checkArgument(var2 <= this.max, "label number must be <= " + this.max);
-      Configuration var3 = new Configuration();
-      var3.setOptionId(this.optionId);
-      var3.setOptionIdOffsetFrom(var2 + this.offset);
-      var3.setOptionIdOffsetTo(var2 + this.offset);
-      return var3;
+   protected Configuration prepareRequest(ChannelHandlerContext context, Integer labelNumber) {
+      Preconditions.checkArgument(labelNumber >= 1, "label number must be >= 1");
+      Preconditions.checkArgument(labelNumber <= this.max, "label number must be <= " + this.max);
+      Configuration configuration2 = new Configuration();
+      configuration2.setOptionId(this.optionId);
+      configuration2.setOptionIdOffsetFrom(labelNumber + this.offset);
+      configuration2.setOptionIdOffsetTo(labelNumber + this.offset);
+      return configuration2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, Configuration var2, List<Message.Response> var3) {
-      if (var2.getOptionId() == this.optionId) {
-         Integer var4 = var2.getOptionIdOffsetFrom();
-         List<String> var5 = var2.getStrings(this.charset);
-         if (var4 == null) {
+   protected void parseResponse(ChannelHandlerContext context, Configuration configuration2, List<Message.Response> responses) {
+      if (configuration2.getOptionId() == this.optionId) {
+         Integer optionIdOffsetFrom = configuration2.getOptionIdOffsetFrom();
+         List<String> strings = configuration2.getStrings(this.charset);
+         if (optionIdOffsetFrom == null) {
             logger.warning("Unexpected null from for option id: " + this.optionId);
             return;
          }
 
-         int var6 = var4 - this.offset;
+         int labelNumber = optionIdOffsetFrom - this.offset;
 
-         for (String var8 : var5) {
-         if (1 <= var6 && var6 <= this.max) {
-            var3.add(new NewValue(this, var6, var8));
+         for (String text : strings) {
+         if (1 <= labelNumber && labelNumber <= this.max) {
+            responses.add(new NewValue(this, labelNumber, text));
          }
-         ++var6;
+         ++labelNumber;
          }
       }
 

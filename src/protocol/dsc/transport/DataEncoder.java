@@ -11,19 +11,19 @@ import protocol.dsc.util.Crc16;
 @Sharable
 public class DataEncoder extends MessageToByteEncoder<ByteBuf> {
 
-   protected void encode(ChannelHandlerContext var1, ByteBuf var2, ByteBuf var3) throws EncoderException {
+   protected void encode(ChannelHandlerContext context, ByteBuf buffer, ByteBuf outputBuffer) throws EncoderException {
 
-      int var4 = var2.readableBytes() + 2;
-      if (var4 >= 4 && var4 <= 32767) {
-         if (var4 <= 127) {
-            var3.writeByte(var4);
+      int payloadLength = buffer.readableBytes() + 2;
+      if (payloadLength >= 4 && payloadLength <= 32767) {
+         if (payloadLength <= 127) {
+            outputBuffer.writeByte(payloadLength);
          } else {
-            var3.writeShort(var4 | 0x8000);
+            outputBuffer.writeShort(payloadLength | 0x8000);
          }
 
-         var3.writeBytes(var2);
-         int var5 = Crc16.CRC_16_CCITT.calculate(var3.slice().retain());
-         var3.writeShort(var5);
+         outputBuffer.writeBytes(buffer);
+         int crc = Crc16.CRC_16_CCITT.calculate(outputBuffer.slice().retain());
+         outputBuffer.writeShort(crc);
       } else {
          throw new EncoderException("invalid message length");
       }

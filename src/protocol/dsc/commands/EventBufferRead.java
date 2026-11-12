@@ -25,23 +25,23 @@ public class EventBufferRead extends DscCommandWithResponse {
       return this.bufferID.toInt();
    }
 
-   public void setBufferID(int var1) {
-      this.bufferID.set((long)var1);
+   public void setBufferID(int value) {
+      this.bufferID.set((long)value);
    }
 
    public int getEventNumber() {
       return this.eventNumber.toInt();
    }
 
-   public void setEventNumber(int var1) {
-      this.eventNumber.set((long)var1);
+   public void setEventNumber(int value) {
+      this.eventNumber.set((long)value);
    }
 
    public int getNumberOfEvents() {
       return this.numberOfEvents.toInt();
    }
 
-   public void setNumberOfEvents(int var1) {
-      this.numberOfEvents.set((long)var1);
+   public void setNumberOfEvents(int value) {
+      this.numberOfEvents.set((long)value);
    }
 }

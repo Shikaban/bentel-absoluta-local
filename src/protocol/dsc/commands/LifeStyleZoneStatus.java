@@ -22,7 +22,7 @@ public class LifeStyleZoneStatus extends DscAbstractCommand {
       return this.zoneNumber.toPositiveInt();
    }
 
-   public final void setZoneNumber(int var1) {
-      this.zoneNumber.setPositiveInt(var1);
+   public final void setZoneNumber(int value) {
+      this.zoneNumber.setPositiveInt(value);
    }
 }

@@ -8,26 +8,26 @@ import io.netty.util.AttributeKey;
 class SequenceHandlersHelper {
    private static final AttributeKey<SequenceHandlersHelper.Counters> COUNTERS_KEY = AttributeKey.valueOf("SequenceHandlersHelper.counters");
 
-   static int next(int var0) {
-      return var0 < 255 ? var0 + 1 : 1;
+   static int next(int sequenceNumber) {
+      return sequenceNumber < 255 ? sequenceNumber + 1 : 1;
    }
 
-   static boolean isLowACK(ByteBuf var0) {
-      return !var0.isReadable();
+   static boolean isLowACK(ByteBuf buffer) {
+      return !buffer.isReadable();
    }
 
-   static SequenceHandlersHelper.Counters getCounters(ChannelHandlerContext var0) {
-      Attribute<SequenceHandlersHelper.Counters> var1 = var0.channel().attr(COUNTERS_KEY);
-      SequenceHandlersHelper.Counters var2 = (SequenceHandlersHelper.Counters)var1.get();
+   static SequenceHandlersHelper.Counters getCounters(ChannelHandlerContext context) {
+      Attribute<SequenceHandlersHelper.Counters> attribute2 = context.channel().attr(COUNTERS_KEY);
+      SequenceHandlersHelper.Counters counters2 = (SequenceHandlersHelper.Counters)attribute2.get();
 
-      assert var2 == null || var2.thread == Thread.currentThread();
+      assert counters2 == null || counters2.thread == Thread.currentThread();
 
-      if (var2 == null) {
-         var2 = new SequenceHandlersHelper.Counters();
-         var1.set(var2);
+      if (counters2 == null) {
+         counters2 = new SequenceHandlersHelper.Counters();
+         attribute2.set(counters2);
       }
 
-      return var2;
+      return counters2;
    }
 
    private SequenceHandlersHelper() {
@@ -62,8 +62,8 @@ class SequenceHandlersHelper {
          return this.remoteSequenceNumber;
       }
 
-      void setNextSequenceNumber(boolean var1) {
-         if (!var1 && !this.firstMessage) {
+      void setNextSequenceNumber(boolean enabled) {
+         if (!enabled && !this.firstMessage) {
             this.prevSequenceNumber = this.sequenceNumber;
             this.sequenceNumber = SequenceHandlersHelper.next(this.sequenceNumber);
          }
@@ -71,17 +71,17 @@ class SequenceHandlersHelper {
          this.firstMessage = false;
       }
 
-      void messageReceived(boolean var1, int var2, int var3) {
-         if (!var1) {
-            this.remoteSequenceNumber = var2;
+      void messageReceived(boolean enabled, int remoteSequenceNumber, int lastReceivedACK) {
+         if (!enabled) {
+            this.remoteSequenceNumber = remoteSequenceNumber;
          }
 
-         this.lastReceivedACK = var3;
+         this.lastReceivedACK = lastReceivedACK;
          this.firstMessage = false;
       }
 
-      void setSentRemoteSequenceNumber(int var1) {
-         this.lastSentACK = var1;
+      void setSentRemoteSequenceNumber(int value) {
+         this.lastSentACK = value;
       }
 
       boolean isReadyForANewCommand() {
@@ -102,7 +102,7 @@ class SequenceHandlersHelper {
       }
 
       // $FF: synthetic method
-      Counters(Object var1) {
+      Counters(Object object2) {
          this();
       }
    }

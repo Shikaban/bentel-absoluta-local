@@ -13,18 +13,18 @@ public class ZoneBypassStatusReading extends RequestableCommandReading<Void, Lis
       super(ZoneBypassStatus.class);
    }
 
-   protected ZoneBypassStatus prepareRequest(ChannelHandlerContext var1, Void var2) {
-      ZoneBypassStatus var3 = new ZoneBypassStatus();
-      var3.setGlobalPartition();
-      return var3;
+   protected ZoneBypassStatus prepareRequest(ChannelHandlerContext context, Void void2) {
+      ZoneBypassStatus zoneBypassStatus2 = new ZoneBypassStatus();
+      zoneBypassStatus2.setGlobalPartition();
+      return zoneBypassStatus2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, ZoneBypassStatus var2, List<Message.Response> var3) {
-      if (var2.getPartitionNumber() == 0) {
-         List<Integer> var4 = var2.getBypassedZones();
-         var3.add(new NewValue(this, var4));
+   protected void parseResponse(ChannelHandlerContext context, ZoneBypassStatus zoneBypassStatus2, List<Message.Response> responses) {
+      if (zoneBypassStatus2.getPartitionNumber() == 0) {
+         List<Integer> bypassedZones = zoneBypassStatus2.getBypassedZones();
+         responses.add(new NewValue(this, bypassedZones));
       } else {
-         var3.add(DscError.newMessageError(this, null, (Integer)null, "unexpected zone bypass status for specific partition " + var2.getPartitionNumber()));
+         responses.add(DscError.newMessageError(this, null, (Integer)null, "unexpected zone bypass status for specific partition " + zoneBypassStatus2.getPartitionNumber()));
       }
 
    }

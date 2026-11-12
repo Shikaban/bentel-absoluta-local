@@ -16,28 +16,28 @@ public class SystemTroubleStatusReading extends RequestableCommandReading<Void, 
       super(SystemTroubleStatus.class);
    }
 
-   protected SystemTroubleStatus prepareRequest(ChannelHandlerContext var1, Void var2) throws Exception {
-      SystemTroubleStatus var3 = new SystemTroubleStatus();
-      var3.setRequestAll();
-      return var3;
+   protected SystemTroubleStatus prepareRequest(ChannelHandlerContext context, Void void2) throws Exception {
+      SystemTroubleStatus systemTroubleStatus2 = new SystemTroubleStatus();
+      systemTroubleStatus2.setRequestAll();
+      return systemTroubleStatus2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, SystemTroubleStatus var2, List<Message.Response> var3) {
-      List<SystemTroubleStatus.Trouble> var4 = var2.getTroubles();
-      List<Pair<Integer, Integer>> var5 = new ArrayList<Pair<Integer, Integer>>();
-      for (SystemTroubleStatus.Trouble trouble : var4) {
+   protected void parseResponse(ChannelHandlerContext context, SystemTroubleStatus systemTroubleStatus2, List<Message.Response> responses) {
+      List<SystemTroubleStatus.Trouble> troubles = systemTroubleStatus2.getTroubles();
+      List<Pair<Integer, Integer>> items = new ArrayList<Pair<Integer, Integer>>();
+      for (SystemTroubleStatus.Trouble trouble : troubles) {
          int deviceModuleType = trouble.getDeviceModuleType();
          for (Integer troubleType : trouble.getTroubleTypes()) {
-         var5.add(Pair.with(deviceModuleType, troubleType));
+         items.add(Pair.with(deviceModuleType, troubleType));
          }
       }
 
-      var3.add(new NewValue(this, var5));
+      responses.add(new NewValue(this, items));
    }
 
-   protected void parseCommandResponse(ChannelHandlerContext var1, Void var2, CommandResponse var3, List<Message.Response> var4) {
-      if (var3.getResponseCode() == 26) {
-         var4.add(new NewValue(this, Collections.emptyList()));
+   protected void parseCommandResponse(ChannelHandlerContext context, Void void2, CommandResponse commandResponse2, List<Message.Response> responses) {
+      if (commandResponse2.getResponseCode() == 26) {
+         responses.add(new NewValue(this, Collections.emptyList()));
       }
 
    }

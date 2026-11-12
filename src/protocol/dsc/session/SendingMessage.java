@@ -10,10 +10,10 @@ public class SendingMessage<P, V> {
    private final P param;
    private final Priority priority;
 
-   public SendingMessage(Message<P, V> var1, P var2, Priority var3) {
-      this.message = Preconditions.checkNotNull(var1);
-      this.param = var2;
-      this.priority = (Priority)Preconditions.checkNotNull(var3);
+   public SendingMessage(Message<P, V> message2, P p2, Priority priority2) {
+      this.message = Preconditions.checkNotNull(message2);
+      this.param = p2;
+      this.priority = (Priority)Preconditions.checkNotNull(priority2);
    }
 
    public Message<P, V> getMessage() {

@@ -7,14 +7,14 @@ import protocol.dsc.commands.SingleZoneBypassWrite;
 import org.javatuples.Triplet;
 
 public class SingleZoneBypassWriting extends Writing<Triplet<Integer, Integer, Boolean>> {
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, Triplet<Integer, Integer, Boolean> var2) throws Exception {
-      Integer var3 = (Integer)var2.getValue0();
-      int var4 = (Integer)var2.getValue1();
-      boolean var5 = (Boolean)var2.getValue2();
-      SingleZoneBypassWrite var6 = new SingleZoneBypassWrite();
-      var6.setPartitionNumber(var3);
-      var6.setZoneNumber(var4);
-      var6.setBypass(var5);
-      return var6;
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext context, Triplet<Integer, Integer, Boolean> triplet2) throws Exception {
+      Integer partitionNumber = (Integer)triplet2.getValue0();
+      int zoneNumber = (Integer)triplet2.getValue1();
+      boolean enabled = (Boolean)triplet2.getValue2();
+      SingleZoneBypassWrite singleZoneBypassWrite2 = new SingleZoneBypassWrite();
+      singleZoneBypassWrite2.setPartitionNumber(partitionNumber);
+      singleZoneBypassWrite2.setZoneNumber(zoneNumber);
+      singleZoneBypassWrite2.setBypass(enabled);
+      return singleZoneBypassWrite2;
    }
 }

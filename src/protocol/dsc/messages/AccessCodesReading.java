@@ -15,14 +15,14 @@ public class AccessCodesReading extends Reading<Pair<Integer, Integer>, List<Str
       super(AccessCodesResponse.class);
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, AccessCodesResponse var2, List<Message.Response> var3) {
-      var3.add(new NewValue(this, Pair.with(var2.getUserNumberStart(), var2.getNumberOfUsers()), var2.getCodes()));
+   protected void parseResponse(ChannelHandlerContext context, AccessCodesResponse accessCodesResponse2, List<Message.Response> responses) {
+      responses.add(new NewValue(this, Pair.with(accessCodesResponse2.getUserNumberStart(), accessCodesResponse2.getNumberOfUsers()), accessCodesResponse2.getCodes()));
    }
 
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, Pair<Integer, Integer> var2) throws Exception {
-      AccessCodes var3 = new AccessCodes();
-      var3.setUserNumberStart((Integer)var2.getValue0());
-      var3.setNumberOfUsers((Integer)var2.getValue1());
-      return var3;
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext context, Pair<Integer, Integer> pair2) throws Exception {
+      AccessCodes accessCodes2 = new AccessCodes();
+      accessCodes2.setUserNumberStart((Integer)pair2.getValue0());
+      accessCodes2.setNumberOfUsers((Integer)pair2.getValue1());
+      return accessCodes2;
    }
 }

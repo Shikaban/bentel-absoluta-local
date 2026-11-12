@@ -8,11 +8,11 @@ import protocol.dsc.commands.DscCommand;
 
 @Sharable
 public class FlushCommandHandler extends ChannelOutboundHandlerAdapter {
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      if (var2 instanceof DscCommand) {
-         var1.writeAndFlush(var2, var3);
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      if (object2 instanceof DscCommand) {
+         context.writeAndFlush(object2, promise);
       } else {
-         super.write(var1, var2, var3);
+         super.write(context, object2, promise);
       }
 
    }

@@ -35,10 +35,10 @@ public class SectionRead extends DscCommandWithResponse {
       return this.moduleNumber.isPresent() ? ((DscNumber)this.moduleNumber.get()).toInt() : null;
    }
 
-   public void setModuleNumber(Integer var1) {
-      this.flags.set(MODULE_NUMBER_BIT, (Boolean)(var1 != null));
-      if (var1 != null) {
-         ((DscNumber)this.moduleNumber.get()).set((long)var1);
+   public void setModuleNumber(Integer moduleNumber) {
+      this.flags.set(MODULE_NUMBER_BIT, (Boolean)(moduleNumber != null));
+      if (moduleNumber != null) {
+         ((DscNumber)this.moduleNumber.get()).set((long)moduleNumber);
       }
 
    }
@@ -47,28 +47,28 @@ public class SectionRead extends DscCommandWithResponse {
       return this.mainSectionNumber.toInt();
    }
 
-   public void setMainSectionNumber(int var1) {
-      this.mainSectionNumber.set((long)var1);
+   public void setMainSectionNumber(int value) {
+      this.mainSectionNumber.set((long)value);
    }
 
    public List<Integer> getSubSectionNumbers() {
-      List<Integer> var1 = new ArrayList<>(this.subSectionNumbers.size());
+      List<Integer> items = new ArrayList<>(this.subSectionNumbers.size());
       for (int i = 0; i < this.subSectionNumbers.size(); i++) {
-         DscNumber var3 = (DscNumber) this.subSectionNumbers.get(i);
-         var1.add(var3.toInt());
+         DscNumber value = (DscNumber) this.subSectionNumbers.get(i);
+         items.add(value.toInt());
       }
 
-      return var1;
+      return items;
    }
 
-   public void setSubSectionNumbers(List<Integer> var1) {
-      if (var1.size() > 7) {
+   public void setSubSectionNumbers(List<Integer> items) {
+      if (items.size() > 7) {
          throw new IllegalArgumentException("too many subsection numbers");
       } else {
-         byte[] var10000 = this.flags.bytes();
-         var10000[0] = (byte)(var10000[0] | var1.size() << 4);
+         byte[] byteValue = this.flags.bytes();
+         byteValue[0] = (byte)(byteValue[0] | items.size() << 4);
          this.subSectionNumbers.clear();
-         for (Integer num : var1) {
+         for (Integer num : items) {
             ((DscNumber)this.subSectionNumbers.addNewElement()).set((long)num);
          }
 
@@ -81,10 +81,10 @@ public class SectionRead extends DscCommandWithResponse {
       return this.index.isPresent() ? ((DscNumber)this.index.get()).toInt() : null;
    }
 
-   public void setIndex(Integer var1) {
-      this.flags.set(INDEX_BIT, (Boolean)(var1 != null));
-      if (var1 != null) {
-         ((DscNumber)this.index.get()).set((long)var1);
+   public void setIndex(Integer index) {
+      this.flags.set(INDEX_BIT, (Boolean)(index != null));
+      if (index != null) {
+         ((DscNumber)this.index.get()).set((long)index);
       }
 
    }
@@ -93,10 +93,10 @@ public class SectionRead extends DscCommandWithResponse {
       return this.count.isPresent() ? ((DscNumber)this.count.get()).toInt() : null;
    }
 
-   public void setCount(Integer var1) {
-      this.flags.set(COUNT_BIT, (Boolean)(var1 != null));
-      if (var1 != null) {
-         ((DscNumber)this.count.get()).set((long)var1);
+   public void setCount(Integer count) {
+      this.flags.set(COUNT_BIT, (Boolean)(count != null));
+      if (count != null) {
+         ((DscNumber)this.count.get()).set((long)count);
       }
 
    }
@@ -105,15 +105,15 @@ public class SectionRead extends DscCommandWithResponse {
       return this.flags.get(VIRTUAL_SECTION_NUMBER_BIT);
    }
 
-   public void setVirtualSectionNumber(boolean var1) {
-      this.flags.set(VIRTUAL_SECTION_NUMBER_BIT, (Boolean)var1);
+   public void setVirtualSectionNumber(boolean enabled) {
+      this.flags.set(VIRTUAL_SECTION_NUMBER_BIT, (Boolean)enabled);
    }
 
    private class FieldPresenceProvider implements DscOptional.PresenceProvider {
       private final int flagsBit;
 
-      FieldPresenceProvider(int var2) {
-         this.flagsBit = var2;
+      FieldPresenceProvider(int flagsBit) {
+         this.flagsBit = flagsBit;
       }
 
       public boolean isPresent() {

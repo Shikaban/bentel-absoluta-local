@@ -17,54 +17,54 @@ public class ResponseHandler extends ChannelDuplexHandler {
    private static final Logger logger = Logger.getLogger(ResponseHandler.class.getName());
    private static final int MAX_WAITING_CMDS = 32;
    private final Queue<DscCommandWithAppSeq> waitingCmds = new LinkedList<DscCommandWithAppSeq>();
-   public void channelInactive(ChannelHandlerContext var1) throws Exception {
+   public void channelInactive(ChannelHandlerContext context) throws Exception {
       if (!this.waitingCmds.isEmpty()) {
          logger.fine("Removing " + this.waitingCmds.size() + " waiting commands");
          this.waitingCmds.clear();
       }
-      super.channelInactive(var1);
+      super.channelInactive(context);
    }
 
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      if (var2 instanceof DscCommandWithAppSeq) {
-         DscCommandWithAppSeq var4 = (DscCommandWithAppSeq)var2;
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      if (object2 instanceof DscCommandWithAppSeq) {
+         DscCommandWithAppSeq commandWithAppSeq = (DscCommandWithAppSeq)object2;
          if (this.waitingCmds.size() == MAX_WAITING_CMDS) {
-            DscCommandWithAppSeq var5 = (DscCommandWithAppSeq)this.waitingCmds.remove();
-            logger.fine("Waiting command removed to limit the queue size: " + var5);
+            DscCommandWithAppSeq commandWithAppSeq2 = (DscCommandWithAppSeq)this.waitingCmds.remove();
+            logger.fine("Waiting command removed to limit the queue size: " + commandWithAppSeq2);
          }
-         this.waitingCmds.add(var4);
+         this.waitingCmds.add(commandWithAppSeq);
       }
-      super.write(var1, var2, var3);
+      super.write(context, object2, promise);
    }
 
-   public void channelRead(ChannelHandlerContext var1, Object var2) throws Exception {
-      boolean var3 = false;
-      if (var2 instanceof DscResponse) {
-         DscResponse var4 = (DscResponse)var2;
-         for (DscCommandWithAppSeq var6 : waitingCmds) {
-            if (var6.matchAsResponse(var4)) {
-               logger.finer("Response " + var4 + " received for " + var6);
-               waitingCmds.remove(var6);
-               var3 = true;
-               if (var4 instanceof DscGeneralResponse) {
-               DscGeneralResponse var7 = (DscGeneralResponse) var4;
-               var6.generalResponseReceived(var1.channel(), var7);
+   public void channelRead(ChannelHandlerContext context, Object object2) throws Exception {
+      boolean enabled = false;
+      if (object2 instanceof DscResponse) {
+         DscResponse response2 = (DscResponse)object2;
+         for (DscCommandWithAppSeq commandWithAppSeq : waitingCmds) {
+            if (commandWithAppSeq.matchAsResponse(response2)) {
+               logger.finer("Response " + response2 + " received for " + commandWithAppSeq);
+               waitingCmds.remove(commandWithAppSeq);
+               enabled = true;
+               if (response2 instanceof DscGeneralResponse) {
+               DscGeneralResponse generalResponse = (DscGeneralResponse) response2;
+               commandWithAppSeq.generalResponseReceived(context.channel(), generalResponse);
                }
                break;
             }
          }
       }
 
-      if (var2 instanceof DscGeneralResponse) {
-         if (!var3) {
-            DscGeneralResponse var8 = (DscGeneralResponse)var2;
-            logger.fine("Unmatched general response " + var8);
-            if (!var8.isSuccess()) {
-               var1.fireChannelRead(DscError.newGenericError(var8.getDescription()));
+      if (object2 instanceof DscGeneralResponse) {
+         if (!enabled) {
+            DscGeneralResponse generalResponse2 = (DscGeneralResponse)object2;
+            logger.fine("Unmatched general response " + generalResponse2);
+            if (!generalResponse2.isSuccess()) {
+               context.fireChannelRead(DscError.newGenericError(generalResponse2.getDescription()));
             }
          }
       } else {
-         super.channelRead(var1, var2);
+         super.channelRead(context, object2);
       }
    }
 }

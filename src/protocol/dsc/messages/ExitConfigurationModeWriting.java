@@ -5,9 +5,9 @@ import protocol.dsc.commands.DscCommandWithAppSeq;
 import protocol.dsc.commands.ExitConfigurationMode;
 
 public class ExitConfigurationModeWriting extends Writing<Integer> {
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, Integer var2) throws Exception {
-      ExitConfigurationMode var3 = new ExitConfigurationMode();
-      var3.setPartitionNumber(var2);
-      return var3;
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext context, Integer partitionNumber) throws Exception {
+      ExitConfigurationMode exitConfigurationMode2 = new ExitConfigurationMode();
+      exitConfigurationMode2.setPartitionNumber(partitionNumber);
+      return exitConfigurationMode2;
    }
 }

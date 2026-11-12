@@ -21,9 +21,9 @@ public class TextNotification extends DscAbstractCommand {
       return 513;
    }
 
-   public void setMessage(int var1, String var2) throws UnsupportedOperationException {
-      this.format.set((long)var1);
-      this.message.setString(DscCharsets.fromDataFormat(var1), var2);
+   public void setMessage(int value, String text) throws UnsupportedOperationException {
+      this.format.set((long)value);
+      this.message.setString(DscCharsets.fromDataFormat(value), text);
    }
 
    public String getMessage() throws UnsupportedOperationException {

@@ -13,17 +13,17 @@ public interface Endpoint {
 
    String getPin();
 
-   void setPin(String var1);
+   void setPin(String id);
 
    boolean isSessionful();
 
-   void setSessionful(boolean var1);
+   void setSessionful(boolean enabled);
 
    DscEndpointState getState();
 
-   void addPropertyChangeListener(PropertyChangeListener var1);
+   void addPropertyChangeListener(PropertyChangeListener propertyChangeListener2);
 
-   void removePropertyChangeListener(PropertyChangeListener var1);
+   void removePropertyChangeListener(PropertyChangeListener propertyChangeListener2);
 
    void close();
 

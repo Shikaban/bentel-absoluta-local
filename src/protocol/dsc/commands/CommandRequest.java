@@ -23,55 +23,55 @@ public class CommandRequest extends DscCommandWithAppSeq {
       return this.requestedCmd;
    }
 
-   public void setRequestedCmd(DscRequestableCommand var1) {
-      this.requestedCmd = var1;
+   public void setRequestedCmd(DscRequestableCommand requestableCommand) {
+      this.requestedCmd = requestableCommand;
    }
 
    public String getCode() {
       return this.code.toString();
    }
 
-   public void setCode(String var1) {
-      this.code.setString(var1);
+   public void setCode(String text) {
+      this.code.setString(text);
    }
 
-   protected boolean matchAsNotGeneralResponse(DscResponse var1) {
-      if (this.requestedCmd != null && var1 instanceof DscRequestableCommand) {
-         DscRequestableCommand var2 = (DscRequestableCommand)var1;
-         return this.requestedCmd.match(var2);
+   protected boolean matchAsNotGeneralResponse(DscResponse response) {
+      if (this.requestedCmd != null && response instanceof DscRequestableCommand) {
+         DscRequestableCommand requestableCommand = (DscRequestableCommand)response;
+         return this.requestedCmd.match(requestableCommand);
       } else {
          return false;
       }
    }
 
-   public void readCodeFrom(ByteBuf var1) {
-      this.code.readFrom(var1);
+   public void readCodeFrom(ByteBuf inputBuffer) {
+      this.code.readFrom(inputBuffer);
    }
 
-   public void readFrom(ByteBuf var1) throws DecoderException, IndexOutOfBoundsException {
+   public void readFrom(ByteBuf inputBuffer) throws DecoderException, IndexOutOfBoundsException {
       throw new UnsupportedOperationException("unable to read CommandRequest with this method");
    }
 
-   public void writeTo(ByteBuf var1) {
+   public void writeTo(ByteBuf buffer) {
       if (this.requestedCmd == null) {
          throw new IllegalStateException("requestedCmd not set");
       } else {
-         var1.writeShort(this.requestedCmd.getCommandNumber());
-         this.requestedCmd.writeRequestDataTo(var1);
-         this.code.writeTo(var1);
+         buffer.writeShort(this.requestedCmd.getCommandNumber());
+         this.requestedCmd.writeRequestDataTo(buffer);
+         this.code.writeTo(buffer);
       }
    }
 
    public String toString() {
-      StringBuilder var1 = new StringBuilder(200);
-      var1.append(super.toString()).append(" [req cmd");
+      StringBuilder textBuilder = new StringBuilder(200);
+      textBuilder.append(super.toString()).append(" [req cmd");
       if (this.requestedCmd == null) {
-         var1.append(" not set");
+         textBuilder.append(" not set");
       } else {
-         var1.append(": ").append(this.requestedCmd.getClass().getSimpleName()).append(String.format("/0x%04X", this.requestedCmd.getCommandNumber()));
+         textBuilder.append(": ").append(this.requestedCmd.getClass().getSimpleName()).append(String.format("/0x%04X", this.requestedCmd.getCommandNumber()));
       }
 
-      var1.append(", code: '").append(this.code).append("']");
-      return var1.toString();
+      textBuilder.append(", code: '").append(this.code).append("']");
+      return textBuilder.toString();
    }
 }

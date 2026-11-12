@@ -1,11 +1,9 @@
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.google.gson.GsonBuilder;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 
@@ -348,10 +346,7 @@ final class EntityManager {
             state = String.join(", ", parts);
         }
 
-        Map<String, Object> attrsMap = new LinkedHashMap<>();
-        attrsMap.put("guasti", panelFaults);
-        attrsMap.put("allarmi_in_memoria", alarmMemory);
-        String attributes = new GsonBuilder().disableHtmlEscaping().create().toJson(attrsMap);
+        String attributes = "{\"guasti\":" + toJsonStringArray(panelFaults) + ",\"allarmi_in_memoria\":" + toJsonStringArray(alarmMemory) + "}";
 
         publish.publish("ABS/panel_faults", state, qos, true, "stato guasti centrale");
         publish.publish("ABS/panel_faults/attributes", attributes, qos, true, "attributi guasti centrale");
@@ -386,6 +381,16 @@ final class EntityManager {
 
         publishPanelFaults();
         bridgeAlertManager.publishAlerts();
+    }
+
+    private static String toJsonStringArray(List<String> list) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append("\"").append(list.get(i).replace("\\", "\\\\").replace("\"", "\\\"")).append("\"");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     private static boolean isValidLabel(String label) {

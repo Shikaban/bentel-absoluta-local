@@ -31,16 +31,16 @@ public class PartitionStatus extends DscRequestableCommand implements DscArray.E
       return this.partitions.getTrueIndexes();
    }
 
-   public void setPartition(int var1) {
+   public void setPartition(int value) {
       this.partitions.reset();
-      this.partitions.setMinNumberOfBits(var1);
-      this.partitions.set(var1, true);
+      this.partitions.setMinNumberOfBits(value);
+      this.partitions.set(value, true);
    }
 
-   public void setPartitions(List<Integer> var1) {
+   public void setPartitions(List<Integer> items) {
       this.partitions.reset();
-      this.partitions.setMinNumberOfBits(var1.isEmpty() ? 0 : (Integer)Collections.max(var1));
-      for (Integer partition : var1) {
+      this.partitions.setMinNumberOfBits(items.isEmpty() ? 0 : (Integer)Collections.max(items));
+      for (Integer partition : items) {
          this.partitions.set(partition, true);
       }
 

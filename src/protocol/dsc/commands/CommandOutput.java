@@ -27,31 +27,31 @@ public class CommandOutput extends DscCommandWithAppSeq {
       return this.partitionNumber.toPositiveInteger();
    }
 
-   public void setPartitionNumber(Integer var1) {
-      this.partitionNumber.setPositiveInteger(var1);
+   public void setPartitionNumber(Integer positiveInteger) {
+      this.partitionNumber.setPositiveInteger(positiveInteger);
    }
 
    public Integer getOutputNumber() {
       return this.outputNumber.toPositiveInteger();
    }
 
-   public void setOutputNumber(Integer var1) {
-      this.outputNumber.setPositiveInteger(var1);
+   public void setOutputNumber(Integer positiveInteger) {
+      this.outputNumber.setPositiveInteger(positiveInteger);
    }
 
    public int getActivationType() {
       return this.activationType.toInt();
    }
 
-   public void setActivationType(int var1) {
-      this.activationType.set((long)var1);
+   public void setActivationType(int value) {
+      this.activationType.set((long)value);
    }
 
    public String getUserCode() {
       return this.userCode.toString();
    }
 
-   public void setUserCode(String var1) {
-      this.userCode.setString(var1);
+   public void setUserCode(String text) {
+      this.userCode.setString(text);
    }
 }

@@ -20,40 +20,40 @@ public abstract class DscRequestableCommand extends DscAbstractCommand implement
          .build();
    }
 
-   public final void readFrom(ByteBuf var1) throws DecoderException, IndexOutOfBoundsException {
-      super.readFrom(var1);
+   public final void readFrom(ByteBuf inputBuffer) throws DecoderException, IndexOutOfBoundsException {
+      super.readFrom(inputBuffer);
    }
 
-   public final void readRequestDataFrom(ByteBuf var1) throws DecoderException, IndexOutOfBoundsException {
+   public final void readRequestDataFrom(ByteBuf inputBuffer) throws DecoderException, IndexOutOfBoundsException {
       List<DscSerializable> requestFields = this.getRequestFields();
       for (int i = 0; i < requestFields.size(); i++) {
-         requestFields.get(i).readFrom(var1);
+         requestFields.get(i).readFrom(inputBuffer);
       }
    }
 
-   public final void writeTo(ByteBuf var1) {
-      super.writeTo(var1);
+   public final void writeTo(ByteBuf buffer) {
+      super.writeTo(buffer);
    }
 
-   public final void writeRequestDataTo(ByteBuf var1) {
+   public final void writeRequestDataTo(ByteBuf buffer) {
       List<DscSerializable> requestFields = this.getRequestFields();
       for (int i = 0; i < requestFields.size(); i++) {
-         requestFields.get(i).writeTo(var1);
+         requestFields.get(i).writeTo(buffer);
       }
    }
 
-   public boolean match(DscRequestableCommand var1) {
-      if (this.getClass() != var1.getClass()) {
+   public boolean match(DscRequestableCommand requestableCommand) {
+      if (this.getClass() != requestableCommand.getClass()) {
          return false;
       } else {
-         List<DscSerializable> var2 = this.getRequestFields();
-         List<DscSerializable> var3 = var1.getRequestFields();
-         int var4 = var2.size();
-         if (var4 != var3.size()) {
+         List<DscSerializable> requestFields = this.getRequestFields();
+         List<DscSerializable> requestFields2 = requestableCommand.getRequestFields();
+         int numericValue = requestFields.size();
+         if (numericValue != requestFields2.size()) {
             return false;
          } else {
-            for(int var5 = 0; var5 < var4; ++var5) {
-               if (!((DscSerializable)var2.get(var5)).isEquivalent((DscSerializable)var3.get(var5))) {
+            for(int index = 0; index < numericValue; ++index) {
+               if (!((DscSerializable)requestFields.get(index)).isEquivalent((DscSerializable)requestFields2.get(index))) {
                   return false;
                }
             }

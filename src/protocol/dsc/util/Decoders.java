@@ -3,17 +3,17 @@ package protocol.dsc.util;
 import io.netty.buffer.ByteBuf;
 
 public final class Decoders {
-   public static int readBytesToFollow(ByteBuf var0) {
-      short var2 = var0.readUnsignedByte();
-      int var1;
-      if ((var2 & 128) == 0) {
-         var1 = var2;
+   public static int readBytesToFollow(ByteBuf inputBuffer) {
+      short byteValue = inputBuffer.readUnsignedByte();
+      int bytesToFollow;
+      if ((byteValue & 128) == 0) {
+         bytesToFollow = byteValue;
       } else {
-         short var3 = var0.readUnsignedByte();
-         var1 = (var2 & 127) << 8 | var3;
+         short byteValue2 = inputBuffer.readUnsignedByte();
+         bytesToFollow = (byteValue & 127) << 8 | byteValue2;
       }
 
-      return var1;
+      return bytesToFollow;
    }
 
    private Decoders() {

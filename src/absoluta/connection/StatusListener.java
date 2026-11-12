@@ -277,28 +277,28 @@ class StatusListener implements MessageListener {
       panelStatus.updateZoneStatus(zoneId, zoneStatus);
    }
 
-   private void manageTrouble(Quartet<Integer, Integer, Integer, Integer> var1) {
-      int var2 = (Integer)var1.getValue0();
-      int var3 = (Integer)var1.getValue1();
-      int var4 = (Integer)var1.getValue2();
-      int var5 = (Integer)var1.getValue3();
-      if (var2 == 1 && !this.panelStatus.getZones().contains(var4)) {
-         logger.fine("discarding trouble 0x" + var3 + " notification for zone " + var4 + " (the zone doesn't belong to the current user)");
+   private void manageTrouble(Quartet<Integer, Integer, Integer, Integer> quartet2) {
+      int deviceType = (Integer)quartet2.getValue0();
+      int troubleType = (Integer)quartet2.getValue1();
+      int deviceNumber = (Integer)quartet2.getValue2();
+      int troubleStatus = (Integer)quartet2.getValue3();
+      if (deviceType == 1 && !this.panelStatus.getZones().contains(deviceNumber)) {
+         logger.fine("discarding trouble 0x" + troubleType + " notification for zone " + deviceNumber + " (the zone doesn't belong to the current user)");
       } else {
-         Trouble var6 = new Trouble(var2, var3, var4, false);
-         Trouble var7 = new Trouble(var2, var3, var4, true);
-         switch (var5) {
+         Trouble trouble = new Trouble(deviceType, troubleType, deviceNumber, false);
+         Trouble inMemoryTrouble = new Trouble(deviceType, troubleType, deviceNumber, true);
+         switch (troubleStatus) {
             case 0:
-               this.panelStatus.removeTrouble(var6);
-               this.panelStatus.removeTrouble(var7);
+               this.panelStatus.removeTrouble(trouble);
+               this.panelStatus.removeTrouble(inMemoryTrouble);
                break;
             case 1:
-               this.panelStatus.removeTrouble(var7);
-               this.panelStatus.addTrouble(var6);
+               this.panelStatus.removeTrouble(inMemoryTrouble);
+               this.panelStatus.addTrouble(trouble);
                break;
             case 2:
-               this.panelStatus.removeTrouble(var6);
-               this.panelStatus.addTrouble(var7);
+               this.panelStatus.removeTrouble(trouble);
+               this.panelStatus.addTrouble(inMemoryTrouble);
          }
 
       }

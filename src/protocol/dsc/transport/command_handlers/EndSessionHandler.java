@@ -16,22 +16,22 @@ import java.util.logging.Logger;
 public class EndSessionHandler extends ChannelDuplexHandler {
    private static final Logger logger = Logger.getLogger(EndSessionHandler.class.getName());
 
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      if (var2 instanceof EndSession) {
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      if (object2 instanceof EndSession) {
          logger.fine("Sending end session");
-         var1.fireUserEventTriggered(SimpleMessage.CLOSING_CHANNEL_EVENT);
+         context.fireUserEventTriggered(SimpleMessage.CLOSING_CHANNEL_EVENT);
       }
 
-      super.write(var1, var2, var3);
+      super.write(context, object2, promise);
    }
 
-   public void channelRead(ChannelHandlerContext var1, Object var2) throws Exception {
-      if (var2 instanceof EndSession) {
+   public void channelRead(ChannelHandlerContext context, Object object2) throws Exception {
+      if (object2 instanceof EndSession) {
          logger.info("Mobile App or Boss have requested an end session, request received");
-         var1.fireUserEventTriggered(SimpleMessage.CLOSING_CHANNEL_EVENT);
-         var1.write(LowACK.getInstance()).addListener(ChannelFutureListener.CLOSE);
+         context.fireUserEventTriggered(SimpleMessage.CLOSING_CHANNEL_EVENT);
+         context.write(LowACK.getInstance()).addListener(ChannelFutureListener.CLOSE);
       } else {
-         super.channelRead(var1, var2);
+         super.channelRead(context, object2);
       }
 
    }

@@ -28,15 +28,15 @@ public class SingleZoneBypassStatus extends DscRequestableCommand {
       return this.zoneNumber.toPositiveInt();
    }
 
-   public void setZoneNumber(int var1) {
-      this.zoneNumber.setPositiveInt(var1);
+   public void setZoneNumber(int value) {
+      this.zoneNumber.setPositiveInt(value);
    }
 
    public boolean isBypassed() {
       return this.bypassed.get(0);
    }
 
-   public void setBypassed(boolean var1) {
-      this.bypassed.set(0, (Boolean)var1);
+   public void setBypassed(boolean enabled) {
+      this.bypassed.set(0, (Boolean)enabled);
    }
 }

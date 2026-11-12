@@ -18,26 +18,26 @@ public class Aes128ecbEncrypter extends MessageToMessageEncoder<ByteBuf> {
    public static final int BLOCK_SIZE = 16;
    public static final AttributeKey<byte[]> ENCRYPT_KEY = AttributeKey.valueOf("Aes128ecbEncrypter.key");
 
-   protected void encode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws Exception {
-      byte[] var4 = (byte[])var1.channel().attr(ENCRYPT_KEY).get();
-      if (var4 != null) {
-         Preconditions.checkArgument(var4.length == KEY_SIZE);
-         Preconditions.checkArgument(var2.readableBytes() % BLOCK_SIZE == 0);
-         ByteBuffer var5 = var2.nioBuffer();
-         ByteBuffer var6 = encrypt(var4, var5);
-         var3.add(Unpooled.wrappedBuffer(var6));
+   protected void encode(ChannelHandlerContext context, ByteBuf buffer, List<Object> output) throws Exception {
+      byte[] byteValue = (byte[])context.channel().attr(ENCRYPT_KEY).get();
+      if (byteValue != null) {
+         Preconditions.checkArgument(byteValue.length == KEY_SIZE);
+         Preconditions.checkArgument(buffer.readableBytes() % BLOCK_SIZE == 0);
+         ByteBuffer buffer2 = buffer.nioBuffer();
+         ByteBuffer buffer3 = encrypt(byteValue, buffer2);
+         output.add(Unpooled.wrappedBuffer(buffer3));
       } else {
-         var3.add(var2.retain());
+         output.add(buffer.retain());
       }
 
    }
 
-   private static ByteBuffer encrypt(byte[] var0, ByteBuffer var1) throws Exception {
-      ByteBuffer var2 = ByteBuffer.allocate(var1.remaining());
-      Cipher var3 = Cipher.getInstance("AES/ECB/NoPadding");
-      SecretKeySpec var4 = new SecretKeySpec(var0, "AES");
-      var3.init(1, var4);
-      var3.doFinal(var1, var2);
-      return (ByteBuffer)var2.flip();
+   private static ByteBuffer encrypt(byte[] byteValue, ByteBuffer buffer) throws Exception {
+      ByteBuffer buffer2 = ByteBuffer.allocate(buffer.remaining());
+      Cipher instance = Cipher.getInstance("AES/ECB/NoPadding");
+      SecretKeySpec secretKeySpec2 = new SecretKeySpec(byteValue, "AES");
+      instance.init(1, secretKeySpec2);
+      instance.doFinal(buffer, buffer2);
+      return (ByteBuffer)buffer2.flip();
    }
 }

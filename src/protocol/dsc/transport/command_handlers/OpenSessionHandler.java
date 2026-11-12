@@ -9,39 +9,39 @@ public class OpenSessionHandler extends HandshakeHandler<OpenSession> {
       super(OpenSession.class);
    }
 
-   public boolean validateOwnInfo(SessionInfo var1) {
-      return var1.getDeviceTypeOrVendorID() != null && var1.getDeviceId() != null && var1.getSoftwareVersion() != null && var1.getProtocolVersion() != null && var1.getTxSize() != null && var1.getRxSize() != null && (var1.getEncryptionType() != null || !Boolean.TRUE.equals(var1.isClient()));
+   public boolean validateOwnInfo(SessionInfo sessionInfo2) {
+      return sessionInfo2.getDeviceTypeOrVendorID() != null && sessionInfo2.getDeviceId() != null && sessionInfo2.getSoftwareVersion() != null && sessionInfo2.getProtocolVersion() != null && sessionInfo2.getTxSize() != null && sessionInfo2.getRxSize() != null && (sessionInfo2.getEncryptionType() != null || !Boolean.TRUE.equals(sessionInfo2.isClient()));
    }
 
-   protected OpenSession getCommand(Channel var1) {
-      SessionInfo var2 = SessionInfo.getOwnInfo(var1);
-      OpenSession var3 = new OpenSession();
-      var3.setDeviceTypeOrVendorID(var2.getDeviceTypeOrVendorID());
-      var3.setDeviceId(var2.getDeviceId());
-      var3.setSoftwareVersion(var2.getSoftwareVersion());
-      var3.setProtocolVersion(var2.getProtocolVersion());
-      var3.setTxSize(var2.getTxSize());
-      var3.setRxSize(var2.getRxSize());
-      var3.setEncriptionType(var2.getEncryptionType());
-      return var3;
+   protected OpenSession getCommand(Channel channel2) {
+      SessionInfo ownInfo = SessionInfo.getOwnInfo(channel2);
+      OpenSession openSession2 = new OpenSession();
+      openSession2.setDeviceTypeOrVendorID(ownInfo.getDeviceTypeOrVendorID());
+      openSession2.setDeviceId(ownInfo.getDeviceId());
+      openSession2.setSoftwareVersion(ownInfo.getSoftwareVersion());
+      openSession2.setProtocolVersion(ownInfo.getProtocolVersion());
+      openSession2.setTxSize(ownInfo.getTxSize());
+      openSession2.setRxSize(ownInfo.getRxSize());
+      openSession2.setEncriptionType(ownInfo.getEncryptionType());
+      return openSession2;
    }
 
-   protected int commandReceived(Channel var1, OpenSession var2) {
-      SessionInfo var3 = SessionInfo.getPeerInfo(var1);
-      var3.setDeviceTypeOrVendorID(var2.getDeviceTypeOrVendorID());
-      var3.setDeviceId(var2.getDeviceId());
-      var3.setSoftwareVersion(var2.getSoftwareVersion());
-      var3.setProtocolVersion(var2.getProtocolVersion());
-      var3.setTxSize(var2.getTxSize());
-      var3.setRxSize(var2.getRxSize());
-      var3.setEncryptionType(var2.getEncryptionType());
-      if (var3.getEncryptionType() != 0 && var3.getEncryptionType() != 1) {
+   protected int commandReceived(Channel channel2, OpenSession openSession2) {
+      SessionInfo peerInfo = SessionInfo.getPeerInfo(channel2);
+      peerInfo.setDeviceTypeOrVendorID(openSession2.getDeviceTypeOrVendorID());
+      peerInfo.setDeviceId(openSession2.getDeviceId());
+      peerInfo.setSoftwareVersion(openSession2.getSoftwareVersion());
+      peerInfo.setProtocolVersion(openSession2.getProtocolVersion());
+      peerInfo.setTxSize(openSession2.getTxSize());
+      peerInfo.setRxSize(openSession2.getRxSize());
+      peerInfo.setEncryptionType(openSession2.getEncryptionType());
+      if (peerInfo.getEncryptionType() != 0 && peerInfo.getEncryptionType() != 1) {
          return 3;
       } else {
-         SessionInfo var4 = SessionInfo.getOwnInfo(var1);
-         if (var4.getEncryptionType() == null) {
-            var4.setEncryptionType(var3.getEncryptionType());
-         } else if (!var4.getEncryptionType().equals(var3.getEncryptionType())) {
+         SessionInfo ownInfo = SessionInfo.getOwnInfo(channel2);
+         if (ownInfo.getEncryptionType() == null) {
+            ownInfo.setEncryptionType(peerInfo.getEncryptionType());
+         } else if (!ownInfo.getEncryptionType().equals(peerInfo.getEncryptionType())) {
             return 3;
          }
 

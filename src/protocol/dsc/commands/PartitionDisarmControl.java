@@ -24,15 +24,15 @@ public class PartitionDisarmControl extends DscCommandWithAppSeq {
       return this.partitionNumber.toPositiveInteger();
    }
 
-   public void setPartitionNumber(Integer var1) {
-      this.partitionNumber.setPositiveInteger(var1);
+   public void setPartitionNumber(Integer positiveInteger) {
+      this.partitionNumber.setPositiveInteger(positiveInteger);
    }
 
    public String getUserCode() {
       return this.userCode.toString();
    }
 
-   public void setUserCode(String var1) {
-      this.userCode.setString(var1);
+   public void setUserCode(String text) {
+      this.userCode.setString(text);
    }
 }

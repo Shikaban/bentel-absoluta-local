@@ -23,15 +23,15 @@ public class AccessCodes extends DscCommandWithResponse {
       return this.userNumberStart.toPositiveInt();
    }
 
-   public void setUserNumberStart(int var1) {
-      this.userNumberStart.setPositiveInt(var1);
+   public void setUserNumberStart(int value) {
+      this.userNumberStart.setPositiveInt(value);
    }
 
    public int getNumberOfUsers() {
       return this.numberOfUsers.toPositiveInt();
    }
 
-   public void setNumberOfUsers(int var1) {
-      this.numberOfUsers.setPositiveInt(var1);
+   public void setNumberOfUsers(int value) {
+      this.numberOfUsers.setPositiveInt(value);
    }
 }

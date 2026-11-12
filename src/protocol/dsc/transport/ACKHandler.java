@@ -15,16 +15,16 @@ import java.util.logging.Logger;
 public class ACKHandler extends ChannelDuplexHandler {
    private static final Logger logger = Logger.getLogger(ACKHandler.class.getName());
 
-   public void write(ChannelHandlerContext var1, Object var2, ChannelPromise var3) throws Exception {
-      if (var2 == SimpleMessage.COMMAND_RECEIVED) {
-         if (TransportLayerEncoder.isOutgoingACKRequired(var1)) {
+   public void write(ChannelHandlerContext context, Object object2, ChannelPromise promise) throws Exception {
+      if (object2 == SimpleMessage.COMMAND_RECEIVED) {
+         if (TransportLayerEncoder.isOutgoingACKRequired(context)) {
             logger.finest("Sending low ACK");
-            var1.write(LowACK.getInstance(), var3);
+            context.write(LowACK.getInstance(), promise);
          } else {
-            var3.setSuccess();
+            promise.setSuccess();
          }
       } else {
-         super.write(var1, var2, var3);
+         super.write(context, object2, promise);
       }
    }
 

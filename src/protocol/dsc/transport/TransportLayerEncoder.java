@@ -11,29 +11,29 @@ import java.util.logging.Logger;
 public class TransportLayerEncoder extends MessageToByteEncoder<ByteBuf> {
    private static final Logger logger = Logger.getLogger(TransportLayerEncoder.class.getName());
 
-   protected void encode(ChannelHandlerContext var1, ByteBuf var2, ByteBuf var3) {
-      boolean var4 = SequenceHandlersHelper.isLowACK(var2);
-      SequenceHandlersHelper.Counters var5 = SequenceHandlersHelper.getCounters(var1);
-      if (!var4 && !var5.isReadyForANewCommand()) {
+   protected void encode(ChannelHandlerContext context, ByteBuf buffer, ByteBuf buffer2) {
+      boolean lowACK = SequenceHandlersHelper.isLowACK(buffer);
+      SequenceHandlersHelper.Counters counters2 = SequenceHandlersHelper.getCounters(context);
+      if (!lowACK && !counters2.isReadyForANewCommand()) {
          logger.fine("Command sent before confirmation of the previous");
       }
 
-      var5.setNextSequenceNumber(var4);
-      int var6 = var5.sequenceNumber();
-      int var7 = var5.remoteSequenceNumber();
-      var3.writeByte(var6);
-      var3.writeByte(var7);
-      var3.writeBytes(var2);
-      var5.setSentRemoteSequenceNumber(var7);
+      counters2.setNextSequenceNumber(lowACK);
+      int sequenceNumber = counters2.sequenceNumber();
+      int sentRemoteSequenceNumber = counters2.remoteSequenceNumber();
+      buffer2.writeByte(sequenceNumber);
+      buffer2.writeByte(sentRemoteSequenceNumber);
+      buffer2.writeBytes(buffer);
+      counters2.setSentRemoteSequenceNumber(sentRemoteSequenceNumber);
    }
 
-   public static boolean isReadyForANewCommand(ChannelHandlerContext var0) {
-      SequenceHandlersHelper.Counters var1 = SequenceHandlersHelper.getCounters(var0);
-      return var1.isReadyForANewCommand();
+   public static boolean isReadyForANewCommand(ChannelHandlerContext context) {
+      SequenceHandlersHelper.Counters counters2 = SequenceHandlersHelper.getCounters(context);
+      return counters2.isReadyForANewCommand();
    }
 
-   public static boolean isOutgoingACKRequired(ChannelHandlerContext var0) {
-      SequenceHandlersHelper.Counters var1 = SequenceHandlersHelper.getCounters(var0);
-      return var1.isOutgoingACKRequired();
+   public static boolean isOutgoingACKRequired(ChannelHandlerContext context) {
+      SequenceHandlersHelper.Counters counters2 = SequenceHandlersHelper.getCounters(context);
+      return counters2.isOutgoingACKRequired();
    }
 }

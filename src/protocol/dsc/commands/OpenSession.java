@@ -30,56 +30,56 @@ public class OpenSession extends DscCommandWithAppSeq {
       return this.deviceTypeOrVendorID.toInt();
    }
 
-   public void setDeviceTypeOrVendorID(int var1) {
-      this.deviceTypeOrVendorID.set((long)var1);
+   public void setDeviceTypeOrVendorID(int value) {
+      this.deviceTypeOrVendorID.set((long)value);
    }
 
    public int getDeviceId() {
       return this.deviceId.toInt();
    }
 
-   public void setDeviceId(int var1) {
-      this.deviceId.set((long)var1);
+   public void setDeviceId(int value) {
+      this.deviceId.set((long)value);
    }
 
    public String getSoftwareVersion() {
       return this.softwareVersion.toString();
    }
 
-   public void setSoftwareVersion(String var1) {
-      this.softwareVersion.setString(var1);
+   public void setSoftwareVersion(String text) {
+      this.softwareVersion.setString(text);
    }
 
    public String getProtocolVersion() {
       return this.protocolVersion.toString();
    }
 
-   public void setProtocolVersion(String var1) {
-      this.protocolVersion.setString(var1);
+   public void setProtocolVersion(String text) {
+      this.protocolVersion.setString(text);
    }
 
    public int getTxSize() {
       return this.txSize.toInt();
    }
 
-   public void setTxSize(int var1) {
-      this.txSize.set((long)var1);
+   public void setTxSize(int value) {
+      this.txSize.set((long)value);
    }
 
    public int getRxSize() {
       return this.rxSize.toInt();
    }
 
-   public void setRxSize(int var1) {
-      this.rxSize.set((long)var1);
+   public void setRxSize(int value) {
+      this.rxSize.set((long)value);
    }
 
    public int getEncryptionType() {
       return this.encryptionType.toInt();
    }
 
-   public void setEncriptionType(int var1) {
-      this.encryptionType.set((long)var1);
+   public void setEncriptionType(int value) {
+      this.encryptionType.set((long)value);
    }
 
    public String toString() {

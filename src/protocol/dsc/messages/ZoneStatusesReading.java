@@ -14,21 +14,21 @@ public class ZoneStatusesReading extends RequestableCommandReading<Pair<Integer,
       super(ZoneStatus.class);
    }
 
-   protected ZoneStatus prepareRequest(ChannelHandlerContext var1, Pair<Integer, Integer> var2) {
-      ZoneStatus var3 = new ZoneStatus();
-      var3.setZoneNumber((Integer)var2.getValue0());
-      var3.setNumberOfZones((Integer)var2.getValue1());
-      return var3;
+   protected ZoneStatus prepareRequest(ChannelHandlerContext context, Pair<Integer, Integer> pair2) {
+      ZoneStatus zoneStatus2 = new ZoneStatus();
+      zoneStatus2.setZoneNumber((Integer)pair2.getValue0());
+      zoneStatus2.setNumberOfZones((Integer)pair2.getValue1());
+      return zoneStatus2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, ZoneStatus var2, List<Message.Response> var3) {
-      int var4 = var2.getZoneNumber();
-      int var5 = var2.getNumberOfZones();
-      List<? extends List<Boolean>> var6 = var2.getZoneStatuses();
-      if (var5 != var6.size()) {
+   protected void parseResponse(ChannelHandlerContext context, ZoneStatus zoneStatus2, List<Message.Response> responses) {
+      int zoneNumber = zoneStatus2.getZoneNumber();
+      int numberOfZones = zoneStatus2.getNumberOfZones();
+      List<? extends List<Boolean>> zoneStatuses = zoneStatus2.getZoneStatuses();
+      if (numberOfZones != zoneStatuses.size()) {
          throw new IllegalArgumentException("invalid zone status");
       } else {
-         var3.add(new NewValue(this, Pair.with(var4, var5), Collections.unmodifiableList(var6)));
+         responses.add(new NewValue(this, Pair.with(zoneNumber, numberOfZones), Collections.unmodifiableList(zoneStatuses)));
       }
    }
 }

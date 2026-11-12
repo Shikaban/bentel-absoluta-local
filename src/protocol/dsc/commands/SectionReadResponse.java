@@ -51,7 +51,7 @@ public class SectionReadResponse extends DscCommandWithResponse.Response<Section
       return this.data.toString();
    }
 
-   public DscBitMask getDataAsBitMask(int var1) {
-      return new DscBitMask(this.data.bytes(), var1, true);
+   public DscBitMask getDataAsBitMask(int numericValue) {
+      return new DscBitMask(this.data.bytes(), numericValue, true);
    }
 }

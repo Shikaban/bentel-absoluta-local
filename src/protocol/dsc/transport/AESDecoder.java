@@ -13,20 +13,20 @@ import java.util.List;
 public class AESDecoder extends MessageToMessageDecoder<ByteBuf> {
    private static final AttributeKey<AESHelper> HELPER_KEY = AttributeKey.valueOf("AESDecoder.helper");
 
-   protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws CorruptedFrameException {
-      AESHelper var4 = (AESHelper)var1.channel().attr(HELPER_KEY).get();
-      if (var4 != null) {
-         ByteBuf var5 = var1.alloc().buffer(var2.readableBytes());
-         var4.process(var2, var5);
-         var3.add(var5);
+   protected void decode(ChannelHandlerContext context, ByteBuf inputBuffer, List<Object> output) throws CorruptedFrameException {
+      AESHelper aESHelper2 = (AESHelper)context.channel().attr(HELPER_KEY).get();
+      if (aESHelper2 != null) {
+         ByteBuf inputBuffer2 = context.alloc().buffer(inputBuffer.readableBytes());
+         aESHelper2.process(inputBuffer, inputBuffer2);
+         output.add(inputBuffer2);
       } else {
-         var3.add(var2.retain());
+         output.add(inputBuffer.retain());
       }
 
    }
 
-   public static void setKey(Channel var0, byte[] var1) {
-      AESHelper var2 = AESHelper.getInstance(var1, 2);
-      var0.attr(HELPER_KEY).set(var2);
+   public static void setKey(Channel channel2, byte[] byteValue) {
+      AESHelper instance = AESHelper.getInstance(byteValue, 2);
+      channel2.attr(HELPER_KEY).set(instance);
    }
 }

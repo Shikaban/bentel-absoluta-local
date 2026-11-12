@@ -13,19 +13,19 @@ public class PartitionStatusesReading extends RequestableCommandReading<List<Int
       super(PartitionStatus.class);
    }
 
-   protected PartitionStatus prepareRequest(ChannelHandlerContext var1, List<Integer> var2) {
-      PartitionStatus var3 = new PartitionStatus();
-      var3.setPartitions(var2);
-      return var3;
+   protected PartitionStatus prepareRequest(ChannelHandlerContext context, List<Integer> items) {
+      PartitionStatus partitionStatus2 = new PartitionStatus();
+      partitionStatus2.setPartitions(items);
+      return partitionStatus2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, PartitionStatus var2, List<Message.Response> var3) {
-      List<Integer> var4 = var2.getPartitions();
-      List<? extends List<Boolean>> var5 = var2.getStatuses();
-      if (var4.size() != var5.size()) {
+   protected void parseResponse(ChannelHandlerContext context, PartitionStatus partitionStatus2, List<Message.Response> responses) {
+      List<Integer> partitions = partitionStatus2.getPartitions();
+      List<? extends List<Boolean>> statuses = partitionStatus2.getStatuses();
+      if (partitions.size() != statuses.size()) {
          throw new IllegalArgumentException("invalid partition status");
       } else {
-         var3.add(new NewValue(this, var4, Collections.unmodifiableList(var5)));
+         responses.add(new NewValue(this, partitions, Collections.unmodifiableList(statuses)));
       }
    }
 }

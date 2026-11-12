@@ -11,18 +11,18 @@ import io.netty.util.AttributeKey;
 public class AESEncoder extends MessageToByteEncoder<ByteBuf> {
    private static final AttributeKey<AESHelper> HELPER_KEY = AttributeKey.valueOf("AESEncoder.helper");
 
-   protected void encode(ChannelHandlerContext var1, ByteBuf var2, ByteBuf var3) {
-      AESHelper var4 = (AESHelper)var1.channel().attr(HELPER_KEY).get();
-      if (var4 != null) {
-         var4.process(var2, var3);
+   protected void encode(ChannelHandlerContext context, ByteBuf buffer, ByteBuf buffer2) {
+      AESHelper aESHelper2 = (AESHelper)context.channel().attr(HELPER_KEY).get();
+      if (aESHelper2 != null) {
+         aESHelper2.process(buffer, buffer2);
       } else {
-         var3.writeBytes(var2);
+         buffer2.writeBytes(buffer);
       }
 
    }
 
-   public static void setKey(Channel var0, byte[] var1) {
-      AESHelper var2 = AESHelper.getInstance(var1, 1);
-      var0.attr(HELPER_KEY).set(var2);
+   public static void setKey(Channel channel2, byte[] byteValue) {
+      AESHelper instance = AESHelper.getInstance(byteValue, 1);
+      channel2.attr(HELPER_KEY).set(instance);
    }
 }

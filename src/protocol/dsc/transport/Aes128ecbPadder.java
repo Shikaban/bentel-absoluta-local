@@ -11,18 +11,18 @@ import java.util.List;
 public class Aes128ecbPadder extends MessageToMessageEncoder<ByteBuf> {
    private static final java.security.SecureRandom SECURE_RANDOM = new java.security.SecureRandom();
 
-   protected void encode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws Exception {
-      byte[] var4 = (byte[])var1.channel().attr(Aes128ecbEncrypter.ENCRYPT_KEY).get();
-      if (var4 != null && var2.readableBytes() % 16 != 0) {
-         int var5 = 16 - var2.readableBytes() % 16;
+   protected void encode(ChannelHandlerContext context, ByteBuf buffer, List<Object> output) throws Exception {
+      byte[] byteValue = (byte[])context.channel().attr(Aes128ecbEncrypter.ENCRYPT_KEY).get();
+      if (byteValue != null && buffer.readableBytes() % 16 != 0) {
+         int index = 16 - buffer.readableBytes() % 16;
 
-         assert 0 < var5 && var5 < 16;
+         assert 0 < index && index < 16;
 
-         byte[] bytes = new byte[var5];
+         byte[] bytes = new byte[index];
          SECURE_RANDOM.nextBytes(bytes);
-         var3.add(Unpooled.wrappedBuffer(new ByteBuf[]{var2.retain(), Unpooled.wrappedBuffer(bytes)}));
+         output.add(Unpooled.wrappedBuffer(new ByteBuf[]{buffer.retain(), Unpooled.wrappedBuffer(bytes)}));
       } else {
-         var3.add(var2.retain());
+         output.add(buffer.retain());
       }
 
    }

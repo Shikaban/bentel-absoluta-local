@@ -18,16 +18,16 @@ class AESHelper {
    private final int mode;
    private final Cipher cipher;
 
-   static AESHelper getInstance(byte[] var0, int var1) {
-      return var0 == null ? null : new AESHelper(var0, var1);
+   static AESHelper getInstance(byte[] byteValue, int numericValue) {
+      return byteValue == null ? null : new AESHelper(byteValue, numericValue);
    }
 
-   private AESHelper(byte[] var1, int var2) {
-      if (var2 != 2 && var2 != 1) {
-         throw new IllegalArgumentException("invalid mode " + var2);
+   private AESHelper(byte[] byteValue, int mode) {
+      if (mode != 2 && mode != 1) {
+         throw new IllegalArgumentException("invalid mode " + mode);
       } else {
-         this.mode = var2;
-         this.cipher = DscUtils.getAESCipher(var1, var2);
+         this.mode = mode;
+         this.cipher = DscUtils.getAESCipher(byteValue, mode);
 
          assert this.cipher.getBlockSize() == BLOCK_SIZE;
 
@@ -36,68 +36,68 @@ class AESHelper {
       }
    }
 
-   void process(ByteBuf var1, ByteBuf var2) {
+   void process(ByteBuf buffer2, ByteBuf buffer3) {
       try {
-         int var3 = (BLOCK_SIZE - var1.readableBytes() % BLOCK_SIZE) % BLOCK_SIZE;
+         int paddingLength = (BLOCK_SIZE - buffer2.readableBytes() % BLOCK_SIZE) % BLOCK_SIZE;
 
-         assert 0 <= var3 && var3 < BLOCK_SIZE;
+         assert 0 <= paddingLength && paddingLength < BLOCK_SIZE;
 
-         assert (var1.readableBytes() + var3) % BLOCK_SIZE == 0;
+         assert (buffer2.readableBytes() + paddingLength) % BLOCK_SIZE == 0;
 
-         if (this.mode == 2 && var3 != 0) {
+         if (this.mode == 2 && paddingLength != 0) {
             throw new CorruptedFrameException(String.format("length must be multiple of %d bytes", BLOCK_SIZE));
          } else {
-            ByteBufInputStream var4 = new ByteBufInputStream(var1);
-            Throwable var5 = null;
+            ByteBufInputStream byteBufInputStream2 = new ByteBufInputStream(buffer2);
+            Throwable exception2 = null;
 
             try {
-               CipherOutputStream var6 = new CipherOutputStream(new ByteBufOutputStream(var2), this.cipher);
-               Throwable var7 = null;
+               CipherOutputStream cipherOutputStream2 = new CipherOutputStream(new ByteBufOutputStream(buffer3), this.cipher);
+               Throwable exception3 = null;
 
                try {
-                  int var8;
-                  while((var8 = var4.read(this.buffer)) != -1) {
-                     var6.write(this.buffer, 0, var8);
+                  int bytesRead;
+                  while((bytesRead = byteBufInputStream2.read(this.buffer)) != -1) {
+                     cipherOutputStream2.write(this.buffer, 0, bytesRead);
                   }
 
-                  var6.write(this.buffer, 0, var3);
-               } catch (Throwable var32) {
-                  var7 = var32;
-                  throw var32;
+                  cipherOutputStream2.write(this.buffer, 0, paddingLength);
+               } catch (Throwable exception4) {
+                  exception3 = exception4;
+                  throw exception4;
                } finally {
-                  if (var6 != null) {
-                     if (var7 != null) {
+                  if (cipherOutputStream2 != null) {
+                     if (exception3 != null) {
                         try {
-                           var6.close();
-                        } catch (Throwable var31) {
-                           var7.addSuppressed(var31);
+                           cipherOutputStream2.close();
+                        } catch (Throwable exception5) {
+                           exception3.addSuppressed(exception5);
                         }
                      } else {
-                        var6.close();
+                        cipherOutputStream2.close();
                      }
                   }
 
                }
-            } catch (Throwable var34) {
-               var5 = var34;
-               throw var34;
+            } catch (Throwable exception6) {
+               exception2 = exception6;
+               throw exception6;
             } finally {
-               if (var4 != null) {
-                  if (var5 != null) {
+               if (byteBufInputStream2 != null) {
+                  if (exception2 != null) {
                      try {
-                        var4.close();
-                     } catch (Throwable var30) {
-                        var5.addSuppressed(var30);
+                        byteBufInputStream2.close();
+                     } catch (Throwable exception7) {
+                        exception2.addSuppressed(exception7);
                      }
                   } else {
-                     var4.close();
+                     byteBufInputStream2.close();
                   }
                }
 
             }
          }
-      } catch (IOException var36) {
-         throw new RuntimeException("unexpected exception", var36);
+      } catch (IOException exception8) {
+         throw new RuntimeException("unexpected exception", exception8);
       }
    }
 }

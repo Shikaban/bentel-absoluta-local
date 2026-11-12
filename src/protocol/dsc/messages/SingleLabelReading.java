@@ -21,41 +21,41 @@ public class SingleLabelReading extends RequestableCommandReading<Void, String, 
    private final Integer number;
    private final Charset charset;
 
-   public SingleLabelReading(int var1, Integer var2) {
-      this(var1, var2, DscCharsets.UNICODE);
+   public SingleLabelReading(int numericValue, Integer integerValue) {
+      this(numericValue, integerValue, DscCharsets.UNICODE);
    }
 
-   public SingleLabelReading(int var1, Integer var2, Charset var3) {
+   public SingleLabelReading(int optionId, Integer number, Charset charset2) {
       super(Configuration.class);
-      this.optionId = var1;
-      this.number = var2;
-      this.charset = (Charset)Preconditions.checkNotNull(var3);
+      this.optionId = optionId;
+      this.number = number;
+      this.charset = (Charset)Preconditions.checkNotNull(charset2);
    }
 
-   protected Configuration prepareRequest(ChannelHandlerContext var1, Void var2) {
-      Configuration var3 = new Configuration();
-      var3.setOptionId(this.optionId);
+   protected Configuration prepareRequest(ChannelHandlerContext context, Void void2) {
+      Configuration configuration2 = new Configuration();
+      configuration2.setOptionId(this.optionId);
       if (this.number != null) {
-         var3.setOptionIdOffsetFrom(this.number);
-         var3.setOptionIdOffsetTo(this.number);
+         configuration2.setOptionIdOffsetFrom(this.number);
+         configuration2.setOptionIdOffsetTo(this.number);
       } else {
-         var3.setOptionIdOffsetFrom((Integer)null);
+         configuration2.setOptionIdOffsetFrom((Integer)null);
       }
 
-      return var3;
+      return configuration2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, Configuration var2, List<Message.Response> var3) {
-      if (var2.getOptionId() == this.optionId) {
-         Integer var4 = var2.getOptionIdOffsetFrom();
-         List<String> var5 = var2.getStrings(this.charset);
-         if (this.number != null && var4 == null) {
+   protected void parseResponse(ChannelHandlerContext context, Configuration configuration2, List<Message.Response> responses) {
+      if (configuration2.getOptionId() == this.optionId) {
+         Integer optionIdOffsetFrom = configuration2.getOptionIdOffsetFrom();
+         List<String> strings = configuration2.getStrings(this.charset);
+         if (this.number != null && optionIdOffsetFrom == null) {
             logger.warning("Unexpected null from for option id: " + this.optionId);
             return;
          }
 
-         if (Objects.equal(this.number, var4) || this.number == null && var4 == 0) {
-            var3.add(new NewValue(this, var5.get(0)));
+         if (Objects.equal(this.number, optionIdOffsetFrom) || this.number == null && optionIdOffsetFrom == 0) {
+            responses.add(new NewValue(this, strings.get(0)));
          }
       }
    }

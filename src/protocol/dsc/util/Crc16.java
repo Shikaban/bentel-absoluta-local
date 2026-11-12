@@ -9,50 +9,50 @@ public class Crc16 {
    private final int finalXor;
    private final int[] tab;
 
-   public Crc16(int var1, int var2, int var3) {
-      this.poly = DscUtils.validateUShort(var1);
-      this.initialVal = DscUtils.validateUShort(var2);
-      this.finalXor = DscUtils.validateUShort(var3);
+   public Crc16(int polynomial, int initialValue, int finalXorValue) {
+      this.poly = DscUtils.validateUShort(polynomial);
+      this.initialVal = DscUtils.validateUShort(initialValue);
+      this.finalXor = DscUtils.validateUShort(finalXorValue);
       this.tab = new int[256];
 
-      for(int var4 = 0; var4 < 256; ++var4) {
-         this.tab[var4] = this.crc1(var4);
+      for(int index = 0; index < 256; ++index) {
+         this.tab[index] = this.crc1(index);
       }
 
    }
 
-   private int crc1(int var1) {
-      int var2 = var1 << 8;
+   private int crc1(int value) {
+      int crc = value << 8;
 
-      for(int var3 = 0; var3 < 8; ++var3) {
-         if ((var2 & 0x8000) != 0) {
-            var2 = (var2 <<= 1) ^ this.poly;
+      for(int index = 0; index < 8; ++index) {
+         if ((crc & 0x8000) != 0) {
+            crc = (crc <<= 1) ^ this.poly;
          } else {
-            var2 <<= 1;
+            crc <<= 1;
          }
 
-         var2 &= 65535;
+         crc &= 65535;
       }
 
-      return var2;
+      return crc;
    }
 
-   public int calculate(ByteBuf var1) {
+   public int calculate(ByteBuf buffer) {
       try {
-         int var2;
-         short var3;
-         int var4;
-         int var5;
-         for(var2 = this.initialVal; var1.isReadable(); var2 = this.tab[var3 ^ var4] ^ var5 << 8) {
-            var3 = var1.readUnsignedByte();
-            var4 = var2 >> 8 & 255;
-            var5 = var2 & 255;
+         int crc;
+         short byteValue;
+         int highByte;
+         int lowByte;
+         for(crc = this.initialVal; buffer.isReadable(); crc = this.tab[byteValue ^ highByte] ^ lowByte << 8) {
+            byteValue = buffer.readUnsignedByte();
+            highByte = crc >> 8 & 255;
+            lowByte = crc & 255;
          }
 
-         int var9 = var2 ^ this.finalXor;
-         return var9;
+         int result = crc ^ this.finalXor;
+         return result;
       } finally {
-         var1.release();
+         buffer.release();
       }
    }
 }

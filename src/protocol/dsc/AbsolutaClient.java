@@ -31,30 +31,30 @@ public class AbsolutaClient implements ITv2Client {
    private final String hostname;
    private final int port;
 
-   public AbsolutaClient(String var1, int var2) {
-      this.hostname = (String)Preconditions.checkNotNull(var1);
-      this.port = var2;
+   public AbsolutaClient(String text, int port) {
+      this.hostname = (String)Preconditions.checkNotNull(text);
+      this.port = port;
    }
 
    @SuppressWarnings("deprecation")
-   public void connect(ITv2Client.Callback var1) throws InterruptedException {
-      Preconditions.checkNotNull(var1);
-      InetSocketAddress var2 = new InetSocketAddress(this.hostname, this.port);
-      logger.info("Connecting to " + var2);
-      NioEventLoopGroup var3 = new NioEventLoopGroup();
+   public void connect(ITv2Client.Callback callback2) throws InterruptedException {
+      Preconditions.checkNotNull(callback2);
+      InetSocketAddress inetSocketAddress2 = new InetSocketAddress(this.hostname, this.port);
+      logger.info("Connecting to " + inetSocketAddress2);
+      NioEventLoopGroup nioEventLoopGroup2 = new NioEventLoopGroup();
 
       try {
-         Bootstrap var4 = new Bootstrap();
-         var4.group(var3);
-         var4.channel(NioSocketChannel.class);
-         var4.option(ChannelOption.SO_KEEPALIVE, true);
-         var4.handler(new AbsolutaClient.ChannelInitializer(var1));
-         ChannelFuture var5 = var4.connect(var2).sync();
-         Channel var6 = var5.channel();
-         var6.closeFuture().sync();
+         Bootstrap bootstrap2 = new Bootstrap();
+         bootstrap2.group(nioEventLoopGroup2);
+         bootstrap2.channel(NioSocketChannel.class);
+         bootstrap2.option(ChannelOption.SO_KEEPALIVE, true);
+         bootstrap2.handler(new AbsolutaClient.ChannelInitializer(callback2));
+         ChannelFuture channelFuture2 = bootstrap2.connect(inetSocketAddress2).sync();
+         Channel channel2 = channelFuture2.channel();
+         channel2.closeFuture().sync();
       } finally {
-         logger.info("Disconnected from " + var2);
-         var3.shutdownGracefully();
+         logger.info("Disconnected from " + inetSocketAddress2);
+         nioEventLoopGroup2.shutdownGracefully();
       }
 
    }
@@ -62,31 +62,31 @@ public class AbsolutaClient implements ITv2Client {
    private class ChannelInitializer extends DscChannelInitializer {
       private final ITv2Client.Callback callback;
 
-      ChannelInitializer(ITv2Client.Callback var2) {
-         this.callback = var2;
+      ChannelInitializer(ITv2Client.Callback callback2) {
+         this.callback = callback2;
       }
 
       protected SessionInfo buildOwnSessionInfo() {
-         SessionInfo var1 = new SessionInfo();
-         var1.setClient(true);
-         var1.setDeviceTypeOrVendorID(143);
-         var1.setDeviceId(0);
-         var1.setSoftwareVersion("0100");
-         var1.setProtocolVersion("0203");
-         var1.setTxSize(50);
-         var1.setRxSize(1024);
-         var1.setEncryptionType(0);
-         var1.setIdentifierOrInitKey("00000000");
-         var1.setSoftwareVersionFields("35 00 00 1E 02 03 00 00 01 03 01");
-         return var1;
+         SessionInfo sessionInfo2 = new SessionInfo();
+         sessionInfo2.setClient(true);
+         sessionInfo2.setDeviceTypeOrVendorID(143);
+         sessionInfo2.setDeviceId(0);
+         sessionInfo2.setSoftwareVersion("0100");
+         sessionInfo2.setProtocolVersion("0203");
+         sessionInfo2.setTxSize(50);
+         sessionInfo2.setRxSize(1024);
+         sessionInfo2.setEncryptionType(0);
+         sessionInfo2.setIdentifierOrInitKey("00000000");
+         sessionInfo2.setSoftwareVersionFields("35 00 00 1E 02 03 00 00 01 03 01");
+         return sessionInfo2;
       }
 
       protected Queue<HandshakeHandler<?>> buildHandshakeHandlers() {
-         Queue<HandshakeHandler<?>> var1 = new ArrayDeque<HandshakeHandler<?>>(3);
-         var1.add(new OpenSessionHandler());
-         var1.add(new RequestAccessHandler());
-         var1.add(new SoftwareVersionHandler());
-         return var1;
+         Queue<HandshakeHandler<?>> queue2 = new ArrayDeque<HandshakeHandler<?>>(3);
+         queue2.add(new OpenSessionHandler());
+         queue2.add(new RequestAccessHandler());
+         queue2.add(new SoftwareVersionHandler());
+         return queue2;
       }
 
       protected int getWriterIdleTimeSeconds() {
@@ -96,16 +96,16 @@ public class AbsolutaClient implements ITv2Client {
       protected PollHandler.PollFactory pollFactory() {
          return new PollHandler.PollFactory() {
             public DscCommand createPoll() {
-               UserActivity var1 = new UserActivity();
-               var1.setPartitionNumber((Integer)null);
-               var1.setType(4);
-               return var1;
+               UserActivity userActivity2 = new UserActivity();
+               userActivity2.setPartitionNumber((Integer)null);
+               userActivity2.setType(4);
+               return userActivity2;
             }
          };
       }
 
-      protected void onInitialized(DscEndpoint var1, SocketChannel var2) {
-         this.callback.connected(var1);
+      protected void onInitialized(DscEndpoint endpoint, SocketChannel socketChannel2) {
+         this.callback.connected(endpoint);
       }
    }
 }

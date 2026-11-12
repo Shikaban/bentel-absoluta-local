@@ -30,20 +30,20 @@ public class SystemTroubleStatus extends DscRequestableCommand implements DscArr
    }
 
    public void setRequestAll() {
-      SystemTroubleStatus.Trouble var1 = new SystemTroubleStatus.Trouble();
-      var1.deviceModuleType.setPositiveInt(SYSTEM, 1);
-      var1.numberOfTroubleTypes.set(1L);
-      var1.troubleTypes.add((new DscVariableBytes()).setPositiveInt(ALL_TROUBLES_NO_TROUBLES, 1));
+      SystemTroubleStatus.Trouble systemTroubleStatus2 = new SystemTroubleStatus.Trouble();
+      systemTroubleStatus2.deviceModuleType.setPositiveInt(SYSTEM, 1);
+      systemTroubleStatus2.numberOfTroubleTypes.set(1L);
+      systemTroubleStatus2.troubleTypes.add((new DscVariableBytes()).setPositiveInt(ALL_TROUBLES_NO_TROUBLES, 1));
       this.troubles.clear();
-      this.troubles.add(var1);
+      this.troubles.add(systemTroubleStatus2);
    }
 
    public List<SystemTroubleStatus.Trouble> getTroubles() {
       return Collections.unmodifiableList(this.troubles);
    }
 
-   public boolean match(DscRequestableCommand var1) {
-      return var1 instanceof SystemTroubleStatus;
+   public boolean match(DscRequestableCommand requestableCommand) {
+      return requestableCommand instanceof SystemTroubleStatus;
    }
 
    public int numberOfElements() {
@@ -68,15 +68,15 @@ public class SystemTroubleStatus extends DscRequestableCommand implements DscArr
       }
 
       public List<Integer> getTroubleTypes() {
-         List<Integer> var1 = new ArrayList<Integer>(this.troubleTypes.size());
+         List<Integer> items = new ArrayList<Integer>(this.troubleTypes.size());
          for (DscVariableBytes troubleType : this.troubleTypes) {
             int value = troubleType.toPositiveInt();
             if (value != ALL_TROUBLES_NO_TROUBLES) {
-               var1.add(value);
+               items.add(value);
             }
          }
 
-         return var1;
+         return items;
       }
 
       public int numberOfElements() {

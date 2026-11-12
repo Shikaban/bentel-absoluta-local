@@ -22,7 +22,7 @@ public abstract class AbstractPartitionReqCommand extends DscRequestableCommand 
       return this.partitionNumber.toPositiveInteger();
    }
 
-   public final void setPartitionNumber(Integer var1) {
-      this.partitionNumber.setPositiveInteger(var1);
+   public final void setPartitionNumber(Integer positiveInteger) {
+      this.partitionNumber.setPositiveInteger(positiveInteger);
    }
 }

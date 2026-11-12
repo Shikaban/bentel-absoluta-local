@@ -29,10 +29,10 @@ public class ZoneAlarmStatus extends DscRequestableCommand implements DscArray.E
       return 2112;
    }
 
-   public boolean match(DscRequestableCommand var1) {
-      if (var1 instanceof ZoneAlarmStatus) {
-         ZoneAlarmStatus var2 = (ZoneAlarmStatus)var1;
-         return this.partitionNumber.equals(var2.partitionNumber);
+   public boolean match(DscRequestableCommand requestableCommand) {
+      if (requestableCommand instanceof ZoneAlarmStatus) {
+         ZoneAlarmStatus zoneAlarmStatus2 = (ZoneAlarmStatus)requestableCommand;
+         return this.partitionNumber.equals(zoneAlarmStatus2.partitionNumber);
       } else {
          return false;
       }
@@ -42,8 +42,8 @@ public class ZoneAlarmStatus extends DscRequestableCommand implements DscArray.E
       return this.partitionNumber.toPositiveInt();
    }
 
-   public void setPartitionNumber(int var1) {
-      this.partitionNumber.setPositiveInt(var1);
+   public void setPartitionNumber(int value) {
+      this.partitionNumber.setPositiveInt(value);
    }
 
    public int getNumberOfZones() {

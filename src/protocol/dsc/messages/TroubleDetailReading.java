@@ -15,21 +15,21 @@ public class TroubleDetailReading extends RequestableCommandReading<Pair<Integer
       super(TroubleDetail.class);
    }
 
-   protected TroubleDetail prepareRequest(ChannelHandlerContext var1, Pair<Integer, Integer> var2) throws Exception {
-      TroubleDetail var3 = new TroubleDetail();
-      var3.setDeviceModuleType((Integer)var2.getValue0());
-      var3.setTroubleType((Integer)var2.getValue1());
-      return var3;
+   protected TroubleDetail prepareRequest(ChannelHandlerContext context, Pair<Integer, Integer> pair2) throws Exception {
+      TroubleDetail troubleDetail2 = new TroubleDetail();
+      troubleDetail2.setDeviceModuleType((Integer)pair2.getValue0());
+      troubleDetail2.setTroubleType((Integer)pair2.getValue1());
+      return troubleDetail2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, TroubleDetail var2, List<Message.Response> var3) {
-      Pair<Integer, Integer> var4 = Pair.with(var2.getDeviceModuleType(), var2.getTroubleType());
-      var3.add(new NewValue(this, var4, var2.getDeviceModuleNumbers()));
+   protected void parseResponse(ChannelHandlerContext context, TroubleDetail troubleDetail2, List<Message.Response> responses) {
+      Pair<Integer, Integer> deviceModuleType = Pair.with(troubleDetail2.getDeviceModuleType(), troubleDetail2.getTroubleType());
+      responses.add(new NewValue(this, deviceModuleType, troubleDetail2.getDeviceModuleNumbers()));
    }
 
-   protected void parseCommandResponse(ChannelHandlerContext var1, Pair<Integer, Integer> var2, CommandResponse var3, List<Message.Response> var4) {
-      if (var3.getResponseCode() == 26) {
-         var4.add(new NewValue(this, var2, Collections.emptyList()));
+   protected void parseCommandResponse(ChannelHandlerContext context, Pair<Integer, Integer> pair2, CommandResponse commandResponse2, List<Message.Response> responses) {
+      if (commandResponse2.getResponseCode() == 26) {
+         responses.add(new NewValue(this, pair2, Collections.emptyList()));
       }
 
    }

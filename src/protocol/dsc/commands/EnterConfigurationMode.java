@@ -34,32 +34,32 @@ public class EnterConfigurationMode extends DscCommandWithAppSeq {
       return this.partitionNumber.toPositiveInt();
    }
 
-   public void setPartitionNumber(int var1) {
-      this.partitionNumber.setPositiveInt(var1);
+   public void setPartitionNumber(int value) {
+      this.partitionNumber.setPositiveInt(value);
    }
 
    public int getType() {
       return this.type.toInt();
    }
 
-   public void setType(int var1) {
-      this.type.set((long)var1);
+   public void setType(int value) {
+      this.type.set((long)value);
    }
 
    public String getProgrammingAccessCode() {
       return this.programmingAccessCode.toString(ACCESS_CODE_CHARSET);
    }
 
-   public void setProgrammingAccessCode(String var1) {
-      this.programmingAccessCode.setString(ACCESS_CODE_CHARSET, var1);
+   public void setProgrammingAccessCode(String text) {
+      this.programmingAccessCode.setString(ACCESS_CODE_CHARSET, text);
    }
 
    public boolean isReadWrite() {
       return this.readWriteAccess.get(0);
    }
 
-   public void setReadWrite(boolean var1) {
-      this.readWriteAccess.set(0, (Boolean)var1);
+   public void setReadWrite(boolean enabled) {
+      this.readWriteAccess.set(0, (Boolean)enabled);
    }
 
    static {

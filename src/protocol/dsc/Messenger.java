@@ -1,15 +1,15 @@
 package protocol.dsc;
 
 public interface Messenger {
-   <V> void send(Message<Void, V> var1);
+   <V> void send(Message<Void, V> message2);
 
-   <V> void send(Message<Void, V> var1, Priority var2);
+   <V> void send(Message<Void, V> message2, Priority priority2);
 
-   <P, V> void send(Message<P, V> var1, P var2);
+   <P, V> void send(Message<P, V> message2, P p2);
 
-   <P, V> void send(Message<P, V> var1, P var2, Priority var3);
+   <P, V> void send(Message<P, V> message2, P p2, Priority priority2);
 
-   void addMessageListener(MessageListener var1);
+   void addMessageListener(MessageListener messageListener2);
 
-   void removeMessageListener(MessageListener var1);
+   void removeMessageListener(MessageListener messageListener2);
 }

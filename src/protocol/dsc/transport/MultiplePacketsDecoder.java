@@ -13,21 +13,21 @@ import java.util.List;
 @Sharable
 public class MultiplePacketsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
-   protected void decode(ChannelHandlerContext var1, ByteBuf var2, List<Object> var3) throws Exception {
+   protected void decode(ChannelHandlerContext context, ByteBuf inputBuffer, List<Object> output) throws Exception {
 
-      if (var2.readableBytes() >= 2 && var2.getShort(var2.readerIndex()) == 1571) {
-         var3.add(var2.readSlice(2).retain());
+      if (inputBuffer.readableBytes() >= 2 && inputBuffer.getShort(inputBuffer.readerIndex()) == 1571) {
+         output.add(inputBuffer.readSlice(2).retain());
 
          try {
-            while(var2.isReadable()) {
-               int var4 = Decoders.readBytesToFollow(var2);
-               var3.add(var2.readSlice(var4).retain());
+            while(inputBuffer.isReadable()) {
+               int numericValue = Decoders.readBytesToFollow(inputBuffer);
+               output.add(inputBuffer.readSlice(numericValue).retain());
             }
-         } catch (IndexOutOfBoundsException var5) {
+         } catch (IndexOutOfBoundsException exception2) {
             throw new WrongCommandLengthException(1571, "unexpected packet length");
          }
       } else {
-         var3.add(var2.retain());
+         output.add(inputBuffer.retain());
       }
 
    }

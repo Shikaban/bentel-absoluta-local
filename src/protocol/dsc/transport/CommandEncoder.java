@@ -22,9 +22,9 @@ public class CommandEncoder extends MessageToByteEncoder<DscCommand> {
       } else {
          buffer.writeShort(cmd.getCommandNumber());
          if (cmd instanceof DscCommandWithAppSeq) {
-            int var4 = SequenceHandlersHelper.getCounters(ctx).nextAppSeq();
-            ((DscCommandWithAppSeq)cmd).setAppSeq(var4);
-            buffer.writeByte(var4);
+            int counters = SequenceHandlersHelper.getCounters(ctx).nextAppSeq();
+            ((DscCommandWithAppSeq)cmd).setAppSeq(counters);
+            buffer.writeByte(counters);
          }
 
          cmd.writeTo(buffer);

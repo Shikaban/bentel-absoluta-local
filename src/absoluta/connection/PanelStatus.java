@@ -439,29 +439,29 @@ public class PanelStatus {
       }
    }
 
-   void addTrouble(Trouble var1) {
-      if (this.unconfirmedTroubles.remove(var1)) {
-         logger.fine("trouble confirmed: " + var1);
+   void addTrouble(Trouble trouble2) {
+      if (this.unconfirmedTroubles.remove(trouble2)) {
+         logger.fine("trouble confirmed: " + trouble2);
       }
 
-      if (!this.troubles.contains(var1)) {
-         ImmutableSet<Trouble> var2 = this.troubles;
-         this.troubles = ImmutableSet.<Trouble>builder().addAll(this.troubles).add(var1).build();
-         logger.fine("trouble added: " + var1);
-         this.changeSupport.firePropertyChange("TROUBLES", var2, this.troubles);
+      if (!this.troubles.contains(trouble2)) {
+         ImmutableSet<Trouble> immutableSet2 = this.troubles;
+         this.troubles = ImmutableSet.<Trouble>builder().addAll(this.troubles).add(trouble2).build();
+         logger.fine("trouble added: " + trouble2);
+         this.changeSupport.firePropertyChange("TROUBLES", immutableSet2, this.troubles);
       }
 
    }
 
-   void removeTrouble(Trouble var1) {
-      this.unconfirmedTroubles.remove(var1);
-      if (this.troubles.contains(var1)) {
-         Set<Trouble> var2 = new HashSet<>(this.troubles);
-         var2.remove(var1);
-         ImmutableSet<Trouble> var3 = this.troubles;
-         this.troubles = ImmutableSet.copyOf(var2);
-         logger.fine("trouble removed: " + var1);
-         this.changeSupport.firePropertyChange("TROUBLES", var3, this.troubles);
+   void removeTrouble(Trouble trouble2) {
+      this.unconfirmedTroubles.remove(trouble2);
+      if (this.troubles.contains(trouble2)) {
+         Set<Trouble> hashSet2 = new HashSet<>(this.troubles);
+         hashSet2.remove(trouble2);
+         ImmutableSet<Trouble> immutableSet2 = this.troubles;
+         this.troubles = ImmutableSet.copyOf(hashSet2);
+         logger.fine("trouble removed: " + trouble2);
+         this.changeSupport.firePropertyChange("TROUBLES", immutableSet2, this.troubles);
       }
 
    }
@@ -472,12 +472,12 @@ public class PanelStatus {
    }
 
    void removeUnconfirmedTroubles() {
-      UnmodifiableIterator<Trouble> var1 = ImmutableSet.copyOf(this.unconfirmedTroubles).iterator();
+      UnmodifiableIterator<Trouble> unmodifiableIterator2 = ImmutableSet.copyOf(this.unconfirmedTroubles).iterator();
 
-      while(var1.hasNext()) {
-         Trouble var2 = (Trouble)var1.next();
-         logger.fine("unconfirmed trouble: " + var2);
-         this.removeTrouble(var2);
+      while(unmodifiableIterator2.hasNext()) {
+         Trouble trouble2 = (Trouble)unmodifiableIterator2.next();
+         logger.fine("unconfirmed trouble: " + trouble2);
+         this.removeTrouble(trouble2);
       }
 
    }

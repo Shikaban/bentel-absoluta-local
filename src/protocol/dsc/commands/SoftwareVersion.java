@@ -22,7 +22,7 @@ public class SoftwareVersion extends DscAbstractCommand {
       return this.versionFields.toString();
    }
 
-   public void setVersionFields(String var1) {
-      this.versionFields.setString(var1);
+   public void setVersionFields(String text) {
+      this.versionFields.setString(text);
    }
 }

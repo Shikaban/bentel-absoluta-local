@@ -12,13 +12,13 @@ public class CommandOutputActivationReading extends RequestableCommandReading<Vo
       super(CommandOutputActivation.class);
    }
 
-   protected CommandOutputActivation prepareRequest(ChannelHandlerContext var1, Void var2) throws Exception {
-      CommandOutputActivation var3 = new CommandOutputActivation();
-      var3.setPartitionNumber((Integer)null);
-      return var3;
+   protected CommandOutputActivation prepareRequest(ChannelHandlerContext context, Void void2) throws Exception {
+      CommandOutputActivation commandOutputActivation2 = new CommandOutputActivation();
+      commandOutputActivation2.setPartitionNumber((Integer)null);
+      return commandOutputActivation2;
    }
 
-   protected void parseResponse(ChannelHandlerContext var1, CommandOutputActivation var2, List<Message.Response> var3) {
-      var3.add(new NewValue(this, null, var2.getActiveOutputs()));
+   protected void parseResponse(ChannelHandlerContext context, CommandOutputActivation commandOutputActivation2, List<Message.Response> responses) {
+      responses.add(new NewValue(this, null, commandOutputActivation2.getActiveOutputs()));
    }
 }

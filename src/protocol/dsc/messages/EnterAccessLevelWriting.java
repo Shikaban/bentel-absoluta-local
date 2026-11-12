@@ -7,11 +7,11 @@ import protocol.dsc.commands.EnterAccessLevel;
 import org.javatuples.Pair;
 
 public class EnterAccessLevelWriting extends Writing<Pair<Integer, String>> {
-   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext var1, Pair<Integer, String> var2) throws Exception {
-      EnterAccessLevel var3 = new EnterAccessLevel();
-      var3.setPartitionNumber((Integer)null);
-      var3.setType((Integer)var2.getValue0());
-      var3.setProgrammingAccessCode((String)var2.getValue1());
-      return var3;
+   protected DscCommandWithAppSeq prepareCommand(ChannelHandlerContext context, Pair<Integer, String> pair2) throws Exception {
+      EnterAccessLevel enterAccessLevel2 = new EnterAccessLevel();
+      enterAccessLevel2.setPartitionNumber((Integer)null);
+      enterAccessLevel2.setType((Integer)pair2.getValue0());
+      enterAccessLevel2.setProgrammingAccessCode((String)pair2.getValue1());
+      return enterAccessLevel2;
    }
 }

@@ -9,7 +9,7 @@ public class MasterCodeReading extends SectionReading<String> {
       super(6, ImmutableList.of(2));
    }
 
-   protected String getResponseValue(SectionReadResponse var1) {
-      return var1.getDataAsBCDString();
+   protected String getResponseValue(SectionReadResponse sectionReadResponse2) {
+      return sectionReadResponse2.getDataAsBCDString();
    }
 }

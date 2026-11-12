@@ -8,20 +8,20 @@ import protocol.dsc.base.DscSerializable;
 import java.util.List;
 
 public abstract class DscCommandWithResponse extends DscCommandWithAppSeq {
-   protected final boolean matchAsNotGeneralResponse(DscResponse var1) {
-      if (!(var1 instanceof DscCommandWithResponse.Response)) {
+   protected final boolean matchAsNotGeneralResponse(DscResponse response2) {
+      if (!(response2 instanceof DscCommandWithResponse.Response)) {
          return false;
       } else {
-         DscCommandWithResponse var2 = ((DscCommandWithResponse.Response<?>)var1).requestInstance;
-         return this.getClass() == var2.getClass() && this.getFields().equals(var2.getFields());
+         DscCommandWithResponse commandWithResponse = ((DscCommandWithResponse.Response<?>)response2).requestInstance;
+         return this.getClass() == commandWithResponse.getClass() && this.getFields().equals(commandWithResponse.getFields());
       }
    }
 
    public abstract static class Response<C extends DscCommandWithResponse> extends DscAbstractCommand implements DscResponse {
       protected final C requestInstance;
 
-      protected Response(C var1) {
-         this.requestInstance = Preconditions.checkNotNull(var1);
+      protected Response(C c2) {
+         this.requestInstance = Preconditions.checkNotNull(c2);
       }
 
       protected abstract List<DscSerializable> getResponseFields();

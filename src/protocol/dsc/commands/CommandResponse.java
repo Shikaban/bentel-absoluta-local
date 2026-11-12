@@ -37,16 +37,16 @@ public class CommandResponse extends DscAbstractCommand implements DscGeneralRes
       return this.commandSeq.toInt();
    }
 
-   public void setCommandSeq(int var1) {
-      this.commandSeq.set((long)var1);
+   public void setCommandSeq(int value) {
+      this.commandSeq.set((long)value);
    }
 
    public int getResponseCode() {
       return this.responseCode.toInt();
    }
 
-   public void setResponseCode(int var1) {
-      this.responseCode.set((long)var1);
+   public void setResponseCode(int value) {
+      this.responseCode.set((long)value);
    }
 
    public String toString() {

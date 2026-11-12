@@ -24,18 +24,18 @@ public final class LowACK implements DscCommand {
       return LowACK.LowACKHolder.INSTANCE;
    }
 
-   public void readFrom(ByteBuf var1) {
+   public void readFrom(ByteBuf inputBuffer) {
    }
 
-   public void writeTo(ByteBuf var1) {
+   public void writeTo(ByteBuf buffer) {
    }
 
-   public boolean isEquivalent(DscSerializable var1) {
-      return var1 instanceof LowACK;
+   public boolean isEquivalent(DscSerializable serializable) {
+      return serializable instanceof LowACK;
    }
 
    // $FF: synthetic method
-   LowACK(Object var1) {
+   LowACK(Object object2) {
       this();
    }
 

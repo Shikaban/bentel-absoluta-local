@@ -29,16 +29,16 @@ public class TroubleDetail extends DscRequestableCommand {
       return this.deviceModuleType.toInt();
    }
 
-   public void setDeviceModuleType(int var1) {
-      this.deviceModuleType.set((long)var1);
+   public void setDeviceModuleType(int value) {
+      this.deviceModuleType.set((long)value);
    }
 
    public int getTroubleType() {
       return this.troubleType.toInt();
    }
 
-   public void setTroubleType(int var1) {
-      this.troubleType.set((long)var1);
+   public void setTroubleType(int value) {
+      this.troubleType.set((long)value);
    }
 
    public List<Integer> getDeviceModuleNumbers() {

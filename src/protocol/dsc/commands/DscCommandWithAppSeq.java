@@ -10,43 +10,43 @@ public abstract class DscCommandWithAppSeq extends DscAbstractCommand {
    protected DscCommandWithAppSeq() {
    }
 
-   protected DscCommandWithAppSeq(boolean var1) {
-      super(var1);
+   protected DscCommandWithAppSeq(boolean enabled) {
+      super(enabled);
    }
 
    public final int getAppSeq() {
       return this.appSeq;
    }
 
-   public final void setAppSeq(int var1) {
-      this.appSeq = DscUtils.validateUByte(var1);
+   public final void setAppSeq(int value) {
+      this.appSeq = DscUtils.validateUByte(value);
    }
 
-   public final void setResponseCallback(DscCommandWithAppSeq.ResponseCallback var1) {
-      this.responseCallback = var1;
+   public final void setResponseCallback(DscCommandWithAppSeq.ResponseCallback responseCallback2) {
+      this.responseCallback = responseCallback2;
    }
 
    public final boolean hasResponseCallback() {
       return this.responseCallback != null;
    }
 
-   public final boolean matchAsResponse(DscResponse var1) {
-      if (var1 instanceof CommandResponse) {
-         return this.getAppSeq() == ((CommandResponse)var1).getCommandSeq();
-      } else if (var1 instanceof CommandError) {
-         return this.getCommandNumber() == ((CommandError)var1).getReceivedCommand();
+   public final boolean matchAsResponse(DscResponse response) {
+      if (response instanceof CommandResponse) {
+         return this.getAppSeq() == ((CommandResponse)response).getCommandSeq();
+      } else if (response instanceof CommandError) {
+         return this.getCommandNumber() == ((CommandError)response).getReceivedCommand();
       } else {
-         return this.matchAsNotGeneralResponse(var1);
+         return this.matchAsNotGeneralResponse(response);
       }
    }
 
-   protected boolean matchAsNotGeneralResponse(DscResponse var1) {
+   protected boolean matchAsNotGeneralResponse(DscResponse response) {
       return false;
    }
 
-   public final void generalResponseReceived(Channel var1, DscGeneralResponse var2) {
+   public final void generalResponseReceived(Channel channel2, DscGeneralResponse generalResponse) {
       if (this.responseCallback != null) {
-         this.responseCallback.generalResponseReceived(var1, var2);
+         this.responseCallback.generalResponseReceived(channel2, generalResponse);
       }
 
    }
@@ -56,6 +56,6 @@ public abstract class DscCommandWithAppSeq extends DscAbstractCommand {
    }
 
    public interface ResponseCallback {
-      void generalResponseReceived(Channel var1, DscGeneralResponse var2);
+      void generalResponseReceived(Channel channel2, DscGeneralResponse generalResponse);
    }
 }

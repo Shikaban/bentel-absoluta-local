@@ -19,64 +19,64 @@ public class RequestAccessHandler extends HandshakeHandler<RequestAccess> {
       super(RequestAccess.class);
    }
 
-   public boolean validateOwnInfo(SessionInfo var1) {
-      String var2 = var1.getIdentifierOrInitKey();
-      switch(var1.getEncryptionType()) {
+   public boolean validateOwnInfo(SessionInfo sessionInfo2) {
+      String identifierOrInitKey = sessionInfo2.getIdentifierOrInitKey();
+      switch(sessionInfo2.getEncryptionType()) {
       case 0:
-         return var2 != null;
+         return identifierOrInitKey != null;
       case 1:
-         return var2 != null && var2.length() >= 8;
+         return identifierOrInitKey != null && identifierOrInitKey.length() >= 8;
       default:
          return false;
       }
    }
 
-   protected RequestAccess getCommand(Channel var1) {
-      SessionInfo var2 = SessionInfo.getOwnInfo(var1);
-      String var3 = var2.getIdentifierOrInitKey();
-      RequestAccess var4 = new RequestAccess();
-      switch(var2.getEncryptionType()) {
+   protected RequestAccess getCommand(Channel channel2) {
+      SessionInfo ownInfo = SessionInfo.getOwnInfo(channel2);
+      String identifierOrInitKey = ownInfo.getIdentifierOrInitKey();
+      RequestAccess requestAccess2 = new RequestAccess();
+      switch(ownInfo.getEncryptionType()) {
       case 0:
          this.ownSessionKey = null;
-         var4.setIdentifier(var3);
+         requestAccess2.setIdentifier(identifierOrInitKey);
          break;
       case 1:
          this.ownSessionKey = RequestAccessAESHelper.getRandomBytes();
-         (new RequestAccessAESHelper(var4)).encryptKey(var3, this.ownSessionKey);
+         (new RequestAccessAESHelper(requestAccess2)).encryptKey(identifierOrInitKey, this.ownSessionKey);
          break;
       default:
          throw new IllegalStateException("unexpected encryption type");
       }
 
-      return var4;
+      return requestAccess2;
    }
 
-   protected void commandSent(Channel var1) {
+   protected void commandSent(Channel channel2) {
       if (this.ownSessionKey != null) {
          logger.fine("Decoding key: " + DscUtils.hexDump(this.ownSessionKey));
-         AESDecoder.setKey(var1, this.ownSessionKey);
+         AESDecoder.setKey(channel2, this.ownSessionKey);
       }
    }
 
-   protected int commandReceived(Channel var1, RequestAccess var2) {
-      SessionInfo var3 = SessionInfo.getPeerInfo(var1);
-      switch(var3.getEncryptionType()) {
+   protected int commandReceived(Channel channel2, RequestAccess requestAccess2) {
+      SessionInfo peerInfo = SessionInfo.getPeerInfo(channel2);
+      switch(peerInfo.getEncryptionType()) {
       case 0:
-         String var4 = var2.getIdentifier();
-         var3.setIdentifierOrInitKey(var4);
-         logger.fine("Peer identifier: " + var4);
+         String identifier2 = requestAccess2.getIdentifier();
+         peerInfo.setIdentifierOrInitKey(identifier2);
+         logger.fine("Peer identifier: " + identifier2);
          return 0;
       case 1:
-         String var5 = var3.getIdentifierOrInitKey();
-         if (var5 == null) {
-            var5 = var3.getMultiPointCommId();
-            var3.setIdentifierOrInitKey(var5);
+         String identifierOrInitKey = peerInfo.getIdentifierOrInitKey();
+         if (identifierOrInitKey == null) {
+            identifierOrInitKey = peerInfo.getMultiPointCommId();
+            peerInfo.setIdentifierOrInitKey(identifierOrInitKey);
          }
 
-         byte[] var6 = (new RequestAccessAESHelper(var2)).decryptKey(var5);
-         if (var6 != null) {
-            logger.fine("Encoding key: " + DscUtils.hexDump(var6));
-            AESEncoder.setKey(var1, var6);
+         byte[] byteValue = (new RequestAccessAESHelper(requestAccess2)).decryptKey(identifierOrInitKey);
+         if (byteValue != null) {
+            logger.fine("Encoding key: " + DscUtils.hexDump(byteValue));
+            AESEncoder.setKey(channel2, byteValue);
             return 0;
          }
 

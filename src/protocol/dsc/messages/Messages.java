@@ -4,10 +4,10 @@ import io.netty.channel.ChannelHandlerContext;
 import protocol.dsc.transport.EndpointHandler;
 
 public final class Messages {
-   public static String getPin(ChannelHandlerContext var0) throws IllegalStateException {
-      String var1 = EndpointHandler.getPin(var0.channel());
-      if (var1 != null) {
-         return var1;
+   public static String getPin(ChannelHandlerContext context) throws IllegalStateException {
+      String pin2 = EndpointHandler.getPin(context.channel());
+      if (pin2 != null) {
+         return pin2;
       } else {
          throw new IllegalStateException("pin not set");
       }

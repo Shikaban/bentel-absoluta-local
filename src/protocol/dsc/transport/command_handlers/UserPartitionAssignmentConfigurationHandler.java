@@ -13,16 +13,16 @@ import org.javatuples.Pair;
 
 @Sharable
 public class UserPartitionAssignmentConfigurationHandler extends ChannelInboundHandlerAdapter {
-   public void channelRead(ChannelHandlerContext var1, Object var2) throws Exception {
-      if (var2 instanceof UserPartitionAssignmentConfiguration) {
-         UserPartitionAssignmentConfiguration var3 = (UserPartitionAssignmentConfiguration)var2;
-         for (Entry<Integer, List<Integer>> entry : var3.getPartitionAssignments().entrySet()) {
+   public void channelRead(ChannelHandlerContext context, Object object2) throws Exception {
+      if (object2 instanceof UserPartitionAssignmentConfiguration) {
+         UserPartitionAssignmentConfiguration userPartitionAssignmentConfiguration2 = (UserPartitionAssignmentConfiguration)object2;
+         for (Entry<Integer, List<Integer>> entry : userPartitionAssignmentConfiguration2.getPartitionAssignments().entrySet()) {
             Integer key = entry.getKey();
             List<Integer> value = entry.getValue();
-            var1.fireChannelRead(new NewValue(Message.USER_PARTITION_ASSIGNMENT_CONFIGURATION, Pair.with(key, value)));
+            context.fireChannelRead(new NewValue(Message.USER_PARTITION_ASSIGNMENT_CONFIGURATION, Pair.with(key, value)));
          }
       } else {
-         super.channelRead(var1, var2);
+         super.channelRead(context, object2);
       }
 
    }

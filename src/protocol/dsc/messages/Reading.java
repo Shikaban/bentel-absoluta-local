@@ -23,28 +23,28 @@ public abstract class Reading<P, V, C extends DscResponse> extends MessageWithRe
 
    }
 
-   public static DscCommandWithAppSeq tryToPrepare(ChannelHandlerContext var0, Object var1) throws Exception {
-      return tryToPrepare(Reading.class, var0, var1);
+   public static DscCommandWithAppSeq tryToPrepare(ChannelHandlerContext context, Object object2) throws Exception {
+      return tryToPrepare(Reading.class, context, object2);
    }
 
-   public static void tryToParse(ChannelHandlerContext var0, Object var1, List<Message.Response> var2) {
-      if (var1 instanceof DscResponse) {
-         DscResponse var3 = (DscResponse)var1;
-         for (Reading<?, ?, ?> reading : readingMap.get(var3.getClass())) {
+   public static void tryToParse(ChannelHandlerContext context, Object object2, List<Message.Response> responses) {
+      if (object2 instanceof DscResponse) {
+         DscResponse response2 = (DscResponse)object2;
+         for (Reading<?, ?, ?> reading : readingMap.get(response2.getClass())) {
             try {
-               reading.doParse(var0, var3, var2);
-            } catch (RuntimeException var7) {
-               var2.add(DscError.newMessageError(reading, null, var7));
+               reading.doParse(context, response2, responses);
+            } catch (RuntimeException exception) {
+               responses.add(DscError.newMessageError(reading, null, exception));
             }
          }
       }
 
    }
 
-   Reading(Class<C> var1) {
+   Reading(Class<C> class2) {
       init();
-      this.cmdClass = Preconditions.checkNotNull(var1);
-      readingMap.put(var1, this);
+      this.cmdClass = Preconditions.checkNotNull(class2);
+      readingMap.put(class2, this);
    }
 
    protected final boolean expectedSuccessfulResponse() {
@@ -52,9 +52,9 @@ public abstract class Reading<P, V, C extends DscResponse> extends MessageWithRe
    }
 
    @SuppressWarnings("unchecked")
-   private void doParse(ChannelHandlerContext var1, DscResponse var2, List<Message.Response> var3) {
-      this.parseResponse(var1, (C) var2, var3);
+   private void doParse(ChannelHandlerContext context, DscResponse response2, List<Message.Response> responses) {
+      this.parseResponse(context, (C) response2, responses);
    }
 
-   protected abstract void parseResponse(ChannelHandlerContext var1, C var2, List<Message.Response> var3);
+   protected abstract void parseResponse(ChannelHandlerContext context, C c2, List<Message.Response> responses);
 }

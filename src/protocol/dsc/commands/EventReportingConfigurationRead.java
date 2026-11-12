@@ -22,19 +22,19 @@ public class EventReportingConfigurationRead extends DscCommandWithResponse {
       return 1889;
    }
 
-   public boolean getReportingType(int var1) {
-      return this.reportingType.get(var1);
+   public boolean getReportingType(int numericValue) {
+      return this.reportingType.get(numericValue);
    }
 
-   public void setReportingType(int var1, boolean var2) {
-      this.reportingType.set(var1, var2);
+   public void setReportingType(int value, boolean enabled) {
+      this.reportingType.set(value, enabled);
    }
 
    public int getEventType() {
       return this.eventType.toInt();
    }
 
-   public void setEventType(int var1) {
-      this.eventType.set((long)var1);
+   public void setEventType(int value) {
+      this.eventType.set((long)value);
    }
 }

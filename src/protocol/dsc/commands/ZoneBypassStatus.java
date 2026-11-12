@@ -28,8 +28,8 @@ public class ZoneBypassStatus extends DscRequestableCommand {
       return this.partitionNumber.toPositiveInt();
    }
 
-   public void setPartitionNumber(int var1) {
-      this.partitionNumber.setPositiveInt(var1);
+   public void setPartitionNumber(int value) {
+      this.partitionNumber.setPositiveInt(value);
    }
 
    public void setGlobalPartition() {
