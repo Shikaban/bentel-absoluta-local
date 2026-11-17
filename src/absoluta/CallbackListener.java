@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import absoluta.connection.Trouble;
 
@@ -18,7 +17,6 @@ import absoluta.connection.PanelStatus;
 import absoluta.spi.PanelProvider.PanelCallback;
 
 class CallbackListener implements PropertyChangeListener {
-   private static final Logger logger = Logger.getLogger(CallbackListener.class.getName());
    private final PanelCallback callback;
    private final PanelStatus panelStatus;
 
