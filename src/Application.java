@@ -102,7 +102,8 @@ public class Application {
       // Se LOG_LOCATION è "FILE", imposta un FileHandler
       if (LOG_LOCATION != null && LOG_LOCATION.equalsIgnoreCase("FILE")) {
          try {
-            java.util.logging.FileHandler fileHandler = new java.util.logging.FileHandler("absoluta.log", false);
+            java.util.logging.FileHandler fileHandler =
+               new java.util.logging.FileHandler("absoluta.log", 10 * 1024 * 1024, 1, false);
             fileHandler.setLevel(logLevel);
             fileHandler.setFormatter(new SimpleFormatter()); // usa un formato di testo semplice
             rootLogger.addHandler(fileHandler);
