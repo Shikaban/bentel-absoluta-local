@@ -13,23 +13,17 @@ import java.util.logging.Logger;
 
 class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
    private static final Logger logger = Logger.getLogger(Callback.class.getName());
-   private MqttClient mqttClient;
    private final Entities entities = new Entities();
    private final BridgeAlertManager bridgeAlertManager;
    private final EntityManager entityManager;
    private final CommandManager commandManager;
    private final Publisher publisher;
    private final ConnectionManager connectionManager;
-   private AbsolutaPanelProvider provider;
    private static final int QOS = 1;
-   private Boolean discoveryEnabled;
    private MqttMessageDispatcher mqttDispatcher;
 
    public Callback(MqttClient mqttClient, AbsolutaPanelProvider provider, MqttConnectOptions mqttOption,
          Boolean discoveryEnabled) {
-      this.mqttClient = mqttClient;
-      this.provider = provider;
-      this.discoveryEnabled = discoveryEnabled;
       this.mqttDispatcher = new MqttMessageDispatcher(mqttClient);
 
       boolean discovery = Boolean.TRUE.equals(discoveryEnabled);
