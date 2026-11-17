@@ -37,13 +37,22 @@ public class MiscNotificationHandler extends ChannelInboundHandlerAdapter {
          ExitDelayNotification.class,
          MiscellaneousPreAlertNotification.class,
          PartitionAlarmMemoryNotification.class,
-         PartitionQuickExitNotification.class,
-         PartitionReadyStatusNotification.class
+         PartitionQuickExitNotification.class
       );
 
    @Override
    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-      if (PARTITION_STATUS_NOTIFICATIONS.contains(msg.getClass())) {
+      if (msg instanceof PartitionReadyStatusNotification) {
+         PartitionReadyStatusNotification notification = (PartitionReadyStatusNotification) msg;
+         Integer partitionNumber = notification.getPartitionNumber();
+         if (partitionNumber != null) {
+            ctx.fireChannelRead(new NewValue(
+               Message.PARTITION_READY_STATUS_CHANGED,
+               partitionNumber,
+               notification.getStatus()
+            ));
+         }
+      } else if (PARTITION_STATUS_NOTIFICATIONS.contains(msg.getClass())) {
          AbstractPartitionReqCommand partitionCommand = (AbstractPartitionReqCommand) msg;
          Integer partitionNumber = partitionCommand.getPartitionNumber();
          if (partitionNumber != null) {

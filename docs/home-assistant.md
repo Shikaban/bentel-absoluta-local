@@ -7,6 +7,7 @@ When `HOME_ASSISTANT_DISCOVERY = true` (the default), the bridge automatically p
 Discovered entities include:
 
 - **Alarm control panels** — one per partition (arm away, arm home, arm night, disarm)
+- **Sensors** — readiness for each partition and the aggregate global partition (`ready`, `ready_to_force`, `not_ready`, `armed`, `partially_armed`, `arming`, `disarming`, `triggered`, or `unknown`)
 - **Binary sensors** — one per zone (open/closed)
 - **Switches** — zone bypass toggles
 - **Buttons** — arming mode selectors (A, B, C, D), alarm memory reset, bridge alert reset

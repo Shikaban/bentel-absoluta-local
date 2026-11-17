@@ -67,6 +67,13 @@ final class EntityManager {
             entities.partitionIdByTopic.put(partition.topic, partitionId);
         }
 
+        ensurePartitionReadinessDiscovery(0, global.name);
+        for (int partitionId : partitions) {
+            ensurePartitionReadinessDiscovery(partitionId, "Partizione " + partitionId);
+            publishPartitionReadiness(partitionId);
+        }
+        publishGlobalReadiness();
+
         if (discoveryEnabled && !entities.partitionDiscoverySent.contains(0)) {
             String topic = "homeassistant/alarm_control_panel/absoluta_partition_0/config";
             String payload = HomeAssistantManager.buildPartition(0, global.name);
@@ -106,6 +113,7 @@ final class EntityManager {
             global.arming = actArming.toString();
         }
         publishGlobalState();
+        publishGlobalReadiness();
     }
 
     void publishGlobalState() {
@@ -238,8 +246,136 @@ final class EntityManager {
         }
         if (actArming != null) {
             partition.arming = actArming.toString();
+            switch (actArming) {
+                case ARMING:
+                    partition.readiness = PanelStatus.PartitionReadiness.ARMING.toString();
+                    break;
+                case DISARMING:
+                    partition.readiness = PanelStatus.PartitionReadiness.DISARMING.toString();
+                    break;
+                case AWAY:
+                case STAY:
+                case NODELAY:
+                    partition.readiness = PanelStatus.PartitionReadiness.ARMED.toString();
+                    break;
+                case TRIGGERED:
+                    partition.readiness = PanelStatus.PartitionReadiness.TRIGGERED.toString();
+                    break;
+                case NOT_AVAILABLE:
+                    partition.readiness = PanelStatus.PartitionReadiness.UNKNOWN.toString();
+                    break;
+                default:
+                    break;
+            }
         }
         publishPartitionArming(partitionID);
+        publishPartitionReadiness(partitionID);
+        publishGlobalReadiness();
+    }
+
+    void updatePartitionReadiness(int partitionID, PanelStatus.PartitionReadiness readiness) {
+        Entities.Partition partition = entities.partitionsById.get(partitionID);
+        if (partition == null) {
+            logger.warning("Partizione non inizializzata: " + partitionID);
+            return;
+        }
+        if (readiness != null) {
+            partition.readiness = readiness.toString();
+        }
+        publishPartitionReadiness(partitionID);
+        publishGlobalReadiness();
+    }
+
+    private void publishPartitionReadiness(int partitionID) {
+        if (partitionID == 0) {
+            publishGlobalReadiness();
+            return;
+        }
+        Entities.Partition partition = entities.partitionsById.get(partitionID);
+        if (partition == null) {
+            logger.warning("Partizione non inizializzata: " + partitionID);
+            return;
+        }
+        String readiness = partition.readiness == null ? "unknown" : partition.readiness;
+        publish.publish("ABS/partition/" + partitionID + "/readiness", readiness, qos, true,
+                "prontezza partizione");
+    }
+
+    private void publishGlobalReadiness() {
+        Entities.Partition global = entities.partitionsById.get(0);
+        if (global == null) {
+            logger.warning("Partizione globale non inizializzata");
+            return;
+        }
+
+        publish.publish("ABS/partition/0/readiness", aggregateReadiness(global), qos, true,
+                "prontezza generale");
+    }
+
+    private String aggregateReadiness(Entities.Partition global) {
+        if ("arming".equals(global.arming) || "disarming".equals(global.arming)
+                || "triggered".equals(global.arming)) {
+            return global.arming;
+        }
+
+        int partitionCount = 0;
+        int armedCount = 0;
+        boolean readyToForce = false;
+        boolean notReady = false;
+        boolean unknown = false;
+        boolean triggered = false;
+
+        for (Map.Entry<Integer, Entities.Partition> entry : entities.partitionsById.entrySet()) {
+            if (entry.getKey() == 0) {
+                continue;
+            }
+            partitionCount++;
+            String readiness = entry.getValue().readiness;
+            if ("armed".equals(readiness)) {
+                armedCount++;
+            } else if ("triggered".equals(readiness)) {
+                armedCount++;
+                triggered = true;
+            } else if ("arming".equals(readiness) || "disarming".equals(readiness)) {
+                return readiness;
+            } else if ("ready_to_force".equals(readiness)) {
+                readyToForce = true;
+            } else if ("not_ready".equals(readiness)) {
+                notReady = true;
+            } else if (!"ready".equals(readiness)) {
+                unknown = true;
+            }
+        }
+
+        if (triggered) {
+            return "triggered";
+        }
+        if (notReady) {
+            return "not_ready";
+        }
+        if (partitionCount == 0 || unknown) {
+            return "unknown";
+        }
+        if (armedCount == partitionCount) {
+            return "armed";
+        }
+        if (readyToForce) {
+            return "ready_to_force";
+        }
+        if (armedCount > 0) {
+            return "partially_armed";
+        }
+        return "ready";
+    }
+
+    private void ensurePartitionReadinessDiscovery(int partitionID, String partitionName) {
+        String discoveredName = entities.partitionReadinessDiscoveryNames.get(partitionID);
+        if (discoveryEnabled && !partitionName.equals(discoveredName)) {
+            String topic = "homeassistant/sensor/absoluta_partition_" + partitionID + "_readiness/config";
+            String payload = HomeAssistantManager.buildPartitionReadiness(partitionID, partitionName);
+            publish.publish(topic, payload, qos, true, "discovery prontezza partizione");
+            entities.partitionReadinessDiscoveryNames.put(partitionID, partitionName);
+        }
     }
 
     void publishPartitionArming(int partitionID) {
@@ -281,6 +417,7 @@ final class EntityManager {
             publish.publish(topic, payload, qos, true, "discovery partizione");
             entities.partitionDiscoverySent.add(partitionID);
         }
+        ensurePartitionReadinessDiscovery(partitionID, name);
 
         String str;
         if (discoveryEnabled) {
@@ -290,6 +427,8 @@ final class EntityManager {
         }
 
         publish.publish(partition.topic, str, qos, true, "stato partizione");
+        publishPartitionReadiness(partitionID);
+        publishGlobalReadiness();
         logger.fine(
                 "Partition Name: " + partition.name + " Arming: " + partition.arming + " Status: " + partition.status);
     }
@@ -359,6 +498,7 @@ final class EntityManager {
 
     void republishAllStates() {
         publishGlobalState();
+        publishGlobalReadiness();
 
         for (Map.Entry<Integer, Entities.Partition> entry : entities.partitionsById.entrySet()) {
             int partitionId = entry.getKey();
@@ -368,6 +508,7 @@ final class EntityManager {
             Entities.Partition partition = entry.getValue();
             if (partition != null && partition.name != null) {
                 publishPartitionArming(partitionId);
+                publishPartitionReadiness(partitionId);
             }
         }
 

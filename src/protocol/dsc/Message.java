@@ -16,6 +16,7 @@ public class Message<P, V> {
    public static final Message<Void, String> TEXT_NOTIFICATION = new Message<>();
    public static final Message<Void, List<Quartet<Integer, Integer, Integer, Integer>>> TROUBLE_DETAIL_NOTIFICATION = new Message<>();
    public static final Message<Void, Integer> PARTITION_STATUS_CHANGED = new Message<>();
+   public static final Message<Integer, Integer> PARTITION_READY_STATUS_CHANGED = new Message<>();
    public static final Message<Void, Integer> PARTITION_ALARM_MEMORY_CHANGED = new Message<>();
    public static final Message<Void, Integer> ZONE_STATUS_CHANGED = new Message<>();
    public static final Message<Void, Quartet<Integer, Integer, Integer, Integer>> ACCESS_LEVEL_LEAD_IN_OUT = new Message<>();

@@ -15,6 +15,7 @@ final class Entities {
 
    final HashSet<Integer> sensorDiscoverySent = new HashSet<>();
    final HashSet<Integer> partitionDiscoverySent = new HashSet<>();
+   final Map<Integer, String> partitionReadinessDiscoveryNames = new HashMap<>();
    final HashSet<Integer> modeDiscoverySent = new HashSet<>();
 
    List<String> panelFaults = Collections.emptyList();
@@ -25,6 +26,7 @@ final class Entities {
       String topic;
       String arming;
       String status;
+      String readiness = "unknown";
    }
 
    static final class Sensor {

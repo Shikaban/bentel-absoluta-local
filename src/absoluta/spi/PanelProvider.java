@@ -9,6 +9,7 @@ import absoluta.connection.PanelStatus.InputStatus;
 import absoluta.connection.PanelStatus.OutputAction;
 import absoluta.connection.PanelStatus.OutputStatus;
 import absoluta.connection.PanelStatus.PartitionArming;
+import absoluta.connection.PanelStatus.PartitionReadiness;
 import absoluta.connection.PanelStatus.PartitionStatus;
 
 public interface PanelProvider {
@@ -40,6 +41,8 @@ public interface PanelProvider {
       void updatePartitionName(int partitionId, String name);
 
       void updatePartitionArming(int partitionId, PartitionArming arming);
+
+      void updatePartitionReadiness(int partitionId, PartitionReadiness readiness);
 
       void updatePartitionStatus(int partitionId, PartitionStatus status);
 

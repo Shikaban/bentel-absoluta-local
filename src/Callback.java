@@ -117,6 +117,10 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
       entityManager.updatePartitionArming(partitionID, actArming);
    }
 
+   public void updatePartitionReadiness(int partitionID, PanelStatus.PartitionReadiness readiness) {
+      entityManager.updatePartitionReadiness(partitionID, readiness);
+   }
+
    public void updatePartitionName(int partitionID, String name) {
       entityManager.updatePartitionName(partitionID, name);
    }

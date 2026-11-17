@@ -6,6 +6,7 @@ import protocol.dsc.DscError;
 import protocol.dsc.Message;
 import protocol.dsc.MessageListener;
 import protocol.dsc.NewValue;
+import protocol.dsc.commands.PartitionReadyStatusNotification;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,7 @@ class StatusListener implements MessageListener {
    private static final int PARTITION_STAY = 1;
    // PARTITION_READY shares index 1: bit1 means "Ready to Arm" when disarmed, "Stay" when armed (ITv2 spec 6.7.4)
    private static final int PARTITION_READY = 1;
+   private static final int PARTITION_READY_TO_FORCE = 2;
    private static final int PARTITION_AWAY = 2;
    private static final int PARTITION_NIGHT = 3;
    private static final int PARTITION_NODELAY = 4;
@@ -53,6 +55,26 @@ class StatusListener implements MessageListener {
       if (msg.isFor(Message.PARTITION_ASSIGNMENT_CONFIGURATION)) {
          List<Integer> partitions = (List<Integer>) msg.getValue(Message.PARTITION_ASSIGNMENT_CONFIGURATION);
          panelStatus.updatePartitions(ImmutableList.copyOf(partitions));
+      } else if (msg.isFor(Message.PARTITION_READY_STATUS_CHANGED)) {
+         int partitionId = (Integer) msg.getParam(Message.PARTITION_READY_STATUS_CHANGED);
+         int status = (Integer) msg.getValue(Message.PARTITION_READY_STATUS_CHANGED);
+         switch (status) {
+            case PartitionReadyStatusNotification.READY_TO_ARM:
+               panelStatus.updatePartitionReadiness(partitionId, PanelStatus.PartitionReadiness.READY);
+               break;
+            case PartitionReadyStatusNotification.READY_TO_FORCE_ARM:
+               panelStatus.updatePartitionReadiness(partitionId, PanelStatus.PartitionReadiness.READY_TO_FORCE);
+               break;
+            case PartitionReadyStatusNotification.NOT_READY_TO_ARM:
+               panelStatus.updatePartitionReadiness(partitionId, PanelStatus.PartitionReadiness.NOT_READY);
+               break;
+            case PartitionReadyStatusNotification.RESERVED:
+               logger.finer("Ignoring reserved partition readiness status for partition " + partitionId);
+               break;
+            default:
+               logger.warning("Unknown partition readiness status " + status + " for partition " + partitionId);
+               break;
+         }
       } else if (msg.isFor(Message.PARTITION_ZONES)) {
          Integer partitionNumber = (Integer) msg.getParam(Message.PARTITION_ZONES);
          if (partitionNumber == null) {
@@ -187,15 +209,27 @@ class StatusListener implements MessageListener {
          armingMode = PanelStatus.PartitionArming.DISARMING;
       }
 
-      boolean ready;
+      PanelStatus.PartitionReadiness readiness;
       if (armingMode == PanelStatus.PartitionArming.DISARMED) {
-         ready = statusMask.size() > PARTITION_READY && statusMask.get(PARTITION_READY);
+         if (statusMask.size() > PARTITION_READY && statusMask.get(PARTITION_READY)) {
+            readiness = PanelStatus.PartitionReadiness.READY;
+         } else if (statusMask.size() > PARTITION_READY_TO_FORCE && statusMask.get(PARTITION_READY_TO_FORCE)) {
+            readiness = PanelStatus.PartitionReadiness.READY_TO_FORCE;
+         } else {
+            readiness = PanelStatus.PartitionReadiness.NOT_READY;
+         }
       } else if (armingMode == PanelStatus.PartitionArming.TRIGGERED) {
-         ready = false;
+         readiness = PanelStatus.PartitionReadiness.TRIGGERED;
+      } else if (armingMode == PanelStatus.PartitionArming.ARMING) {
+         readiness = PanelStatus.PartitionReadiness.ARMING;
+      } else if (armingMode == PanelStatus.PartitionArming.DISARMING) {
+         readiness = PanelStatus.PartitionReadiness.DISARMING;
+      } else if (armingMode == PanelStatus.PartitionArming.NOT_AVAILABLE) {
+         readiness = PanelStatus.PartitionReadiness.UNKNOWN;
       } else {
-         ready = true;
+         readiness = PanelStatus.PartitionReadiness.ARMED;
       }
-      panelStatus.updatePartitionReady(partitionId, ready);
+      panelStatus.updatePartitionReadiness(partitionId, readiness);
 
       panelStatus.updatePartitionArming(partitionId, armingMode);
 

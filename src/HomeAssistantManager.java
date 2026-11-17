@@ -31,6 +31,17 @@ public class HomeAssistantManager {
         "}";
     }
 
+    public static String buildPartitionReadiness(int partitionID, String partitionName) {
+        return "{" +
+            "\"name\": \"" + partitionName + " Prontezza\"," +
+            "\"state_topic\": \"ABS/partition/" + partitionID + "/readiness\"," +
+            "\"unique_id\": \"absoluta_partition_" + partitionID + "_readiness\"," +
+            "\"icon\": \"mdi:shield-check\"," +
+            AVAILABILITY_JSON +
+            DEVICE_JSON +
+        "}";
+    }
+
     public static String buildSensor(int sensorID, String sensorName) {
         return "{" +
             "\"name\": \"" + sensorName + "\"," +

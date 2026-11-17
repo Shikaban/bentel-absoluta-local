@@ -34,7 +34,7 @@ public class PanelStatus {
    public static final String OUTPUT_LABEL = "OUTPUT_LABEL";
    public static final String ARMING_MODE_LABEL = "ARMING_MODE_LABEL";
    public static final String TROUBLES = "TROUBLES";
-   public static final String PARTITION_READY_STATUS = "PARTITION_READY_STATUS";
+   public static final String PARTITION_READINESS = "PARTITION_READINESS";
    public static final String PARTITION_ALARM_IN_MEMORY = "PARTITION_ALARM_IN_MEMORY";
 
    private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
@@ -58,7 +58,7 @@ public class PanelStatus {
    private final Map<Integer, String> armingModeLabels;
    private ImmutableSet<Trouble> troubles;
    private final Set<Trouble> unconfirmedTroubles;
-   private final Map<Integer, Boolean> partitionReady = new HashMap<>();
+   private final Map<Integer, PartitionReadiness> partitionReadiness = new HashMap<>();
    private final Map<Integer, Boolean> partitionAlarmInMemory = new HashMap<>();
    private List<Integer> pendingArmPartitions;
 
@@ -156,6 +156,23 @@ public class PanelStatus {
          PartitionArming oldMode = this.partitionArmings.get(partitionId);
          this.partitionArmings.put(partitionId, newMode);
          this.changeSupport.fireIndexedPropertyChange(PARTITION_ARMING, partitionId, oldMode, newMode);
+         if (newMode == PartitionArming.ARMING) {
+            this.updatePartitionReadiness(partitionId, PartitionReadiness.ARMING);
+         } else if (newMode == PartitionArming.DISARMING) {
+            this.updatePartitionReadiness(partitionId, PartitionReadiness.DISARMING);
+         } else if (newMode == PartitionArming.TRIGGERED) {
+            this.updatePartitionReadiness(partitionId, PartitionReadiness.TRIGGERED);
+         } else if (newMode == PartitionArming.AWAY || newMode == PartitionArming.STAY
+               || newMode == PartitionArming.NODELAY) {
+            this.updatePartitionReadiness(partitionId, PartitionReadiness.ARMED);
+         } else if (newMode == PartitionArming.NOT_AVAILABLE) {
+            this.updatePartitionReadiness(partitionId, PartitionReadiness.UNKNOWN);
+         } else if (newMode == PartitionArming.DISARMED) {
+            PartitionReadiness readiness = this.partitionReadiness.get(partitionId);
+            if (readiness == PartitionReadiness.ARMING || readiness == PartitionReadiness.DISARMING) {
+               this.updatePartitionReadiness(partitionId, PartitionReadiness.UNKNOWN);
+            }
+         }
       }
    }
 
@@ -254,17 +271,27 @@ public class PanelStatus {
       return this.outputLabels.get(outputId);
    }
 
-   // Stato prontezza all'armamento (valido solo quando disarmata)
-   void updatePartitionReady(int partitionId, boolean ready) {
+   // Prontezza e stato di armamento sono distinti; la centrale non espone la prontezza mentre è armata.
+   void updatePartitionReadiness(int partitionId, PartitionReadiness readiness) {
       if (this.partitions != null && this.partitions.contains(partitionId)) {
-         Boolean old = this.partitionReady.get(partitionId);
-         this.partitionReady.put(partitionId, ready);
-         this.changeSupport.fireIndexedPropertyChange(PARTITION_READY_STATUS, partitionId, old, (Boolean) ready);
+         PartitionReadiness old = this.partitionReadiness.put(partitionId, readiness);
+         this.changeSupport.fireIndexedPropertyChange(PARTITION_READINESS, partitionId, old, readiness);
       }
    }
 
+   public PartitionReadiness getPartitionReadiness(int partitionId) {
+      return this.partitionReadiness.get(partitionId);
+   }
+
    public Boolean getPartitionReady(int partitionId) {
-      return this.partitionReady.get(partitionId);
+      PartitionReadiness readiness = this.partitionReadiness.get(partitionId);
+      if (readiness == null || readiness == PartitionReadiness.UNKNOWN) {
+         return null;
+      }
+      return readiness == PartitionReadiness.READY
+            || readiness == PartitionReadiness.ARMED
+            || readiness == PartitionReadiness.ARMING
+            || readiness == PartitionReadiness.DISARMING;
    }
 
    void updatePartitionAlarmInMemory(int partitionId, boolean inMemory) {
@@ -369,6 +396,28 @@ public class PanelStatus {
       private final String wireValue;
 
       PartitionArming(String wireValue) {
+         this.wireValue = wireValue;
+      }
+
+      @Override
+      public String toString() {
+         return this.wireValue;
+      }
+   }
+
+   public enum PartitionReadiness {
+      UNKNOWN("unknown"),
+      READY("ready"),
+      READY_TO_FORCE("ready_to_force"),
+      NOT_READY("not_ready"),
+      ARMED("armed"),
+      TRIGGERED("triggered"),
+      ARMING("arming"),
+      DISARMING("disarming");
+
+      private final String wireValue;
+
+      PartitionReadiness(String wireValue) {
          this.wireValue = wireValue;
       }
 

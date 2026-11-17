@@ -38,6 +38,9 @@ class CallbackListener implements PropertyChangeListener {
                case "PARTITION_ARMING":
                   this.callback.updatePartitionArming(indexProperty, this.panelStatus.getPartitionArming(indexProperty));
                   break;
+               case "PARTITION_READINESS":
+                  this.callback.updatePartitionReadiness(indexProperty, this.panelStatus.getPartitionReadiness(indexProperty));
+                  break;
                case "PARTITION_STATUS":
                   this.callback.updatePartitionStatus(indexProperty, this.panelStatus.getPartitionStatus(indexProperty));
                   break;

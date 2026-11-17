@@ -20,7 +20,7 @@ public class Application {
    // Major: Cambiamenti significativi, API breaking
    // Minor: Nuove funzionalità, compatibilità con le versioni precedenti
    // Patch: Correzioni di bug, miglioramenti minori
-   private static final String VERSION = "1.3.5";
+   private static final String VERSION = "1.4.0";
 
    // Restituisce il valore della variabile d'ambiente o, se vuota/nulla, dal file di configurazione
    private static String getConfigValue(Properties props, String key) {
@@ -166,11 +166,6 @@ public class Application {
                logger.severe("Impossibile connettersi alla centrale dopo " + maxAttempts + " tentativi.");
                System.exit(1);
             }
-
-            // Avvio il thread di ping TCP solo dopo la connessione alla centrale
-            logger.info("Avvio thread di ping TCP verso " + ADDRESS + ":" + PORT);
-            PingKeepAlive pingKeepAlive = new PingKeepAlive(ADDRESS, Integer.parseInt(PORT));
-            pingKeepAlive.start();
 
             connected = true;
          } catch (MqttException ex) {
