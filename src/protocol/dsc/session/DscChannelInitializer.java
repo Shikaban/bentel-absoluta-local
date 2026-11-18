@@ -44,6 +44,47 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
 
    private static final AtomicInteger CONNECTION_COUNTER = new AtomicInteger();
    private final int connectionId;
+   private static volatile LogLevel nettyLogLevel = null;
+
+   public static void configureNettyLogging(String level) {
+      if (level == null || level.trim().isEmpty() ||
+            "OFF".equalsIgnoreCase(level.trim()) ||
+            "DISABLED".equalsIgnoreCase(level.trim()) ||
+            "NONE".equalsIgnoreCase(level.trim())) {
+         nettyLogLevel = null;
+         Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.OFF);
+         return;
+      }
+
+      switch (level.trim().toUpperCase(Locale.ROOT)) {
+         case "TRACE":
+            nettyLogLevel = LogLevel.TRACE;
+            Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.FINEST);
+            break;
+         case "DEBUG":
+            nettyLogLevel = LogLevel.DEBUG;
+            Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.FINE);
+            break;
+         case "INFO":
+            nettyLogLevel = LogLevel.INFO;
+            Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.INFO);
+            break;
+         case "WARN":
+         case "WARNING":
+            nettyLogLevel = LogLevel.WARN;
+            Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.WARNING);
+            break;
+         case "ERROR":
+            nettyLogLevel = LogLevel.ERROR;
+            Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.SEVERE);
+            break;
+         default:
+            LOGGER.warning("Invalid NETTY_LOG_LEVEL \"" + level + "\"; using OFF");
+            nettyLogLevel = null;
+            Logger.getLogger("DEBUG:").setLevel(java.util.logging.Level.OFF);
+            break;
+      }
+   }
 
    public DscChannelInitializer() {
       this.connectionId = CONNECTION_COUNTER.getAndIncrement();
@@ -121,45 +162,55 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
       ChannelPipeline pipeline = channel.pipeline();
 
       // Costruzione pipeline Netty
+      addLoggingHandler(pipeline, logHandlerIndex++);
       pipeline
-         .addLast(newLoggingHandler(logHandlerIndex++))
          .addLast(new ReadTimeoutHandler(Consts.IDLE_TIMEOUT))
          .addLast(new WriteTimeoutHandler(Consts.IDLE_TIMEOUT))
          .addLast(new IdleStateHandler(0, getWriterIdleTimeSeconds(), 0))
          .addLast(new FrameDecoder())
          .addLast(FRAME_ENCODER)
          .addLast(AES_DECODER)
-         .addLast(AES_ENCODER)
-         .addLast(newLoggingHandler(logHandlerIndex++))
+         .addLast(AES_ENCODER);
+      addLoggingHandler(pipeline, logHandlerIndex++);
+      pipeline
          .addLast(DATA_DECODER)
-         .addLast(DATA_ENCODER)
-         .addLast(newLoggingHandler(logHandlerIndex++))
+         .addLast(DATA_ENCODER);
+      addLoggingHandler(pipeline, logHandlerIndex++);
+      pipeline
          .addLast(TRANSPORT_LAYER_DECODER)
          .addLast(TRANSPORT_LAYER_ENCODER)
-         .addLast(MULTIPLE_PACKETS_DECODER)
-         .addLast(newLoggingHandler(logHandlerIndex++))
+         .addLast(MULTIPLE_PACKETS_DECODER);
+      addLoggingHandler(pipeline, logHandlerIndex++);
+      pipeline
          .addLast(COMMAND_DECODER)
-         .addLast(COMMAND_ENCODER)
-         .addLast(newLoggingHandler(logHandlerIndex++))
+         .addLast(COMMAND_ENCODER);
+      addLoggingHandler(pipeline, logHandlerIndex++);
+      pipeline
          .addLast(FLUSH_COMMAND_HANDLER)
          .addLast(ACK_HANDLER)
          .addLast(new ResponseHandler())
-         .addLast(new CommandQueueHandler())
-         .addLast(newLoggingHandler(logHandlerIndex++))
+         .addLast(new CommandQueueHandler());
+      addLoggingHandler(pipeline, logHandlerIndex++);
+      pipeline
          .addLast(END_SESSION_HANDLER)
          .addLast(new PollHandler(this.pollFactory()))
-         .addLast(new PipelineHandler(this.buildHandshakeHandlers(), this.buildNormalModeHandlers()))
-         .addLast(newLoggingHandler(logHandlerIndex++))
+         .addLast(new PipelineHandler(this.buildHandshakeHandlers(), this.buildNormalModeHandlers()));
+      addLoggingHandler(pipeline, logHandlerIndex++);
+      pipeline
          .addLast(FALLBACK_HANDLER)
-         .addLast(new EndpointHandler(endpoint))
-         .addLast(newLoggingHandler(logHandlerIndex++));
+         .addLast(new EndpointHandler(endpoint));
+      addLoggingHandler(pipeline, logHandlerIndex++);
 
       // Hook for post-initialization customization
       this.onInitialized(endpoint, channel);
    }
 
    // Logging handler with an identifying name for debugging
-   private LoggingHandler newLoggingHandler(int index) {
-      return new LoggingHandler("DEBUG: .LoggingHandler_" + index + ".connection_" + this.connectionId, LogLevel.TRACE);
+   private void addLoggingHandler(ChannelPipeline pipeline, int index) {
+      if (nettyLogLevel != null) {
+         pipeline.addLast(new LoggingHandler(
+               "DEBUG: .LoggingHandler_" + index + ".connection_" + this.connectionId,
+               nettyLogLevel));
+      }
    }
 }

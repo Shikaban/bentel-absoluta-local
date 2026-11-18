@@ -11,3 +11,4 @@ services:
       ALARM_ADDRESS: "<ALARM_ADDRESS>"
       ALARM_PIN: "<ALARM_PIN>"
       ALARM_PORT: "<ALARM_PORT>"
+      NETTY_LOG_LEVEL: "OFF"

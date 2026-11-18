@@ -8,6 +8,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import absoluta.AbsolutaPanelProvider;
+import protocol.dsc.session.DscChannelInitializer;
 
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -66,6 +67,7 @@ public class Application {
       String HOME_ASSISTANT_DISCOVERY = getConfigValue(props, "HOME_ASSISTANT_DISCOVERY");
       String LOG_LEVEL = getConfigValue(props, "LOG_LEVEL");
       String LOG_LOCATION = getConfigValue(props, "LOG_LOCATION");
+      String NETTY_LOG_LEVEL = getConfigValue(props, "NETTY_LOG_LEVEL");
 
       if (MQTT_ADDRESS == null || MQTT_PORT == null || Username == null || Password == null ||
          ADDRESS == null || PIN == null || PORT == null) {
@@ -80,6 +82,7 @@ public class Application {
       boolean discoveryEnabled = HOME_ASSISTANT_DISCOVERY == null ? true : HOME_ASSISTANT_DISCOVERY.equalsIgnoreCase("true");
 
       Level logLevel = parseLogLevel(LOG_LEVEL);
+      DscChannelInitializer.configureNettyLogging(NETTY_LOG_LEVEL);
 
       // Set the level on the root logger
       Logger rootLogger = Logger.getLogger("");
@@ -92,7 +95,7 @@ public class Application {
 
       // Add one configured ConsoleHandler
       java.util.logging.ConsoleHandler handler = new java.util.logging.ConsoleHandler();
-      handler.setLevel(logLevel);
+      handler.setLevel(Level.ALL);
       rootLogger.addHandler(handler);
 
       // Disable detailed logs for external library packages
@@ -104,7 +107,7 @@ public class Application {
          try {
             java.util.logging.FileHandler fileHandler =
                new java.util.logging.FileHandler("absoluta.log", 10 * 1024 * 1024, 1, false);
-            fileHandler.setLevel(logLevel);
+            fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(new SimpleFormatter()); // Use a simple text format
             rootLogger.addHandler(fileHandler);
          } catch (IOException e) {

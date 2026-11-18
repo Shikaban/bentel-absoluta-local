@@ -17,6 +17,7 @@ All parameters are passed as environment variables in `docker-compose.yml`.
 | `HOME_ASSISTANT_DISCOVERY` | No       | `true`    | `true`         | Set to `false` to disable Home Assistant MQTT Discovery |
 | `LOG_LEVEL`                | No       | `WARNING` | `FINER`        | Verbosity: `SEVERE` `WARNING` `INFO` `CONFIG` `FINE` `FINER` `FINEST`. For troubleshooting, `FINE` is usually sufficient. **Do not use `FINER` or `FINEST` in production: from `FINER` onwards, the panel PIN is written in plaintext in the logs.** |
 | `LOG_LOCATION`             | No       | *(empty)* | `FILE`         | Set to `FILE` to write logs to a file; omit or leave empty for console output. When set to `FILE`, logs are written to `/app/absoluta.log` inside the container. |
+| `NETTY_LOG_LEVEL`          | No       | `OFF`     | `TRACE`        | Netty wire/protocol tracing. Supported values: `OFF`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`. Leave `OFF` in normal use. |
 
 ---
 
@@ -48,4 +49,5 @@ services:
       HOME_ASSISTANT_DISCOVERY: "true"
       LOG_LEVEL: "WARNING"
       LOG_LOCATION: ""
+      NETTY_LOG_LEVEL: "OFF"
 ```
