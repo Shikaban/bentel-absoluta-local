@@ -19,6 +19,8 @@ All parameters are passed as environment variables in `docker-compose.yml`.
 | `LOG_LOCATION`             | No       | *(empty)* | `FILE`         | Set to `FILE` to write logs to a file; omit or leave empty for console output. When set to `FILE`, logs are written to `/app/absoluta.log` inside the container. |
 | `NETTY_LOG_LEVEL`          | No       | `OFF`     | `TRACE`        | Netty wire/protocol tracing. Supported values: `OFF`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`. Leave `OFF` in normal use. |
 
+Console and file logs use local timestamps with millisecond precision.
+
 ---
 
 ## Security Notes

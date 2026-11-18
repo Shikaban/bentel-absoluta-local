@@ -93,6 +93,10 @@ public class Application {
          rootLogger.removeHandler(h);
       }
 
+      System.setProperty(
+            "java.util.logging.SimpleFormatter.format",
+            "%1$tF %1$tT.%1$tL %1$tZ [%4$s] %2$s%n%5$s%6$s%n");
+
       // Add one configured ConsoleHandler
       java.util.logging.ConsoleHandler handler = new java.util.logging.ConsoleHandler();
       handler.setLevel(Level.ALL);
@@ -106,7 +110,7 @@ public class Application {
       if (LOG_LOCATION != null && LOG_LOCATION.equalsIgnoreCase("FILE")) {
          try {
             java.util.logging.FileHandler fileHandler =
-               new java.util.logging.FileHandler("absoluta.log", 10 * 1024 * 1024, 1, false);
+               new java.util.logging.FileHandler("absoluta.log", 5 * 1024 * 1024, 2, false);
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(new SimpleFormatter()); // Use a simple text format
             rootLogger.addHandler(fileHandler);
