@@ -33,11 +33,6 @@ jobs:
           VERSION=$(grep 'VERSION = ' src/Application.java | sed -E 's/.*\"([^"]+)\".*/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Run build_secured.sh
-        run: |
-          chmod +x build_secured.sh
-          ./build_secured.sh
-
       - name: Run build.sh
         run: |
           chmod +x build.sh

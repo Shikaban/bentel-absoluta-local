@@ -8,7 +8,6 @@ WORKDIR /app
 # Copia il JAR e le dipendenze
 COPY build/app.jar /app/app.jar
 COPY lib/jars/*.jar /app/lib/
-COPY secured/*.jar /app/lib/
 
 # Variabili d'ambiente (possono essere sovrascritte in fase di run)
 ENV MQTT_ADDRESS="" \

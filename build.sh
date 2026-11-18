@@ -4,7 +4,7 @@ set -e
 mkdir -p build
 
 find src -name "*.java" > sources.txt
-javac --release 19 -cp "lib/jars/*:secured/*" -d build @sources.txt
+javac --release 19 -cp "lib/jars/*" -d build @sources.txt
 rm sources.txt
 
 find src -name "*.properties" | while read f; do

@@ -8,17 +8,7 @@
 
 ## Steps
 
-1. Compile the protocol and panel modules:
-
-```bash
-# Linux/macOS
-./build_secured.sh
-
-# Windows
-.\build_secured.ps1
-```
-
-2. Compile the main application:
+1. Compile the application, including the protocol and panel modules:
 
 ```bash
 # Linux/macOS
@@ -28,7 +18,7 @@
 .\build.ps1
 ```
 
-3. Build the Docker image:
+2. Build the Docker image:
 
 ```bash
 docker build -t bentel-absoluta-local-bridge .

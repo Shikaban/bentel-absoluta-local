@@ -19,14 +19,11 @@ Per creare l'immagine del container docker, è necessario eseguire lo script di 
 
 In powershell:
 ```powershell
-.\build_secured.ps1
 .\build.ps1
 ```
 Nel terminale linux o macOS:
 ```bash
 chmod +x build.sh
-chmod +x build_secured.sh
-./build_secured.sh
 ./build.sh
 ```
 

@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 if (!(Test-Path "build")) { New-Item -ItemType Directory -Path "build" | Out-Null }
 
 $javaFiles = Get-ChildItem -Path src -Recurse -Filter *.java | ForEach-Object { $_.FullName }
-javac --release 19 -cp "lib/jars/*;secured/*" -d build $javaFiles
+javac --release 19 -cp "lib/jars/*" -d build $javaFiles
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Get-ChildItem -Path src -Recurse -Filter *.properties | ForEach-Object {

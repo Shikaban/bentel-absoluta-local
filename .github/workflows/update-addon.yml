@@ -19,11 +19,6 @@ jobs:
           distribution: 'temurin'
           java-version: '19'
 
-      - name: Build absoluta.jar, protocol.jar
-        run: |
-          chmod +x build_secured.sh
-          ./build_secured.sh
-
       - name: Build app.jar
         run: |
           chmod +x build.sh
@@ -33,9 +28,10 @@ jobs:
         run: |
           git clone https://x-access-token:${{ secrets.ADDONTOKEN }}@github.com/AlessandroTischer/ha-absoluta-local-bridge.git
 
-      - name: Copy JARs to Repo Addon
+      - name: Update app JAR in Repo Addon
         run: |
-          cp secured/*.jar ha-absoluta-local-bridge/absoluta_local/secured/
+          rm -f ha-absoluta-local-bridge/absoluta_local/secured/absoluta.jar
+          rm -f ha-absoluta-local-bridge/absoluta_local/secured/protocol.jar
           cp build/app.jar ha-absoluta-local-bridge/absoluta_local/app.jar
 
       - name: Update config.yaml version
