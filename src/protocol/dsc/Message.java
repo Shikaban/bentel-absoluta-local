@@ -12,7 +12,7 @@ import protocol.dsc.base.DscCharsets;
 import protocol.dsc.messages.*;
 
 public class Message<P, V> {
-   // Definizioni statiche di messaggi comuni
+   // Static definitions for common messages
    public static final Message<Void, String> TEXT_NOTIFICATION = new Message<>();
    public static final Message<Void, List<Quartet<Integer, Integer, Integer, Integer>>> TROUBLE_DETAIL_NOTIFICATION = new Message<>();
    public static final Message<Void, Integer> PARTITION_STATUS_CHANGED = new Message<>();

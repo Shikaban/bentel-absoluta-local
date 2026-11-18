@@ -121,7 +121,7 @@ class CallbackListener implements PropertyChangeListener {
          Boolean inMemory = this.panelStatus.getPartitionAlarmInMemory(id);
          if (Boolean.TRUE.equals(inMemory)) {
             String label = this.panelStatus.getPartitionLabel(id);
-            alarmMemory.add(label != null && !label.isEmpty() ? label : "Partizione " + id);
+            alarmMemory.add(label != null && !label.isEmpty() ? label : "Partition " + id);
          }
       }
       return Collections.unmodifiableList(alarmMemory);

@@ -8,17 +8,17 @@ import javax.swing.SwingUtilities;
 
 public final class AlertNotifier {
    private static final Logger logger = Logger.getLogger(AlertNotifier.class.getName());
-   // Singleton per la gestione centralizzata delle notifiche di allarme
+   // Singleton for centralized alarm notification management
    private static final AlertNotifier INSTANCE = new AlertNotifier();
 
-   // Lista thread-safe di listener registrati
+   // Thread-safe list of registered listeners
    private final List<AlertListener> listeners = new CopyOnWriteArrayList<>();
 
    public static AlertNotifier getDefault() {
       return INSTANCE;
    }
 
-   //Notifica tutti i listener di un nuovo evento di allarme.
+   // Notify all listeners of a new alarm event.
    void fire(Object source, String message) {
       final AlertEvent alertEvent = new AlertEvent(
          Preconditions.checkNotNull(message),
@@ -26,7 +26,7 @@ public final class AlertNotifier {
       );
       logger.finer("Firing new event: " + alertEvent);
 
-      // Esegue la notifica dei listener
+      // Notify the listeners
       SwingUtilities.invokeLater(new Runnable() {
          public void run() {
                for (AlertListener listener : AlertNotifier.this.listeners) {

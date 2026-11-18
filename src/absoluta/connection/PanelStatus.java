@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class PanelStatus {
    private static final Logger logger = Logger.getLogger(StatusListener.class.getName());
 
-   // Costanti per i nomi delle proprietà osservabili
+   // Constants for observable property names
    public static final String CONNECTION_STATUS = "CONNECTION_STATUS";
    public static final String GLOBAL_ARMING = "GLOBAL_ARMING";
    public static final String SYSTEM_LABEL = "SYSTEM_LABEL";
@@ -46,7 +46,7 @@ public class PanelStatus {
    private ImmutableList<Integer> zones;
    private ImmutableList<Integer> outputs;
 
-   // Mappe per stato e label di partizioni, zone e uscite
+   // State and label maps for partitions, zones, and outputs
    private final Map<Integer, PartitionArming> partitionArmings;
    private final Map<Integer, PartitionStatus> partitionStatuses;
    private final Map<Integer, String> partitionLabels;
@@ -85,7 +85,7 @@ public class PanelStatus {
       this.changeSupport.removePropertyChangeListener(listener);
    }
 
-   // Stato connessione pannello
+   // Panel connection state
    void updateConnectionStatus(PanelConnStatus newStatus) {
       PanelConnStatus oldStatus;
       synchronized (this) {
@@ -99,7 +99,7 @@ public class PanelStatus {
       return this.connectionStatus;
    }
 
-   // Stato armamento globale
+   // Global arming state
    void updateGlobalArming(GlobalArming newMode) {
       GlobalArming oldMode = this.globalArming;
       this.globalArming = newMode;
@@ -150,7 +150,7 @@ public class PanelStatus {
       return this.outputs;
    }
 
-   // Stato armamento partizione
+   // Partition arming state
    void updatePartitionArming(int partitionId, PartitionArming newMode) {
       if (this.partitions != null && this.partitions.contains(partitionId)) {
          PartitionArming oldMode = this.partitionArmings.get(partitionId);
@@ -180,7 +180,7 @@ public class PanelStatus {
       return this.partitionArmings.get(partitionId);
    }
 
-   // Stato partizione
+   // Partition state
    void updatePartitionStatus(int partitionId, PartitionStatus newStatus) {
       if (this.partitions != null && this.partitions.contains(partitionId)) {
          PartitionStatus oldStatus = this.partitionStatuses.get(partitionId);
@@ -193,7 +193,7 @@ public class PanelStatus {
       return this.partitionStatuses.get(partitionId);
    }
 
-   // Label partizione
+   // Partition label
    void updatePartitionLabel(int partitionId, String newLabel) {
       if (this.partitions != null && this.partitions.contains(partitionId)) {
          String oldLabel = this.partitionLabels.get(partitionId);
@@ -206,7 +206,7 @@ public class PanelStatus {
       return this.partitionLabels.get(partitionId);
    }
 
-   // Stato zona
+   // Zone state
    void updateZoneStatus(int zoneId, InputStatus newStatus) {
       if (this.zones != null && this.zones.contains(zoneId)) {
          InputStatus oldStatus = this.zoneStatuses.get(zoneId);
@@ -219,7 +219,7 @@ public class PanelStatus {
       return this.zoneStatuses.get(zoneId);
    }
 
-   // Bypass zona
+   // Zone bypass
    void updateZoneBypass(int zoneId, Boolean newSet) {
       if (this.zones != null && this.zones.contains(zoneId)) {
          Boolean oldSet = this.zoneBypass.get(zoneId);
@@ -232,7 +232,7 @@ public class PanelStatus {
       return this.zoneBypass.get(zoneId);
    }
 
-   // Label zona
+   // Zone label
    void updateZoneLabel(int zoneId, String newLabel) {
       if (this.zones != null && this.zones.contains(zoneId)) {
          String oldLabel = this.zoneLabels.get(zoneId);
@@ -245,7 +245,7 @@ public class PanelStatus {
       return this.zoneLabels.get(zoneId);
    }
 
-   // Stato uscita
+   // Output state
    void updateOutputStatus(int outputId, OutputStatus newStatus) {
       if (this.outputs != null && this.outputs.contains(outputId)) {
          OutputStatus oldStatus = this.outputStatuses.get(outputId);
@@ -258,7 +258,7 @@ public class PanelStatus {
       return this.outputStatuses.get(outputId);
    }
 
-   // Label uscita
+   // Output label
    void updateOutputLabel(int outputId, String newLabel) {
       if (this.outputs != null && this.outputs.contains(outputId)) {
          String oldLabel = this.outputLabels.get(outputId);
@@ -271,7 +271,7 @@ public class PanelStatus {
       return this.outputLabels.get(outputId);
    }
 
-   // Prontezza e stato di armamento sono distinti; la centrale non espone la prontezza mentre è armata.
+   // Readiness and arming state are distinct; the panel does not expose readiness while armed.
    void updatePartitionReadiness(int partitionId, PartitionReadiness readiness) {
       if (this.partitions != null && this.partitions.contains(partitionId)) {
          PartitionReadiness old = this.partitionReadiness.put(partitionId, readiness);
@@ -314,7 +314,7 @@ public class PanelStatus {
       return this.pendingArmPartitions;
    }
 
-   // Label modalità armamento
+   // Arming mode label
    void updateArmingModeLabel(int modeId, String newLabel) {
       String oldLabel = this.armingModeLabels.get(modeId);
       this.armingModeLabels.put(modeId, newLabel);
@@ -325,7 +325,7 @@ public class PanelStatus {
       return this.armingModeLabels.get(modeId);
    }
 
-   // Enum per stato connessione pannello
+   // Panel connection status enum
    public enum PanelConnStatus {
       CONNECTED("connected"),
       DISCONNECTING("disconnecting"),
@@ -343,7 +343,7 @@ public class PanelStatus {
       }
    }
 
-   // Enum per stato zona
+   // Zone status enum
    public enum InputStatus {
       TAMPER("tamper"),
       FAULT("fault"),
@@ -364,7 +364,7 @@ public class PanelStatus {
       }
    }
 
-   // Enum per stato uscita
+   // Output state enum
    public enum OutputStatus {
       UNKNOWN("unknown"),
       OPEN("open"),
@@ -382,7 +382,7 @@ public class PanelStatus {
       }
    }
 
-   // Enum per modalità armamento partizione
+   // Partition arming mode enum
    public enum PartitionArming {
       DISARMED("disarmed"),
       AWAY("armed_away"),
@@ -427,7 +427,7 @@ public class PanelStatus {
       }
    }
 
-   // Enum per stato partizione
+   // Partition state enum
    public enum PartitionStatus {
       FIRE("Fire"),
       TAMPER("Tamper"),
@@ -448,7 +448,7 @@ public class PanelStatus {
       }
    }
 
-   // Enum per azione uscita
+   // Output action enum
    public enum OutputAction {
       DO_IMPULSE("impulse"),
       DO_OPEN("open"),
@@ -466,7 +466,7 @@ public class PanelStatus {
       }
    }
 
-   // Enum per stato armamento globale
+   // Global arming state enum
    public enum GlobalArming {
       GLOBALLY_ARMED("armed_away"),
       PARTIALLY_ARMED("armed_custom_bypass"),

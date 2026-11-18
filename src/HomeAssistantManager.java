@@ -5,7 +5,7 @@ public class HomeAssistantManager {
     private static final String DEVICE_JSON =
         "\"device\": {" +
             "\"identifiers\": [\"absoluta_panel\"]," +
-            "\"name\": \"Centrale Absoluta\"," +
+            "\"name\": \"Absoluta Panel\"," +
             "\"manufacturer\": \"Bentel\"," +
             "\"model\": \"Absoluta\"" +
         "}";
@@ -33,7 +33,7 @@ public class HomeAssistantManager {
 
     public static String buildPartitionReadiness(int partitionID, String partitionName) {
         return "{" +
-            "\"name\": \"" + partitionName + " Prontezza\"," +
+            "\"name\": \"" + partitionName + " Readiness\"," +
             "\"state_topic\": \"ABS/partition/" + partitionID + "/readiness\"," +
             "\"unique_id\": \"absoluta_partition_" + partitionID + "_readiness\"," +
             "\"icon\": \"mdi:shield-check\"," +
@@ -81,7 +81,7 @@ public class HomeAssistantManager {
 
     public static String buildResetAlarmMemory() {
         return "{" +
-            "\"name\": \"Resetta Allarmi in Memoria\"," +
+            "\"name\": \"Reset Alarm Memory\"," +
             "\"state_topic\": \"ABS/reset_alarm_memory\"," +
             "\"unique_id\": \"absoluta_reset_alarm_memory\"," +
             "\"command_topic\": \"ABS/absoluta_alarm_memory/set\"," +
@@ -93,7 +93,7 @@ public class HomeAssistantManager {
 
     public static String buildResetErrors() {
         return "{" +
-            "\"name\": \"Resetta Avvisi Bridge\"," +
+            "\"name\": \"Reset Bridge Alerts\"," +
             "\"state_topic\": \"ABS/reset_bridge_alerts\"," +
             "\"unique_id\": \"absoluta_reset_bridge_alerts\"," +
             "\"command_topic\": \"ABS/absoluta_bridge_alerts/set\"," +
@@ -105,7 +105,7 @@ public class HomeAssistantManager {
 
     public static String buildTroublesSensor() {
         return "{" +
-            "\"name\": \"Guasti della Centrale\"," +
+            "\"name\": \"Panel Faults\"," +
             "\"state_topic\": \"ABS/panel_faults\"," +
             "\"unique_id\": \"absoluta_panel_faults\"," +
             "\"icon\": \"mdi:alert-circle\"," +
@@ -117,7 +117,7 @@ public class HomeAssistantManager {
 
     public static String buildErrorSensor() {
         return "{" +
-            "\"name\": \"Avvisi Bridge\"," +
+            "\"name\": \"Bridge Alerts\"," +
             "\"state_topic\": \"ABS/bridge_alerts\"," +
             "\"icon\": \"mdi:alert\"," +
             "\"unique_id\": \"absoluta_bridge_alerts\"," +

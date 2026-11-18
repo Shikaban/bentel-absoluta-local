@@ -39,14 +39,14 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
    }
 
    public void connectionLost() {
-      bridgeAlertManager.notifyAlert("Connessione persa con la centrale! Riconnessione...");
+      bridgeAlertManager.notifyAlert("Connection lost with the panel! Reconnecting...");
       connectionManager.onPanelConnectionLost();
    }
 
    public void alert(String message) {
-      // Questa è la callback chiamata da AlertListener per notificare errori
+      // Callback invoked by AlertListener to report errors
       // specifici
-      // come problemi di inserimento, esclusione zone e controllo output
+      // such as arming failures, zone bypass, and output control
       logger.warning("Alert received: " + message);
 
       bridgeAlertManager.notifyAlert(message);
@@ -70,7 +70,7 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
       entityManager.initPartitions(partitions);
 
       connectionManager.onPanelConnected();
-      logger.fine("Partizione ID: " + String.valueOf(partitions));
+      logger.fine("Partition ID: " + String.valueOf(partitions));
    }
 
    public void updateGlobalArming(PanelStatus.GlobalArming actArming) {
@@ -126,7 +126,7 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
    public void tagZoneIntoPartition(int partitionId, List<Integer> zones) {
    }
 
-   // Smistamento dei comandi ricevuti via MQTT
+   // Dispatch commands received via MQTT
    public void messageArrived(String topic, MqttMessage msg) {
       commandManager.onMessageArrived(topic, msg);
    }

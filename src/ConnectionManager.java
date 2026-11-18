@@ -37,8 +37,8 @@ final class ConnectionManager {
     void onPanelConnected() {
         if (!isPanelConnected) {
             isPanelConnected = true;
-            publisher.publish("ABS/conn", "Status: Connesso", qos, false, "connessione iniziale");
-            publisher.publish(HomeAssistantManager.AVAILABILITY_TOPIC, "online", qos, true, "disponibilità online");
+            publisher.publish("ABS/conn", "Status: Connected", qos, false, "initial connection");
+            publisher.publish(HomeAssistantManager.AVAILABILITY_TOPIC, "online", qos, true, "online availability");
         }
 
         try {
@@ -46,30 +46,30 @@ final class ConnectionManager {
             mqttClient.subscribe("ABS/+/+/set");
             mqttClient.subscribe("homeassistant/status");
         } catch (Exception ex) {
-            logger.warning("Errore durante la subscribe ai topic: " + ex.getMessage());
+            logger.warning("Error subscribing to topics: " + ex.getMessage());
         }
     }
 
     void onMqttConnectionLost(Throwable ex) {
         String msg = ex == null ? "" : ex.getMessage();
-        logger.warning("Connessione persa con il broker MQTT: " + msg + ". Riconnessione...");
-        reconnectWithDelay("broker MQTT");
+        logger.warning("Connection lost with the MQTT broker: " + msg + ". Reconnecting...");
+        reconnectWithDelay("MQTT broker");
     }
 
     void onPanelConnectionLost() {
-        logger.warning("Connessione persa con la centrale! Riconnessione...");
-        reconnectWithDelay("centrale");
+        logger.warning("Connection lost with the panel! Reconnecting...");
+        reconnectWithDelay("panel");
     }
 
     private void reconnectWithDelay(String objName) {
         try {
-            if (objName.equals("centrale")) {
+            if (objName.equals("panel")) {
                 isPanelConnected = false;
                 ++panelReconnectionAttempts;
-                logger.warning("Tentativo di riconnessione " + panelReconnectionAttempts + " a " + objName + " in "
-                        + RECON_DELAY_SECONDS + " secondi...");
-                publisher.publish("ABS/conn", "Status: Scollegato", qos, false, "disconnessione forzata");
-                publisher.publish(HomeAssistantManager.AVAILABILITY_TOPIC, "offline", qos, true, "disponibilità offline");
+                logger.warning("Reconnection attempt " + panelReconnectionAttempts + " to " + objName + " in "
+                        + RECON_DELAY_SECONDS + " seconds...");
+                publisher.publish("ABS/conn", "Status: Disconnected", qos, false, "forced disconnection");
+                publisher.publish(HomeAssistantManager.AVAILABILITY_TOPIC, "offline", qos, true, "offline availability");
 
                 TimeUnit.SECONDS.sleep(RECON_DELAY_SECONDS);
                 providerConnStatus status = provider.connect();
@@ -78,24 +78,24 @@ final class ConnectionManager {
                 } else if (status == providerConnStatus.SUCCESS) {
                     panelReconnectionAttempts = 0;
                     isPanelConnected = true;
-                    publisher.publish("ABS/conn", "Status: Connesso", qos, false, "riconnessione riuscita");
-                    publisher.publish(HomeAssistantManager.AVAILABILITY_TOPIC, "online", qos, true, "disponibilità online");
+                    publisher.publish("ABS/conn", "Status: Connected", qos, false, "successful reconnection");
+                    publisher.publish(HomeAssistantManager.AVAILABILITY_TOPIC, "online", qos, true, "online availability");
                     entityManager.republishAllStates();
                 }
 
                 return;
             }
 
-            if (objName.equals("broker MQTT")) {
+            if (objName.equals("MQTT broker")) {
                 if (mqttReconnectAttempts >= MAX_MQTT_RECONNECT_ATTEMPTS) {
                     logger.severe(
-                            "Raggiunto il numero massimo di tentativi di riconnessione al broker MQTT. Riavviare l'applicazione.");
+                            "Maximum MQTT broker reconnection attempts reached. Restart the application.");
                     return;
                 }
 
                 ++mqttReconnectAttempts;
-                logger.warning("Tentativo di riconnessione " + mqttReconnectAttempts + "/" + MAX_MQTT_RECONNECT_ATTEMPTS
-                        + " al broker MQTT in " + RECON_DELAY_SECONDS + " secondi...");
+                logger.warning("Reconnection attempt " + mqttReconnectAttempts + "/" + MAX_MQTT_RECONNECT_ATTEMPTS
+                        + " to the MQTT broker in " + RECON_DELAY_SECONDS + " seconds...");
 
                 try {
                     if (mqttClient.isConnected()) {
@@ -111,7 +111,7 @@ final class ConnectionManager {
                     mqttClient.subscribe("ABS/+/+/set");
                     mqttClient.subscribe("homeassistant/status");
 
-                    logger.info("Riconnessione al broker MQTT riuscita");
+                    logger.info("MQTT broker reconnection successful");
                 } catch (Exception e) {
                     handleReconnectionFailure(objName, e);
                 }
@@ -127,11 +127,11 @@ final class ConnectionManager {
     }
 
     private void handleReconnectionFailure(String name, Exception ex) {
-        logger.warning("Impossibile riconnettersi a " + name + " Causa: " + ex.getMessage());
+        logger.warning("Unable to reconnect to " + name + ". Cause: " + ex.getMessage());
         ex.printStackTrace();
 
-        boolean shouldRetry = name.equals("centrale")
-                || (name.equals("broker MQTT") && mqttReconnectAttempts < MAX_MQTT_RECONNECT_ATTEMPTS);
+        boolean shouldRetry = name.equals("panel")
+                || (name.equals("MQTT broker") && mqttReconnectAttempts < MAX_MQTT_RECONNECT_ATTEMPTS);
         if (!shouldRetry) {
             return;
         }

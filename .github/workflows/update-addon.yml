@@ -41,7 +41,7 @@ jobs:
           if [ -f "$CONFIG_FILE" ]; then
             sed -i "s/^version: .*/version: '$VERSION'/" "$CONFIG_FILE"
           else
-            echo "Attenzione: $CONFIG_FILE non trovato!"
+            echo "Warning: $CONFIG_FILE not found!"
           fi
 
       - name: Commit and Push to Repo Addon

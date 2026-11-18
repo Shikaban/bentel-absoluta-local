@@ -26,7 +26,7 @@ public class AbsolutaPanelProvider implements PanelProvider {
    @Override
    public void initialize(PanelCallback callback) {
       this.callback = callback;
-      // Listener per notificare i cambiamenti di stato al callback
+      // Listener for notifying the callback of state changes
       this.panelStatus.addPropertyChangeListener(new CallbackListener(callback, this.panelStatus));
    }
 
@@ -36,16 +36,16 @@ public class AbsolutaPanelProvider implements PanelProvider {
       if (!this.connectionHandler.setPin(this.pin)) {
          return providerConnStatus.UNAUTHORIZED;
       } else {
-         // Avvia il thread di connessione TCP/IP
+         // Start the TCP/IP connection thread
          Thread connThread = new ConnectionThread(this.address, this.port, this.connectionHandler);
          connThread.setName("Absoluta-ConnectionThread");
          connThread.start();
 
          try {
-               // Attende l'esito della connessione
+               // Wait for the connection result
                return this.connectionHandler.waitConnection();
          } catch (InterruptedException ex) {
-               logger.severe("Connessione interrotta: " + ex.getMessage());
+               logger.severe("Connection interrupted: " + ex.getMessage());
                Thread.currentThread().interrupt();
                return providerConnStatus.UNREACHABLE;
          }

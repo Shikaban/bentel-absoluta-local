@@ -74,7 +74,7 @@ final class CommandManager {
                     provider.cleanTroubles();
                     bridgeAlertManager.resetAlerts();
                 } else {
-                    logger.warning("Comando " + (msg == null ? "null" : msg.toString()) + " non valido per il topic: "
+                    logger.warning("Command " + (msg == null ? "null" : msg.toString()) + " is invalid for topic: "
                             + topic);
                 }
                 return;
@@ -85,13 +85,13 @@ final class CommandManager {
                     logger.info("Resetting alarm memory...");
                     provider.cleanAlarmMemory();
                 } else {
-                    logger.warning("Comando " + (msg == null ? "null" : msg.toString()) + " non valido per il topic: "
+                    logger.warning("Command " + (msg == null ? "null" : msg.toString()) + " is invalid for topic: "
                             + topic);
                 }
                 return;
             }
 
-            logger.warning("Comando non riconosciuto per il topic: " + topic);
+            logger.warning("Unrecognized command for topic: " + topic);
             return;
         }
 
@@ -102,20 +102,20 @@ final class CommandManager {
             return;
         }
 
-        logger.warning("Comando non riconosciuto per il topic: " + topic);
+        logger.warning("Unrecognized command for topic: " + topic);
     }
 
     private void commandPartition(int partitionId, MqttMessage msg) {
-        logger.fine("Comando ricevuto per partizione numero: " + partitionId + " nuovo stato: "
+        logger.fine("Command received for partition number " + partitionId + ", new state: "
                 + (msg == null ? "null" : msg.toString()));
         String cmd = normalizeCmd(msg);
         PanelStatus.PartitionArming arming = PARTITION_COMMANDS.get(cmd);
         if (arming == null) {
-            logger.warning("Comando " + cmd + " non valido");
+            logger.warning("Invalid command " + cmd);
             return;
         }
         if (arming != PanelStatus.PartitionArming.DISARMED) {
-            if (rejectIfNotReady("partizione " + partitionId, partitionId)) {
+            if (rejectIfNotReady("partition " + partitionId, partitionId)) {
                 return;
             }
         }
@@ -123,16 +123,16 @@ final class CommandManager {
     }
 
     private void commandGlobal(MqttMessage msg) {
-        logger.fine("Comando ricevuto per stato globale: " + (msg == null ? "null" : msg.toString()));
+        logger.fine("Command received for global state: " + (msg == null ? "null" : msg.toString()));
         String cmd = normalizeCmd(msg);
         PanelStatus.GlobalArming arming = GLOBAL_COMMANDS.get(cmd);
         if (arming == null) {
-            logger.warning("Comando " + cmd + " non valido");
+            logger.warning("Invalid command " + cmd);
             return;
         }
         if (arming == PanelStatus.GlobalArming.GLOBALLY_ARMED) {
             int[] partIds = realPartitionIds();
-            if (rejectIfNotReady("globale", partIds)) {
+            if (rejectIfNotReady("global", partIds)) {
                 return;
             }
         }
@@ -140,14 +140,14 @@ final class CommandManager {
     }
 
     private void commandMode(MqttMessage msg) {
-        logger.fine("Comando ricevuto per modalità: " + (msg == null ? "null" : msg.toString()));
+        logger.fine("Command received for mode: " + (msg == null ? "null" : msg.toString()));
         String cmd = normalizeCmd(msg);
         Character mode = MODE_COMMANDS.get(cmd);
         if (mode == null) {
-            logger.warning("Comando " + cmd + " non valido");
+            logger.warning("Invalid command " + cmd);
             return;
         }
-        if (rejectIfNotReady("modalità " + mode, realPartitionIds())) {
+        if (rejectIfNotReady("mode " + mode, realPartitionIds())) {
             return;
         }
         provider.setModeArming(mode);
@@ -155,7 +155,7 @@ final class CommandManager {
 
     private void commandSensor(int zoneId, MqttMessage msg) {
         if (msg == null) {
-            logger.warning("Comando null non valido per il sensore ID: " + zoneId);
+            logger.warning("Null command is invalid for sensor ID: " + zoneId);
             return;
         }
 
@@ -164,7 +164,7 @@ final class CommandManager {
         } else if (msg.toString().equals("OFF")) {
             provider.setZoneBypass(zoneId, false);
         } else {
-            logger.warning("Comando " + msg.toString() + " non valido per il sensore ID: " + zoneId);
+            logger.warning("Command " + msg.toString() + " is invalid for sensor ID: " + zoneId);
         }
     }
 
@@ -172,8 +172,8 @@ final class CommandManager {
         for (int partitionId : partitionIds) {
             Boolean ready = provider.isPartitionReady(partitionId);
             if (!Boolean.TRUE.equals(ready)) {
-                String msgText = "Inserimento rifiutato (" + context + "): partizione " + partitionId
-                        + " non pronta (zone aperte o in anomalia)";
+                String msgText = "Arming rejected (" + context + "): partition " + partitionId
+                        + " is not ready (zones open or in fault)";
                 logger.warning(msgText);
                 bridgeAlertManager.notifyAlert(msgText);
                 return true;

@@ -49,7 +49,7 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
       this.connectionId = CONNECTION_COUNTER.getAndIncrement();
    }
 
-   // Info di sessione predefinite per il proprio endpoint
+   // Default session information for this endpoint
    protected SessionInfo buildOwnSessionInfo() {
       SessionInfo info = new SessionInfo();
       info.setClient(false);
@@ -64,7 +64,7 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
       return info;
    }
 
-   // Costruisce la sequenza di handler per handshake iniziale
+   // Build the handler sequence for the initial handshake
    protected Queue<HandshakeHandler<?>> buildHandshakeHandlers() {
       Queue<HandshakeHandler<?>> handshakeHandlers = new ArrayDeque<>(2);
       handshakeHandlers.add(new OpenSessionHandler());
@@ -72,7 +72,7 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
       return handshakeHandlers;
    }
 
-   // Costruisce la lista di handler per la modalità operativa normale
+   // Build the handler list for normal operation mode
    protected List<ChannelHandler> buildNormalModeHandlers() {
       List<ChannelHandler> handlers = new ArrayList<>(6);
       handlers.add(new RequestedReadingHandler());
@@ -84,12 +84,12 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
       return handlers;
    }
 
-   // Timeout di idle per il writer (poll)
+   // Writer idle timeout (poll)
    protected int getWriterIdleTimeSeconds() {
       return Consts.DEFAULT_POLL_TIMEOUT;
    }
 
-   // Factory per la creazione dei comandi di Poll
+   // Factory for creating poll commands
    protected PollHandler.PollFactory pollFactory() {
       return new PollHandler.PollFactory() {
          public DscCommand createPoll() {
@@ -98,7 +98,7 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
       };
    }
 
-   // Da implementare: chiamato quando la pipeline è pronta
+   // To be implemented: called when the pipeline is ready
    protected abstract void onInitialized(DscEndpoint endpoint, SocketChannel channel);
 
    @Override
@@ -107,14 +107,14 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
 
       final DscEndpoint endpoint = new DscEndpoint(channel);
 
-      // Listener per chiusura canale: aggiorna lo stato endpoint
+      // Listener for channel closure: update endpoint state
       channel.closeFuture().addListener(new ChannelFutureListener() {
          public void operationComplete(ChannelFuture future) {
                endpoint.setState(DscEndpointState.CLOSED);
          }
       });
 
-      // Inizializza le info di sessione associate al canale
+      // Initialize the session information associated with the channel
       SessionInfo.initInfo(channel, this.buildOwnSessionInfo());
 
       int logHandlerIndex = 0;
@@ -154,11 +154,11 @@ public abstract class DscChannelInitializer extends ChannelInitializer<SocketCha
          .addLast(new EndpointHandler(endpoint))
          .addLast(newLoggingHandler(logHandlerIndex++));
 
-      // Hook per personalizzazioni post-inizializzazione
+      // Hook for post-initialization customization
       this.onInitialized(endpoint, channel);
    }
 
-   // Handler di logging con nome identificativo per debugging
+   // Logging handler with an identifying name for debugging
    private LoggingHandler newLoggingHandler(int index) {
       return new LoggingHandler("DEBUG: .LoggingHandler_" + index + ".connection_" + this.connectionId, LogLevel.TRACE);
    }

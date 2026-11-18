@@ -1,25 +1,25 @@
-# Comunicazione locale con absoluta
+# Local communication with Absoluta
 
-Utilizzando il protocollo ITv2 comunichiamo con la centrale e riceviamo lo
-stato dei sensori, delle partizioni e dell'allarme. Possiamo inoltre armare o
-disattivare l'antifurto.
+Using the ITv2 protocol, the bridge communicates with the panel and receives
+the state of zones, partitions, and the alarm system. It can also arm or disarm
+the security system.
 
-## Struttura folder
+## Folder structure
 
-- `src`: contenente il codice sorgente
-- `lib`: contenente le librerie utilizzate
+- `src`: source code
+- `lib`: libraries
 
-## Creare immagine container docker
+## Create the Docker container image
 
-Per creare l'immagine Docker, eseguire lo script di build. Lo script compila il
-codice sorgente e prepara l'applicazione Java.
+Run the build script to create the Docker image. It compiles the source code
+and prepares the Java application.
 
-### Requisiti
+### Requirements
 
-- Java JDK 19 o superiore
-- Docker installato
-- Docker Compose installato
-- Terminale aperto nella cartella del progetto
+- Java JDK 19 or newer
+- Docker
+- Docker Compose
+- A terminal opened in the project folder
 
 In PowerShell:
 
@@ -27,31 +27,30 @@ In PowerShell:
 .\build.ps1
 ```
 
-Nel terminale Linux o macOS:
+In a Linux or macOS terminal:
 
 ```bash
 chmod +x build.sh
 ./build.sh
 ```
 
-Dopo aver creato il JAR dell'applicazione, creare l'immagine Docker:
+After creating the application JAR, build the Docker image:
 
 ```bash
 docker build -t bentel-absoluta . --no-cache
 ```
 
-Per esportare l'immagine in un file tar:
+To export the image to a TAR file:
 
 ```bash
 docker save -o bentel-absoluta.tar bentel-absoluta:latest
 ```
 
-## Eseguire il container
+## Run the container
 
-Modificare `docker-compose.yml` per impostare le variabili d'ambiente
-necessarie.
+Edit `docker-compose.yml` to set the required environment variables.
 
-Per avviare il container:
+To start the container:
 
 ```bash
 docker-compose up

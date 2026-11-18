@@ -11,10 +11,10 @@ public class Trouble {
    static final int TROUBLE = 1;
    static final int TROUBLE_IN_MEMORY = 2;
 
-   private final int deviceType;      // Tipo di dispositivo (es. zona, sensore, ecc.)
-   private final int troubleType;     // Tipo di guasto (restore, trouble, in memory)
-   private final int deviceNumber;    // Numero identificativo del dispositivo
-   private final boolean inMemory;    // True se il guasto è solo in memoria
+   private final int deviceType;      // Device type (zone, sensor, etc.)
+   private final int troubleType;     // Trouble type (restore, trouble, in memory)
+   private final int deviceNumber;    // Device identifier
+   private final boolean inMemory;    // True if the trouble exists only in memory
 
    Trouble(int deviceType, int troubleType, int deviceNumber, boolean inMemory) {
       this.deviceType = deviceType;
@@ -48,7 +48,7 @@ public class Trouble {
          sb.append(String.format("%s 0x%02X", BUNDLE.getString("Trouble.deviceType"), this.deviceType));
       }
 
-      // Se è una zona e c'è un'etichetta, aggiungila; altrimenti mostra solo il numero
+      // If it is a zone with a label, include the label; otherwise show only the number
       if (this.deviceType == ZONE_DEVICE && panelStatus.getZoneLabel(this.deviceNumber) != null) {
          sb.append(" ").append(panelStatus.getZoneLabel(this.deviceNumber));
       } else if (this.deviceNumber != 0) {

@@ -17,8 +17,8 @@ class AbsolutaTroubleManagerProvider implements TroubleManagerProvider, Property
     private final AbsolutaPanelProvider panelProvider;
     private final ChangeSupport changeSupport = new ChangeSupport(this);
     private ImmutableList<String> troubles = ImmutableList.of();
-    private boolean troublesInMemory; // True se almeno un guasto è solo in memoria
-    private boolean connected;        // True se il pannello è connesso
+    private boolean troublesInMemory; // True if at least one trouble is in memory only
+    private boolean connected;        // True if the panel is connected
 
     AbsolutaTroubleManagerProvider(AbsolutaPanelProvider panelProvider) {
         this.panelProvider = Objects.requireNonNull(panelProvider);
@@ -57,7 +57,7 @@ class AbsolutaTroubleManagerProvider implements TroubleManagerProvider, Property
             SortedSet<String> troubleSet = new TreeSet<>();
             this.troublesInMemory = false;
 
-            // Aggiorna la lista dei guasti e verifica se almeno uno è solo in memoria
+            // Update the trouble list and check whether at least one is memory-only
             for (Object obj : (Iterable<?>) evt.getNewValue()) {
                 Trouble trouble = (Trouble) obj;
                 troubleSet.add(trouble.toLocalizedString(panelStatus));
@@ -72,7 +72,7 @@ class AbsolutaTroubleManagerProvider implements TroubleManagerProvider, Property
             break;
         }
 
-        // Notifica i listener solo se c'è stato un cambiamento effettivo
+        // Notify listeners only if there was an actual change
         if (!oldTroubles.equals(this.troubles)) {
             this.changeSupport.fireChange();
         }

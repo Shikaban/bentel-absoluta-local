@@ -1,4 +1,4 @@
-# Script PowerShell per compilare e creare il JAR eseguibile
+# PowerShell script to compile and create the executable JAR
 $ErrorActionPreference = "Stop"
 
 if (!(Test-Path "build")) { New-Item -ItemType Directory -Path "build" | Out-Null }

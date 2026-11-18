@@ -17,12 +17,12 @@ public class Application {
 
    private static final Logger logger = Logger.getLogger(Application.class.getName());
    // X.Y.Z Major.Minor.Patch
-   // Major: Cambiamenti significativi, API breaking
-   // Minor: Nuove funzionalità, compatibilità con le versioni precedenti
-   // Patch: Correzioni di bug, miglioramenti minori
-   private static final String VERSION = "1.4.0";
+   // Major: Significant changes, breaking API
+   // Minor: New features, backward compatibility
+   // Patch: Bug fixes, minor improvements
+   private static final String VERSION = "2.0.0";
 
-   // Restituisce il valore della variabile d'ambiente o, se vuota/nulla, dal file di configurazione
+   // Returns the environment variable value or, if empty/null, the value from the configuration file
    private static String getConfigValue(Properties props, String key) {
       String value = System.getenv(key);
       if (value == null || value.isEmpty()) {
@@ -47,7 +47,7 @@ public class Application {
          props.load(fis);
       } catch (IOException e) {
          if (!e.getMessage().contains("No such file or directory")) {
-            logger.severe("Errore durante il caricamento del file di configurazione: " + e.getMessage());
+            logger.severe("Error loading the configuration file: " + e.getMessage());
             System.exit(1);
          }
          else {
@@ -69,8 +69,8 @@ public class Application {
 
       if (MQTT_ADDRESS == null || MQTT_PORT == null || Username == null || Password == null ||
          ADDRESS == null || PIN == null || PORT == null) {
-         logger.severe("MQTT_ADDRESS, MQTT_PORT, MQTT_USERNAME, MQTT_PASSWORD, ALARM_ADDRESS, ALARM_PIN e ALARM_PORT devono essere valorizzati!" + 
-            (configFromFile ? " Controlla il file di configurazione config.properties." : "Nessun file config.properties trovato. Controlla le variabili d'ambiente."));
+         logger.severe("MQTT_ADDRESS, MQTT_PORT, MQTT_USERNAME, MQTT_PASSWORD, ALARM_ADDRESS, ALARM_PIN, and ALARM_PORT must be set!" +
+            (configFromFile ? " Check the config.properties configuration file." : "No config.properties file found. Check the environment variables."));
          System.exit(1);
       }
 
@@ -81,47 +81,47 @@ public class Application {
 
       Level logLevel = parseLogLevel(LOG_LEVEL);
 
-      // Imposta il livello sul root logger
+      // Set the level on the root logger
       Logger rootLogger = Logger.getLogger("");
       rootLogger.setLevel(logLevel);
 
-      // Rimuovi tutti gli handler esistenti dal root logger
+      // Remove all existing handlers from the root logger
       for (java.util.logging.Handler h : rootLogger.getHandlers()) {
          rootLogger.removeHandler(h);
       }
 
-      // Aggiungi un solo ConsoleHandler configurato al root logger
+      // Add one configured ConsoleHandler
       java.util.logging.ConsoleHandler handler = new java.util.logging.ConsoleHandler();
       handler.setLevel(logLevel);
       rootLogger.addHandler(handler);
 
-      // Disabilita log dettagliati per i package di librerie esterne
+      // Disable detailed logs for external library packages
       Logger.getLogger("org.eclipse.paho.client.mqttv3").setLevel(Level.WARNING);
       Logger.getLogger("io.netty").setLevel(Level.WARNING);
 
-      // Se LOG_LOCATION è "FILE", imposta un FileHandler
+      // If LOG_LOCATION is "FILE", set up a FileHandler
       if (LOG_LOCATION != null && LOG_LOCATION.equalsIgnoreCase("FILE")) {
          try {
             java.util.logging.FileHandler fileHandler =
                new java.util.logging.FileHandler("absoluta.log", 10 * 1024 * 1024, 1, false);
             fileHandler.setLevel(logLevel);
-            fileHandler.setFormatter(new SimpleFormatter()); // usa un formato di testo semplice
+            fileHandler.setFormatter(new SimpleFormatter()); // Use a simple text format
             rootLogger.addHandler(fileHandler);
          } catch (IOException e) {
-            logger.severe("Errore durante la creazione del FileHandler: " + e.getMessage());
+            logger.severe("Error creating the FileHandler: " + e.getMessage());
          }
       } else {
-         logger.info("Registrazione su console abilitata. Per registrare su file, imposta LOG_LOCATION a 'FILE'.");
+         logger.info("Console logging enabled. To log to a file, set LOG_LOCATION to 'FILE'.");
       }
 
-      logger.info("Avvio Bentel Absoluta MQTT Bridge - Versione " + VERSION);
+      logger.info("Starting Bentel Absoluta MQTT Bridge - Version " + VERSION);
 
       logger.fine("MQTT_ADDRESS=" + MQTT_ADDRESS);
       logger.fine("MQTT_PORT=" + MQTT_PORT);
       logger.fine("MQTT_USERNAME=" + Username);
-      logger.fine("MQTT_PASSWORD=" + (Password != null ? "***" : "non definito"));
+      logger.fine("MQTT_PASSWORD=" + (Password != null ? "***" : "not set"));
       logger.fine("ALARM_ADDRESS=" + ADDRESS);
-      logger.fine("ALARM_PIN=" + (PIN != null ? "***" : "non definito"));
+      logger.fine("ALARM_PIN=" + (PIN != null ? "***" : "not set"));
       logger.fine("ALARM_PORT=" + PORT);
       logger.fine("HOME_ASSISTANT_DISCOVERY=" + discoveryEnabled);
 
@@ -138,12 +138,12 @@ public class Application {
             mqttOption.setKeepAliveInterval(60);  // 60 seconds keep-alive
             mqttOption.setConnectionTimeout(30);   // 30 seconds connection timeout
             mqttOption.setWill("ABS/availability", "offline".getBytes(), 1, true);
-            logger.info("Collegamento al broker: " + mqttServer);
+            logger.info("Connecting to broker: " + mqttServer);
             AbsolutaPanelProvider provider = new AbsolutaPanelProvider(ADDRESS, PIN, PORT);
             Callback callback = new Callback(mqttClient, provider, mqttOption, discoveryEnabled);
             mqttClient.setCallback(callback);
             mqttClient.connect(mqttOption);
-            logger.info("Broker connesso");
+            logger.info("Broker connected");
             provider.initialize(callback);
 
             int maxAttempts = 5;
@@ -153,49 +153,49 @@ public class Application {
                attempt++;
                connStatus = provider.connect();
                if (connStatus != AbsolutaPanelProvider.providerConnStatus.SUCCESS) {
-                  logger.warning("Connessione con la centrale fallita: " + connStatus + ". Riprovo tra 90 secondi...");
+                  logger.warning("Connection to the panel failed: " + connStatus + ". Retrying in 90 seconds...");
                   try {
                      Thread.sleep(90000L);
-                     logger.info("Tentativo di connessione alla centrale n° " + attempt);
+                     logger.info("Panel connection attempt #" + attempt);
                   } catch (InterruptedException e) {
-                     logger.severe("Interrotto durante l'attesa di ricollegamento alla centrale: " + e.getMessage());
+                     logger.severe("Interrupted while waiting to reconnect to the panel: " + e.getMessage());
                      break;
                   }
                }
             }
             if (connStatus != AbsolutaPanelProvider.providerConnStatus.SUCCESS) {
-               logger.severe("Impossibile connettersi alla centrale dopo " + maxAttempts + " tentativi.");
+               logger.severe("Unable to connect to the panel after " + maxAttempts + " attempts.");
                System.exit(1);
             }
 
             connected = true;
          } catch (MqttException ex) {
             logger.warning("Exception: " + ex.getReasonCode());
-            logger.warning("Attendo 15 secondi prima del prossimo tentativo per il collegamento al broker...");
+            logger.warning("Waiting 15 seconds before the next broker connection attempt...");
             try {
                Thread.sleep(15000L);
-               logger.info("Tentativo di connessione al broker numero: " + (i + 1));
+               logger.info("Broker connection attempt #" + (i + 1));
             } catch (InterruptedException e) {
-               logger.severe("Interruzione durante l'attesa tra i tentativi di connessione al broker: " + e.getMessage());
+               logger.severe("Interrupted while waiting between broker connection attempts: " + e.getMessage());
             }
          }
       }
       if (!connected) {
-         logger.severe("Impossibile connettersi al broker MQTT dopo " + MQTT_CONNECT_ATTEMPTS + " tentativi.");
+         logger.severe("Unable to connect to the MQTT broker after " + MQTT_CONNECT_ATTEMPTS + " attempts.");
          System.exit(1);
       }
    }
 
-   // Helper per parsing int con log
+   // Helper for integer parsing with logging
    private static int parseIntOrDefault(String value, int defaultValue, Logger logger, String name) {
       if (value != null) {
          try {
             return Integer.parseInt(value);
          } catch (NumberFormatException e) {
-            logger.warning(name + " non è un numero valido, utilizzando il valore predefinito di " + defaultValue);
+            logger.warning(name + " is not a valid number; using default value " + defaultValue);
          }
       } else {
-         logger.warning(name + " non è definito, utilizzo il valore predefinito di " + defaultValue);
+         logger.warning(name + " is not set; using default value " + defaultValue);
       }
       return defaultValue;
    }

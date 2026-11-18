@@ -39,7 +39,7 @@ abstract class MessageWithResponse<P, V> extends Message<P, V> {
       DscCommandWithAppSeq command = this.prepareCommand(ctx, param);
 
       if (command.hasResponseCallback()) {
-         throw new IllegalStateException("Callback già presente!");
+         throw new IllegalStateException("Callback already present!");
       }
 
       command.setResponseCallback(new MessageResponseCallback(ctx, param));
@@ -53,7 +53,7 @@ abstract class MessageWithResponse<P, V> extends Message<P, V> {
 
    private DscError errorFromDscResponse(P param, DscGeneralResponse response) {
       if (response.isSuccess()) {
-         throw new IllegalArgumentException("La risposta dovrebbe essere di errore!");
+         throw new IllegalArgumentException("The response should be an error!");
       }
 
       Integer responseCode = null;

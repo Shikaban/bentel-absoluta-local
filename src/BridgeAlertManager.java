@@ -39,7 +39,7 @@ final class BridgeAlertManager {
 
         addAlert(new AlertEvent(timestamp, message));
         publishAlerts();
-        publish.publish("ABS/bridge_alerts/last", message, qos, false, "ultimo avviso bridge");
+        publish.publish("ABS/bridge_alerts/last", message, qos, false, "last bridge alert");
     }
 
     void resetAlerts() {
@@ -67,7 +67,7 @@ final class BridgeAlertManager {
         final boolean hasAlerts;
         synchronized (alertsLock) {
             hasAlerts = !alerts.isEmpty();
-            StringBuilder sb = new StringBuilder("{\"avvisi\":[");
+            StringBuilder sb = new StringBuilder("{\"alerts\":[");
             boolean first = true;
             for (AlertEvent e : alerts) {
                 if (!first) sb.append(",");
@@ -78,7 +78,7 @@ final class BridgeAlertManager {
             attributesPayload = sb.toString();
         }
 
-        publish.publish("ABS/bridge_alerts/attributes", attributesPayload, qos, true, "avviso bridge");
-        publish.publish("ABS/bridge_alerts", hasAlerts ? "Avviso!" : "Funzionamento Regolare", qos, true, "avviso bridge");
+        publish.publish("ABS/bridge_alerts/attributes", attributesPayload, qos, true, "bridge alert");
+        publish.publish("ABS/bridge_alerts", hasAlerts ? "Warning!" : "System OK", qos, true, "bridge alert");
     }
 }

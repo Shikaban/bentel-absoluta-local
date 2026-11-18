@@ -1,15 +1,15 @@
-# Usa una immagine base temurin 21
+# Use a Temurin 21 base image
 FROM eclipse-temurin:21-jdk-jammy
 
 
-# Crea una directory per l'app
+# Create a directory for the application
 WORKDIR /app
 
-# Copia il JAR e le dipendenze
+# Copy the JAR and dependencies
 COPY build/app.jar /app/app.jar
 COPY lib/jars/*.jar /app/lib/
 
-# Variabili d'ambiente (possono essere sovrascritte in fase di run)
+# Environment variables (can be overridden at runtime)
 ENV MQTT_ADDRESS="" \
     MQTT_PORT="" \
     MQTT_USERNAME="" \
@@ -18,5 +18,5 @@ ENV MQTT_ADDRESS="" \
     ALARM_PIN="" \
     ALARM_PORT=""
 
-# Comando di avvio
+# Start command
 ENTRYPOINT exec java -Duser.timezone=${TZ:-UTC} -cp /app/app.jar:/app/lib/* Application
