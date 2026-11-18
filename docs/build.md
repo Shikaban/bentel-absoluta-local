@@ -18,7 +18,7 @@
 .\build.ps1
 ```
 
-2. Build the Docker image:
+1. Build the Docker image:
 
 ```bash
 docker build -t bentel-absoluta-local-bridge .
