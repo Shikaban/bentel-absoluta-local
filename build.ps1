@@ -1,7 +1,8 @@
 # PowerShell script to compile and create the executable JAR
 $ErrorActionPreference = "Stop"
 
-if (!(Test-Path "build")) { New-Item -ItemType Directory -Path "build" | Out-Null }
+if (Test-Path "build") { Remove-Item -Path "build" -Recurse -Force }
+New-Item -ItemType Directory -Path "build" | Out-Null
 
 $javaFiles = Get-ChildItem -Path src -Recurse -Filter *.java | ForEach-Object { $_.FullName }
 javac --release 19 -cp "lib/jars/*" -d build $javaFiles
