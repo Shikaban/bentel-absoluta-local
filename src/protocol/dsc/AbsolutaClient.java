@@ -41,7 +41,7 @@ public class AbsolutaClient implements ITv2Client {
       Preconditions.checkNotNull(callback2);
       InetSocketAddress inetSocketAddress2 = new InetSocketAddress(this.hostname, this.port);
       logger.info("Connecting to " + inetSocketAddress2);
-      NioEventLoopGroup nioEventLoopGroup2 = new NioEventLoopGroup();
+      NioEventLoopGroup nioEventLoopGroup2 = new NioEventLoopGroup(1);
 
       try {
          Bootstrap bootstrap2 = new Bootstrap();

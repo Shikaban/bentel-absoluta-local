@@ -8,9 +8,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class MqttMessageDispatcher {
-    private static final int MAX_PENDING_REQUESTS = 500;
+    private static final Logger logger = Logger.getLogger(MqttMessageDispatcher.class.getName());
+    private static final int MAX_PENDING_REQUESTS = 2048;
     private static final long RETRY_DELAY_MS = 1000;
 
     private final MqttClient mqttClient;
@@ -48,6 +50,7 @@ public class MqttMessageDispatcher {
                 if (!queue.offer(topic)) {
                     queuedTopics.remove(topic);
                     pendingByTopic.remove(topic);
+                    logger.warning("MQTT publish queue is full; dropped pending message for topic " + topic);
                 }
             }
         }
@@ -78,6 +81,7 @@ public class MqttMessageDispatcher {
                     );
                 } catch (MqttException e) {
                     if (running) {
+                        logger.fine("MQTT publish failed for topic " + topic + "; retrying: " + e.getMessage());
                         try {
                             Thread.sleep(RETRY_DELAY_MS);
                         } catch (InterruptedException interrupted) {
@@ -90,6 +94,7 @@ public class MqttMessageDispatcher {
                                 if (!queue.offer(topic)) {
                                     queuedTopics.remove(topic);
                                     pendingByTopic.remove(topic);
+                                    logger.warning("MQTT publish queue is full; dropped retry for topic " + topic);
                                 }
                             }
                         }
