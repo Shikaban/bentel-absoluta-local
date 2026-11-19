@@ -1,8 +1,7 @@
 import java.util.List;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import absoluta.AbsolutaPanelProvider;
@@ -11,7 +10,7 @@ import absoluta.connection.PanelStatus;
 
 import java.util.logging.Logger;
 
-class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
+class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallbackExtended {
    private static final Logger logger = Logger.getLogger(Callback.class.getName());
    private final Entities entities = new Entities();
    private final BridgeAlertManager bridgeAlertManager;
@@ -22,8 +21,7 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
    private static final int QOS = 1;
    private MqttMessageDispatcher mqttDispatcher;
 
-   public Callback(MqttClient mqttClient, AbsolutaPanelProvider provider, MqttConnectOptions mqttOption,
-         Boolean discoveryEnabled) {
+   public Callback(MqttClient mqttClient, AbsolutaPanelProvider provider, Boolean discoveryEnabled) {
       this.mqttDispatcher = new MqttMessageDispatcher(mqttClient);
 
       boolean discovery = Boolean.TRUE.equals(discoveryEnabled);
@@ -31,11 +29,15 @@ class Callback implements AbsolutaPanelProvider.PanelCallback, MqttCallback {
       this.bridgeAlertManager = new BridgeAlertManager(publisher, QOS);
       this.entityManager = new EntityManager(entities, mqttClient, publisher, discovery, logger, QOS, bridgeAlertManager);
       this.commandManager = new CommandManager(entities, provider, bridgeAlertManager, entityManager, logger);
-      this.connectionManager = new ConnectionManager(mqttClient, mqttOption, provider, publisher, logger, QOS, entityManager);
+      this.connectionManager = new ConnectionManager(mqttClient, provider, publisher, logger, QOS, entityManager);
    }
 
    public void connectionLost(Throwable ex) {
       connectionManager.onMqttConnectionLost(ex);
+   }
+
+   public void connectComplete(boolean reconnect, String serverURI) {
+      connectionManager.onMqttConnected(reconnect);
    }
 
    public void connectionLost() {

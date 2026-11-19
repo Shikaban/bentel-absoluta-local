@@ -1,18 +1,30 @@
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 public class MqttMessageDispatcher {
+    private static final int MAX_PENDING_REQUESTS = 500;
+    private static final long RETRY_DELAY_MS = 1000;
+
     private final MqttClient mqttClient;
-    private final BlockingQueue<PublishRequest> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(MAX_PENDING_REQUESTS);
+    private final ConcurrentMap<String, PublishRequest> pendingByTopic = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Boolean> queuedTopics = new ConcurrentHashMap<>();
+    private final Object queueLock = new Object();
     private final Thread worker;
     private volatile boolean running = true;
 
     public MqttMessageDispatcher(MqttClient mqttClient) {
         this.mqttClient = mqttClient;
         this.worker = new Thread(this::processQueue, "MqttMessageDispatcher-Worker");
+        this.worker.setDaemon(true);
         this.worker.start();
     }
 
@@ -22,16 +34,41 @@ public class MqttMessageDispatcher {
     }
 
     public void publishString(String topic, String payload, int qos, boolean retained) {
-        MqttMessage msg = new MqttMessage(payload.getBytes());
+        if (!running || topic == null) {
+            return;
+        }
+
+        MqttMessage msg = new MqttMessage(payload == null ? new byte[0] : payload.getBytes(StandardCharsets.UTF_8));
         msg.setQos(qos);
         msg.setRetained(retained);
-        queue.offer(new PublishRequest(topic, msg));
+        synchronized (queueLock) {
+            pendingByTopic.put(topic, new PublishRequest(topic, msg));
+
+            if (queuedTopics.putIfAbsent(topic, Boolean.TRUE) == null) {
+                if (!queue.offer(topic)) {
+                    queuedTopics.remove(topic);
+                    pendingByTopic.remove(topic);
+                }
+            }
+        }
     }
 
     private void processQueue() {
         while (running) {
             try {
-                PublishRequest req = queue.take();
+                String topic = queue.poll(1, TimeUnit.SECONDS);
+                if (topic == null) {
+                    continue;
+                }
+                PublishRequest req;
+                synchronized (queueLock) {
+                    queuedTopics.remove(topic);
+                    req = pendingByTopic.remove(topic);
+                }
+                if (req == null) {
+                    continue;
+                }
+
                 try {
                     mqttClient.publish(
                         req.topic,
@@ -39,15 +76,28 @@ public class MqttMessageDispatcher {
                         req.message.getQos(),
                         req.message.isRetained()
                     );
-                    // Success: next message will be processed automatically
                 } catch (MqttException e) {
-                    // On failure, requeue the message for retry
-                    queue.offer(req);
-                    try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                    if (running) {
+                        try {
+                            Thread.sleep(RETRY_DELAY_MS);
+                        } catch (InterruptedException interrupted) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                        synchronized (queueLock) {
+                            pendingByTopic.putIfAbsent(topic, req);
+                            if (queuedTopics.putIfAbsent(topic, Boolean.TRUE) == null) {
+                                if (!queue.offer(topic)) {
+                                    queuedTopics.remove(topic);
+                                    pendingByTopic.remove(topic);
+                                }
+                            }
+                        }
+                    }
                 }
             } catch (InterruptedException e) {
-                // Thread interrupted, likely shutting down
                 Thread.currentThread().interrupt();
+                break;
             }
         }
     }

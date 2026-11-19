@@ -144,10 +144,10 @@ public class Application {
             mqttOption.setAutomaticReconnect(true);
             mqttOption.setKeepAliveInterval(60);  // 60 seconds keep-alive
             mqttOption.setConnectionTimeout(30);   // 30 seconds connection timeout
-            mqttOption.setWill("ABS/availability", "offline".getBytes(), 1, true);
+            mqttOption.setWill("ABS/availability", "offline".getBytes(java.nio.charset.StandardCharsets.UTF_8), 1, true);
             logger.info("Connecting to broker: " + mqttServer);
             AbsolutaPanelProvider provider = new AbsolutaPanelProvider(ADDRESS, PIN, PORT);
-            Callback callback = new Callback(mqttClient, provider, mqttOption, discoveryEnabled);
+            Callback callback = new Callback(mqttClient, provider, discoveryEnabled);
             mqttClient.setCallback(callback);
             mqttClient.connect(mqttOption);
             logger.info("Broker connected");
