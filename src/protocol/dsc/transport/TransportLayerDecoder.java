@@ -47,6 +47,7 @@ public class TransportLayerDecoder extends MessageToMessageDecoder<ByteBuf> {
             if (byteValue2 != counters2.sequenceNumber() && byteValue2 != counters2.prevSequenceNumber()) {
                throw new WrongSequenceNumberException(unsignedShort, String.format("unexpected remote sequence number: %d instead of %d or %d", Integer.valueOf(byteValue2), counters2.sequenceNumber(), counters2.prevSequenceNumber()));
             } else {
+               TransportLayerEncoder.cancelRetry(context.channel(), byteValue2);
                output.add(inputBuffer.readSlice(inputBuffer.readableBytes()).retain());
             }
          } finally {

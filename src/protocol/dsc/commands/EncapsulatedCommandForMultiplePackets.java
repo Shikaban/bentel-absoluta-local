@@ -6,13 +6,13 @@ import java.util.List;
 import protocol.dsc.base.DscSerializable;
 
 public class EncapsulatedCommandForMultiplePackets extends DscAbstractCommand {
-   public static final int COMMAND_NUMBER = 1571;
+   public static final int COMMAND_NUMBER = 1570;
 
    protected List<DscSerializable> getFields() {
       return Collections.emptyList();
    }
 
    public int getCommandNumber() {
-      return 1571;
+      return COMMAND_NUMBER;
    }
 }

@@ -11,15 +11,21 @@ import protocol.dsc.commands.DscResponse;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class ResponseHandler extends ChannelDuplexHandler {
    private static final Logger logger = Logger.getLogger(ResponseHandler.class.getName());
    private static final int MAX_WAITING_CMDS = 32;
-   private final Queue<DscCommandWithAppSeq> waitingCmds = new LinkedList<DscCommandWithAppSeq>();
+   private static final int RESPONSE_TIMEOUT_SECONDS = 5;
+   private final Queue<WaitingCommand> waitingCmds = new LinkedList<WaitingCommand>();
    public void channelInactive(ChannelHandlerContext context) throws Exception {
       if (!this.waitingCmds.isEmpty()) {
          logger.fine("Removing " + this.waitingCmds.size() + " waiting commands");
+         for (WaitingCommand waiting : this.waitingCmds) {
+            waiting.timeoutFuture.cancel(false);
+         }
          this.waitingCmds.clear();
       }
       super.channelInactive(context);
@@ -29,10 +35,22 @@ public class ResponseHandler extends ChannelDuplexHandler {
       if (object2 instanceof DscCommandWithAppSeq) {
          DscCommandWithAppSeq commandWithAppSeq = (DscCommandWithAppSeq)object2;
          if (this.waitingCmds.size() == MAX_WAITING_CMDS) {
-            DscCommandWithAppSeq commandWithAppSeq2 = (DscCommandWithAppSeq)this.waitingCmds.remove();
-            logger.fine("Waiting command removed to limit the queue size: " + commandWithAppSeq2);
+            WaitingCommand removed = this.waitingCmds.remove();
+            removed.timeoutFuture.cancel(false);
+            logger.fine("Waiting command removed to limit the queue size: " + removed.command);
          }
-         this.waitingCmds.add(commandWithAppSeq);
+         WaitingCommand waiting = new WaitingCommand(commandWithAppSeq);
+         this.waitingCmds.add(waiting);
+         waiting.timeoutFuture = context.executor().schedule(new Runnable() {
+            @Override
+            public void run() {
+               if (waitingCmds.remove(waiting)) {
+                  logger.warning("Application response timeout for " + commandWithAppSeq);
+                  context.fireChannelRead(DscError.newGenericError(
+                        "Application response timeout after " + RESPONSE_TIMEOUT_SECONDS + " seconds"));
+               }
+            }
+         }, RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
       }
       super.write(context, object2, promise);
    }
@@ -41,14 +59,15 @@ public class ResponseHandler extends ChannelDuplexHandler {
       boolean enabled = false;
       if (object2 instanceof DscResponse) {
          DscResponse response2 = (DscResponse)object2;
-         for (DscCommandWithAppSeq commandWithAppSeq : waitingCmds) {
-            if (commandWithAppSeq.matchAsResponse(response2)) {
-               logger.finer("Response " + response2 + " received for " + commandWithAppSeq);
-               waitingCmds.remove(commandWithAppSeq);
+         for (WaitingCommand waiting : waitingCmds) {
+            if (waiting.command.matchAsResponse(response2)) {
+               logger.finer("Response " + response2 + " received for " + waiting.command);
+               waiting.timeoutFuture.cancel(false);
+               waitingCmds.remove(waiting);
                enabled = true;
                if (response2 instanceof DscGeneralResponse) {
                DscGeneralResponse generalResponse = (DscGeneralResponse) response2;
-               commandWithAppSeq.generalResponseReceived(context.channel(), generalResponse);
+               waiting.command.generalResponseReceived(context.channel(), generalResponse);
                }
                break;
             }
@@ -65,6 +84,15 @@ public class ResponseHandler extends ChannelDuplexHandler {
          }
       } else {
          super.channelRead(context, object2);
+      }
+   }
+
+   private static final class WaitingCommand {
+      private final DscCommandWithAppSeq command;
+      private ScheduledFuture<?> timeoutFuture;
+
+      private WaitingCommand(DscCommandWithAppSeq command) {
+         this.command = command;
       }
    }
 }
