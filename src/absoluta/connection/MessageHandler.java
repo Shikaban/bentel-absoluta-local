@@ -117,7 +117,9 @@ public class MessageHandler {
       if (this.started && this.enqueuedMessages.isEmpty() && (this.lastMessage == null || this.lastMessage.responseReceived)) {
          logger.finest("Sending immediately " + msg);
          this.sendMessage(msg);
-      } else if (msg.type != MessageType.COMMAND && this.enqueuedMessages.contains(msg)) {
+      } else if (msg.type != MessageType.COMMAND
+            && ((this.lastMessage != null && !this.lastMessage.responseReceived && this.lastMessage.equals(msg))
+                  || this.enqueuedMessages.contains(msg))) {
          logger.finest("Discarding " + msg);
       } else {
          logger.finest("Enqueuing " + msg);
