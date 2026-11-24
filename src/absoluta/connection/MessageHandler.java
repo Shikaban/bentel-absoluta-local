@@ -25,7 +25,8 @@ public class MessageHandler {
    private static final int RETRY_NUMBER = 4;
    private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
    private static final long START_TIMEOUT= TimeUnit.SECONDS.toMillis(40);
-   private static final long RETRY_TIMEOUT = TimeUnit.SECONDS.toMillis(2);
+   // Wait beyond the protocol's 5-second application-response timeout before retrying.
+   private static final long RETRY_TIMEOUT = TimeUnit.SECONDS.toMillis(6);
    private final Messenger messenger;
    private final ScheduledExecutorService executor;
    private final ConnectionHandler.ErrorListener errorListener;
@@ -167,6 +168,7 @@ public class MessageHandler {
                || this.lastMessage.type == MessageType.LOW_PRIORITY_READING) {
          // Transient panel unavailability (e.g. busy arming) — skip and continue
          logger.warning("Too many attempts for " + this.lastMessage + ", skipping");
+         this.lastMessage = null;
          this.sendNext();
       } else {
          logger.warning("Too many attempts for " + this.lastMessage);
@@ -182,9 +184,14 @@ public class MessageHandler {
          }
          this.lastMessage = msg;
          this.retryFuture = this.executor.schedule(() -> {
-               assert MessageHandler.this.lastMessage == msg;
-               if (!msg.responseReceived) {
-                  logger.warning("Response timeout for " + msg);
+               if (MessageHandler.this.lastMessage == msg && !msg.responseReceived) {
+                  String timeoutMessage = "Response timeout (attempt " + msg.attemptNum + "/"
+                        + RETRY_NUMBER + ") for " + msg;
+                  if (msg.attemptNum > 1) {
+                     logger.warning(timeoutMessage);
+                  } else {
+                     logger.fine(timeoutMessage);
+                  }
                   MessageHandler.this.manageError(null);
                }
          }, RETRY_TIMEOUT, TIME_UNIT);
